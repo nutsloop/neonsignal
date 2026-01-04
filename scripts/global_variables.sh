@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+# Centralized repository paths.
+NEONSIGNAL_ROOT_DIR="/home/core/code/neonsignal"
+NEONSIGNAL_SCRIPTS_DIR="$NEONSIGNAL_ROOT_DIR/scripts"
+NEONSIGNAL_LOGGING_LIB_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/lib/logging.sh"
+
+# Sphinx pipeline
+NEONSIGNAL_SPHINX_BOOK_DIR="$NEONSIGNAL_ROOT_DIR/www/book" # source directory
+NEONSIGNAL_SPHINX_VENV_DIR="$NEONSIGNAL_SPHINX_BOOK_DIR/.venv"
+NEONSIGNAL_SPHINX_BUILD_DIR="$NEONSIGNAL_ROOT_DIR/build/www/book" # build directory
+NEONSIGNAL_SPHINX_PUBLIC_DIR="$NEONSIGNAL_ROOT_DIR/public/neonsignal.nutsloop.host/book" # public directory
+NEONSIGNAL_SPHINX_PUBLIC_ENTRY="$NEONSIGNAL_SPHINX_PUBLIC_DIR/../neonsignal-book.html"
+NEONSIGNAL_SPHINX_THEME_DIR="$NEONSIGNAL_ROOT_DIR/themes/sphinx-synthwave-theme"
+# Sphinx dynamics sources
+NEONSIGNAL_SPHINX_BENCHMARK_SOURCE_DIR="$NEONSIGNAL_ROOT_DIR/benchmark"
+NEONSIGNAL_SPHINX_BENCHMARK_TARGET_DIR="$NEONSIGNAL_SPHINX_BOOK_DIR/source/benchmarks"
+NEONSIGNAL_SPHINX_BENCHMARK_INDEX="$NEONSIGNAL_SPHINX_BENCHMARK_TARGET_DIR/index.md"
+NEONSIGNAL_SPHINX_PLANS_SOURCE_DIR="$NEONSIGNAL_ROOT_DIR/plans"
+NEONSIGNAL_SPHINX_AI_TARGET_DIR="$NEONSIGNAL_SPHINX_BOOK_DIR/source/ai-conversations"
+NEONSIGNAL_SPHINX_AI_INDEX="$NEONSIGNAL_SPHINX_AI_TARGET_DIR/index.md"
+# Sphinx scripts
+NEONSIGNAL_SPHINX_ALL_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/sphinx/all.sh" # pipeline orchestrator
+NEONSIGNAL_SPHINX_SETUP_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/sphinx/setup.sh" # setup sphinx environment
+NEONSIGNAL_SPHINX_DYNAMICS_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/sphinx/dynamics.sh" # populate dynamic content
+NEONSIGNAL_SPHINX_BUILD_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/sphinx/build.sh" # build sphinx book
+NEONSIGNAL_SPHINX_CLEAN_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/sphinx/clean.sh" # clean sphinx build directory
+
+# NutsloopJSX pipeline
+NEONSIGNAL_NUTSLOOPJSX_SOURCE_DIR="$NEONSIGNAL_ROOT_DIR/www/nutsloopjsx" # source directory
+NEONSIGNAL_NUTSLOOPJSX_BUILD_DIR="$NEONSIGNAL_ROOT_DIR/build/www/nutsloopjsx" # transpiled output
+NEONSIGNAL_NUTSLOOPJSX_PUBLIC_DIR="$NEONSIGNAL_ROOT_DIR/public/nutsloop.host" # bundled output
+# NutsloopJSX scripts
+NEONSIGNAL_NUTSLOOPJSX_ALL_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/nutsloopjsx/all.sh" # pipeline orchestrator
+NEONSIGNAL_NUTSLOOPJSX_BUILD_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/nutsloopjsx/build.sh"
+NEONSIGNAL_NUTSLOOPJSX_CLEAN_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/nutsloopjsx/clean.sh"
+
+# NeonSignalJSX pipeline
+NEONSIGNAL_NEONSIGNALJSX_SOURCE_DIR="$NEONSIGNAL_ROOT_DIR/www/neonsignaljsx" # source directory
+NEONSIGNAL_NEONSIGNALJSX_BUILD_DIR="$NEONSIGNAL_ROOT_DIR/build/www/neonsignaljsx" # transpiled output
+NEONSIGNAL_NEONSIGNALJSX_PUBLIC_DIR="$NEONSIGNAL_ROOT_DIR/public/neonsignal.nutsloop.host" # bundled output
+# NeonSignalJSX scripts
+NEONSIGNAL_NEONSIGNALJSX_ALL_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/neonsignaljsx/all.sh" # pipeline orchestrator
+NEONSIGNAL_NEONSIGNALJSX_BUILD_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/neonsignaljsx/build.sh"
+NEONSIGNAL_NEONSIGNALJSX_CLEAN_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/neonsignaljsx/clean.sh"
+
+# SimoneDelPopolo pipeline (static site)
+NEONSIGNAL_SIMONEDELPOPOLO_SOURCE_DIR="$NEONSIGNAL_ROOT_DIR/www/simonedelpopolo" # source directory
+NEONSIGNAL_SIMONEDELPOPOLO_PUBLIC_DIR="$NEONSIGNAL_ROOT_DIR/public/simonedelpopolo.host" # public output
+# SimoneDelPopolo scripts
+NEONSIGNAL_SIMONEDELPOPOLO_ALL_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/simonedelpopolo/all.sh" # pipeline orchestrator
+NEONSIGNAL_SIMONEDELPOPOLO_BUILD_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/simonedelpopolo/build.sh"
+NEONSIGNAL_SIMONEDELPOPOLO_CLEAN_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/simonedelpopolo/clean.sh"
+
+# Default vhost pipeline (static site)
+NEONSIGNAL_DEFAULT_SOURCE_DIR="$NEONSIGNAL_ROOT_DIR/www/_default" # source directory
+NEONSIGNAL_DEFAULT_PUBLIC_DIR="$NEONSIGNAL_ROOT_DIR/public/_default" # public output
+# Default vhost scripts
+NEONSIGNAL_DEFAULT_ALL_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/_default/all.sh" # pipeline orchestrator
+NEONSIGNAL_DEFAULT_BUILD_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/_default/build.sh"
+NEONSIGNAL_DEFAULT_CLEAN_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/_default/clean.sh"
+
+# Shared NeonJSX runtime
+NEONSIGNAL_NEONJSX_SOURCE_DIR="$NEONSIGNAL_ROOT_DIR/neonjsx" # runtime source
+NEONSIGNAL_NEONJSX_BUILD_DIR="$NEONSIGNAL_ROOT_DIR/build/www/neonjsx" # transpiled runtime
+
+# ESLint scripts
+NEONSIGNAL_ESLINT_LINT_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/eslint/lint.sh"
+NEONSIGNAL_ESLINT_LINT_FIX_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/eslint/lint-fix.sh"
+
+# Certificate management
+NEONSIGNAL_CERTS_DIR="$NEONSIGNAL_ROOT_DIR/certs"
+NEONSIGNAL_CERTS_CA_DIR="$NEONSIGNAL_CERTS_DIR/ca"
+NEONSIGNAL_ACME_WEBROOT="$NEONSIGNAL_ROOT_DIR/acme-challenge"
+NEONSIGNAL_LETSENCRYPT_EMAIL="simonedelpopolo@outlook.com"
+# Certificate scripts
+NEONSIGNAL_CERT_ISSUER_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/certificates/issuer.sh"
+
+# Deployment rewrite configuration
+NEONSIGNAL_DEV_IP="10.0.0.10"
+NEONSIGNAL_PROD_IP="10.0.0.217"
+# Deployment scripts
+NEONSIGNAL_DEPLOYMENT_REWRITE_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/deployment/rewrite.sh"

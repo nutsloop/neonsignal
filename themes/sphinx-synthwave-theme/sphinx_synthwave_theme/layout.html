@@ -1,0 +1,120 @@
+{# Sphinx Synthwave Theme - Main Layout #}
+{% extends "basic/layout.html" %}
+
+{%- block doctype -%}
+<!DOCTYPE html>
+{%- endblock -%}
+
+{%- block extrahead %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0a0a0f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ pathto('_static/css/synthwave.css', 1) }}">
+<link rel="stylesheet" href="{{ pathto('_static/css/responsive.css', 1) }}">
+<link rel="stylesheet" href="{{ pathto('_static/css/components.css', 1) }}">
+<link rel="stylesheet" href="{{ pathto('_static/css/code-blocks.css', 1) }}">
+{% endblock %}
+
+{%- block header %}
+<header class="synthwave-header">
+  <div class="header-inner">
+    <button class="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false">
+      <span class="toggle-icon toggle-open" aria-hidden="true">v</span>
+      <span class="toggle-icon toggle-close" aria-hidden="true">&gt;</span>
+    </button>
+
+    <a class="header-logo" href="{{ pathto(master_doc) }}">
+      <span class="logo-text">{{ project }}</span>
+    </a>
+
+    <div class="header-spacer"></div>
+  </div>
+</header>
+{% endblock %}
+
+{%- block relbar1 %}{%- endblock %}
+{%- block relbar2 %}{%- endblock %}
+
+{%- block content %}
+<div class="synthwave-container">
+  {# Sidebar #}
+  <aside class="synthwave-sidebar" id="sidebar">
+    <div class="sidebar-inner">
+      <div class="sidebar-header">
+        <span class="project-name">{{ project }}</span>
+        {% if version %}
+        <span class="project-version">v{{ version }}</span>
+        {% endif %}
+      </div>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        {{ toctree(maxdepth=theme_show_toc_level|int, titles_only=True, includehidden=True) }}
+      </nav>
+    </div>
+  </aside>
+
+  {# Main content #}
+  <main class="synthwave-main">
+    <article class="synthwave-article">
+      {# Breadcrumbs #}
+      {% if parents %}
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <ul>
+          <li><a href="{{ pathto(master_doc) }}">{{ shorttitle }}</a></li>
+          {% for parent in parents %}
+          <li><a href="{{ parent.link }}">{{ parent.title }}</a></li>
+          {% endfor %}
+          <li aria-current="page">{{ title }}</li>
+        </ul>
+      </nav>
+      {% endif %}
+
+      {# Page content #}
+      <div class="page-content">
+        {% block body %}{% endblock %}
+      </div>
+
+      {# Page navigation #}
+      <nav class="page-nav" aria-label="Page navigation">
+        {% if prev %}
+        <a class="nav-prev" href="{{ prev.link }}">
+          <span class="nav-label">Previous</span>
+          <span class="nav-title">{{ prev.title }}</span>
+        </a>
+        {% endif %}
+        {% if next %}
+        <a class="nav-next" href="{{ next.link }}">
+          <span class="nav-label">Next</span>
+          <span class="nav-title">{{ next.title }}</span>
+        </a>
+        {% endif %}
+      </nav>
+    </article>
+
+    {# Table of contents #}
+    <aside class="synthwave-toc">
+      <div class="toc-inner">
+        <h4 class="toc-title">On this page</h4>
+        {{ toc }}
+      </div>
+    </aside>
+  </main>
+</div>
+{% endblock %}
+
+{%- block footer %}
+<footer class="synthwave-footer">
+  <div class="footer-inner">
+    <div class="footer-copyright">
+      {% trans copyright=copyright|e %}&copy; {{ copyright }}{% endtrans %}
+    </div>
+    <div class="footer-meta">
+      Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      using the <a href="https://github.com/nutsloop/sphinx-synthwave-theme">Synthwave Theme</a>
+    </div>
+  </div>
+</footer>
+<script src="{{ pathto('_static/js/synthwave.js', 1) }}"></script>
+{% endblock %}

@@ -1,0 +1,21 @@
+[Unit]
+Description=neonsignal HTTP/2 server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=core
+Group=core
+WorkingDirectory=/home/core/code/neonsignal
+Environment=NEONSIGNAL_THREADS=3
+Environment=NEONSIGNAL_HOST=10.0.0.10
+Environment=NEONSIGNAL_PORT=9443
+Environment=NEONSIGNAL_RP_ID=neonsignal.nutsloop.host
+Environment=NEONSIGNAL_ORIGIN=https://neonsignal.nutsloop.host
+ExecStart=/usr/local/bin/neonsignal
+Restart=on-failure
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

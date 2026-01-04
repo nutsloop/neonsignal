@@ -1,0 +1,8 @@
+# NeonSignal routes
+/
+/data.html
+/auth.html
+/about.html
+/login.html
+/register.html
+/codex.html

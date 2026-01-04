@@ -1,0 +1,6 @@
+BasedOnStyle: LLVM
+IndentWidth: 2
+UseTab: Never
+AllowShortIfStatementsOnASingleLine: true
+BreakBeforeBraces: Attach
+ColumnLimit: 100

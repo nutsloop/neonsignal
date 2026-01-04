@@ -1,0 +1,36 @@
+{
+  "name": "neonsignal-vhost-applications",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "clean:neonjsx": "bash neonjsx/clean.sh",
+    "build:neonjsx": "bash neonjsx/build.sh",
+    "clean:neonsignal": "bash scripts/neonsignaljsx/clean.sh",
+    "build:neonsignal": "bash scripts/neonsignaljsx/build.sh",
+    "all:neonsignal": "bash scripts/neonsignaljsx/all.sh",
+    "clean:nutsloop": "bash scripts/nutsloopjsx/clean.sh",
+    "build:nutsloop": "bash scripts/nutsloopjsx/build.sh",
+    "all:nutsloop": "bash scripts/nutsloopjsx/all.sh",
+    "clean:simonedelpopolo": "bash scripts/simonedelpopolo/clean.sh",
+    "build:simonedelpopolo": "bash scripts/simonedelpopolo/build.sh",
+    "all:simonedelpopolo": "bash scripts/simonedelpopolo/all.sh",
+    "clean:_default": "bash scripts/_default/clean.sh",
+    "build:_default": "bash scripts/_default/build.sh",
+    "all:_default": "bash scripts/_default/all.sh",
+    "lint": "bash scripts/eslint/lint.sh",
+    "lint-fix": "bash scripts/eslint/lint-fix.sh"
+  },
+  "devDependencies": {
+    "@babel/cli": "8.0.0-beta.3",
+    "@babel/core": "8.0.0-beta.3",
+    "@babel/plugin-transform-react-jsx": "8.0.0-beta.3",
+    "@babel/preset-typescript": "8.0.0-beta.3",
+    "@typescript-eslint/eslint-plugin": "^8.50.1",
+    "@typescript-eslint/parser": "^8.50.1",
+    "esbuild": "^0.27.2",
+    "eslint": "^9.39.2",
+    "eslint-plugin-perfectionist": "^5.1.0",
+    "typescript": "^5.9.3"
+  }
+}

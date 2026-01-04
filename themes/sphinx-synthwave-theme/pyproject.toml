@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sphinx-synthwave-theme"
+version = "0.1.0"
+description = "Synthwave-inspired Sphinx theme with dark/light/system modes"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Simone Del Popolo", email = "simonedelpopolo@outlook.com" }
+]
+keywords = ["sphinx", "theme", "synthwave", "documentation", "neon"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: Sphinx",
+    "Framework :: Sphinx :: Theme",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Documentation :: Sphinx",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "sphinx>=7.0",
+]
+
+[project.entry-points."sphinx.html_themes"]
+sphinx_synthwave_theme = "sphinx_synthwave_theme"
+
+[project.urls]
+Homepage = "https://github.com/nutsloop/sphinx-synthwave-theme"
+Documentation = "https://neonsignal.nutsloop.com/docs/"
+
+[tool.hatch.build.targets.wheel]
+packages = ["sphinx_synthwave_theme"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "sphinx_synthwave_theme/**/*",
+    "README.md",
+    "LICENSE",
+]

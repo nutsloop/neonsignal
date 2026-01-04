@@ -1,0 +1,7 @@
+[wrap-git]
+url = https://github.com/erthink/libmdbx.git
+revision = stable
+depth = 1
+
+[provide]
+libmdbx = mdbx_dep

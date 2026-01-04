@@ -1,0 +1,23 @@
+id = "neonsignal-synthwave"
+name = "NeonSignal Synthwave"
+version = "0.0.1"
+schema_version = 1
+description = "NeonSignal synthwave theme for Zed"
+repository = "https://github.com/nutsloop/neonsignal"
+authors = ["NeonSignal"]
+themes = ["themes/synthwave.json"]
+icon_themes = []
+languages = []
+capabilities = []
+
+[lib]
+
+[grammars]
+
+[language_servers]
+
+[context_servers]
+
+[agent_servers]
+
+[slash_commands]

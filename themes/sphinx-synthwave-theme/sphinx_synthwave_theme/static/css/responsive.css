@@ -1,0 +1,212 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Sphinx Synthwave Theme - Responsive Breakpoints
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Extra Large Screens (1280px+)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (min-width: 1280px) {
+  .synthwave-article {
+    padding: 2rem 4rem;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Large Screens (1024px - 1279px)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1279px) {
+  :root {
+    --toc-width: 200px;
+  }
+
+  .synthwave-toc ul ul {
+    display: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Medium Screens (768px - 1023px) - Hide TOC
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1023px) {
+  .synthwave-toc {
+    display: none;
+  }
+
+  .synthwave-article {
+    max-width: 100%;
+    padding: 1.5rem 2rem;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Small Screens (640px - 767px) - Collapsible Sidebar
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  :root {
+    --sidebar-width: 280px;
+    --header-height: 56px;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+
+  .synthwave-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: var(--shadow-soft);
+    z-index: 200;
+    pointer-events: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+  }
+
+  .synthwave-sidebar.open {
+    transform: translateX(0);
+    z-index: 1001;
+  }
+
+  .synthwave-main {
+    margin-left: 0;
+  }
+
+  .synthwave-footer {
+    margin-left: 0;
+  }
+
+  .synthwave-article {
+    padding: 1.5rem;
+  }
+
+  /* Overlay when sidebar is open */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    top: var(--header-height);
+    left: var(--sidebar-width);
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+
+  .sidebar-overlay.active {
+    display: block;
+  }
+
+  /* Page nav stacks */
+  .page-nav {
+    flex-direction: column;
+  }
+
+  .nav-next {
+    margin-left: 0;
+    align-items: flex-start;
+  }
+
+  /* Footer stacks */
+  .footer-inner {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Extra Small Screens (< 640px) - Mobile
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 639px) {
+  html {
+    font-size: 15px;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  .header-inner {
+    padding: 0 1rem;
+  }
+
+  .header-logo .logo-text {
+    font-size: 1.125rem;
+  }
+
+  .synthwave-article {
+    padding: 1rem;
+  }
+
+  .synthwave-footer {
+    padding: 1.5rem 1rem;
+  }
+
+  /* Tables scroll horizontally */
+  .page-content table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Code blocks scroll */
+  pre {
+    max-width: calc(100vw - 2rem);
+  }
+
+  /* Breadcrumbs hide on mobile */
+  .breadcrumbs {
+    display: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Print Styles
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media print {
+  .synthwave-header,
+  .synthwave-sidebar,
+  .synthwave-toc,
+  .synthwave-footer,
+  .page-nav,
+  .theme-toggle-wrapper {
+    display: none !important;
+  }
+
+  .synthwave-main {
+    margin-left: 0;
+  }
+
+  .synthwave-article {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  a {
+    color: black;
+    text-decoration: underline;
+  }
+
+  pre, code {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+  }
+}
