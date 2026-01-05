@@ -1,6 +1,8 @@
 # NeonSignal Documentation
 
-**NeonSignal** is a high-performance HTTP/2 server written in modern C++23, designed for low-latency, real-time applications. It features native TLS 1.3 support, Server-Sent Events, and flexible virtual hosting with SNI.
+**NeonSignal** is a high-performance HTTP/2 server written in modern C++23, designed for low-latency, real-time applications. Built as a monolithic repository, it integrates a C++23 server backend with custom JSX frontend runtime, Sphinx documentation, and AI-powered content generation.
+
+**Target Platform:** Oracle Linux 10 (ARM64) on Oracle Cloud Infrastructure (Ampere A1 Compute)
 
 ::::{grid} 2
 :gutter: 3
@@ -37,23 +39,37 @@ Production setup with systemd, Let's Encrypt, and monitoring.
 
 ## Key Features
 
+**Core Server:**
 - **HTTP/2 Native** — Built from scratch on RFC 9113, not a wrapper
 - **TLS 1.3+** — Modern cryptography via OpenSSL
 - **SNI Virtual Hosting** — Per-domain certificates and content
 - **Server-Sent Events** — Real-time streaming with automatic buffer management
-- **Minimal Dependencies** — Only OpenSSL and libnghttp2
-- **~2MB Binary** — Small, fast, efficient
+- **LIBMDBX Database** — Embedded transactional storage
+- **WebAuthn Support** — User enrollment and authentication
+- **~1MB Binaries** — Compact, stripped, release builds (902K + 196K)
+
+**Integrated Stack:**
+- **NeonJSX Runtime** — Custom JSX implementation (not React)
+- **Multiple Frontends** — Web applications for different domains
+- **AI-Powered Content** — Codex CLI integration for blog generation
+- **Sphinx Documentation** — Technical docs with custom synthwave theme
+- **Unified Build System** — Meson (C++) + npm (TypeScript/JSX)
 
 ## Implementation Status
 
 | Feature                           | Status            |
 |-----------------------------------|-------------------|
-| HTTP/2 Server                     | ✔ Working         |
-| TLS/SNI Certificates              | ✔ Working         |
+| HTTP/2 Server (C++23)             | ✔ Working         |
+| TLS 1.3 / SNI Certificates        | ✔ Working         |
 | Virtual Hosting (directory-based) | ✔ Working         |
 | Static File Serving               | ✔ Working         |
 | SSE Streaming                     | ✔ Working         |
+| LIBMDBX Database Integration      | ✔ Working         |
+| WebAuthn User Enrollment          | ✔ Working         |
 | Let's Encrypt Integration         | ✔ Working         |
+| NeonJSX Runtime                   | ✔ Working         |
+| AI Content Generation (Codex)     | ✔ Working         |
+| Sphinx Documentation              | ✔ Working         |
 | VHScript Configuration            | … Planned         |
 | NeonEcho Language                 | ✦ Future Vision   |
 
