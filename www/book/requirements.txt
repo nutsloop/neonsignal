@@ -21,7 +21,7 @@ setuptools==80.9.0
 snowballstemmer==3.0.1
 Sphinx==8.2.3
 sphinx-copybutton==0.5.2
--e git+ssh://git@github.com/nutsloop/neonsignal.git@d66b1eb86523584abeeb69532545605e169f1b19#egg=sphinx_synthwave_theme&subdirectory=themes/sphinx-synthwave-theme
+-e git+ssh://git@github.com/nutsloop/neonsignal.git@79ed3dccaed82c2a1b3ba29e70b8513c48c76d68#egg=sphinx_synthwave_theme&subdirectory=themes/sphinx-synthwave-theme
 sphinx_design==0.6.1
 sphinxcontrib-applehelp==2.0.0
 sphinxcontrib-devhelp==2.0.0

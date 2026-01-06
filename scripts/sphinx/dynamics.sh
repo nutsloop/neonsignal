@@ -80,6 +80,9 @@ report=""
 
 while IFS= read -r -d '' file; do
   filename="$(basename "$file")"
+  if [[ "$filename" == "_toc.generated.md" ]]; then
+    continue
+  fi
   if [[ "$filename" == full.*.md ]]; then
     full_reports+=("$filename")
   elif [[ "$filename" == quick.app.js.*.md ]]; then
@@ -126,7 +129,7 @@ ai_toc_file="$NEONSIGNAL_SPHINX_AI_TARGET_DIR/_toc.generated.md"
 declare -a plan_docs=()
 while IFS= read -r -d '' file; do
   filename="$(basename "$file")"
-  if [[ "$filename" != "index.md" ]]; then
+  if [[ "$filename" != "index.md" && "$filename" != "_toc.generated.md" ]]; then
     plan_docs+=("$filename")
   fi
 done < <(find "$NEONSIGNAL_SPHINX_AI_TARGET_DIR" -maxdepth 1 -type f -name "*.md" -print0)
