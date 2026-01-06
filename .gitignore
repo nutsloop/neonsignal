@@ -19,3 +19,4 @@
 !/www/book/source/ai-conversations/index.md
 /www/book/source/benchmarks/*
 !/www/book/source/benchmarks/index.md
+__pycache__/

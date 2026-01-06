@@ -11,9 +11,5 @@ Welcome to the synthwave telemetry bay. These runs capture the pulse of NeonSign
 Reports are linked from the main documentation index and refreshed automatically by the benchmark index generator.
 
 The generator also writes a full list of direct links for each report.
-<!-- BENCHMARK LINKS START -->
-```{toctree}
-:maxdepth: 1
-
+```{include} _toc.generated.md
 ```
-<!-- BENCHMARK LINKS END -->

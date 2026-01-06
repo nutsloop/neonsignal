@@ -20,24 +20,5 @@ quality.
 The documents in this section capture the decisions, trade-offs, and evolving
 architecture that emerged through AI collaboration. They are not just notes;
 they are the transmission log of how NeonSignal was forged.
-<!-- AI CONVERSATIONS TOCTREE START -->
-```{toctree}
-:maxdepth: 1
-
-helix-ide-setup
-Language_Design_Philosophy
-NeonEcho_Grammar
-neonjsx-spa-routing
-radical_syntax
-re-neonsignal
-scripts-synthwave-styling
-security-review-pre-reset
-simonedelpopolo-visual-performance
-single-user-limit
-SSE
-synthwave-sphinx-theme
-VHScript
-VirtualHosting
-VirtualHostingSSL
+```{include} _toc.generated.md
 ```
-<!-- AI CONVERSATIONS TOCTREE END -->

@@ -70,6 +70,8 @@ fi
 
 print_step "Regenerating benchmark index"
 
+benchmark_toc_file="$NEONSIGNAL_SPHINX_BENCHMARK_TARGET_DIR/_toc.generated.md"
+
 declare -a full_reports=()
 declare -a quick_reports=()
 declare -a app_reports=()
@@ -95,43 +97,31 @@ unset IFS
 all_reports=("${full_reports[@]}" "${quick_reports[@]}" "${app_reports[@]}")
 
 if [[ ${#all_reports[@]} -gt 0 ]]; then
-  python3 - "$NEONSIGNAL_SPHINX_BENCHMARK_INDEX" "${all_reports[@]}" <<'PY'
+  python3 - "$benchmark_toc_file" "${all_reports[@]}" <<'PY'
 import sys
 
-index_path = sys.argv[1]
+toc_path = sys.argv[1]
 reports = sys.argv[2:]
 
-marker_start = "<!-- BENCHMARK LINKS START -->"
-marker_end = "<!-- BENCHMARK LINKS END -->"
-
 block_lines = [
-    marker_start,
     "```{toctree}",
     ":maxdepth: 1",
     "",
 ]
 block_lines.extend([f"{name[:-3]}" for name in reports])
-block_lines.extend(["```", marker_end])
-block = "\n".join(block_lines)
+block_lines.append("```")
+block = "\n".join(block_lines) + "\n"
 
-with open(index_path, "r", encoding="utf-8") as handle:
-    content = handle.read()
-
-if marker_start in content and marker_end in content:
-    prefix, rest = content.split(marker_start, 1)
-    _, suffix = rest.split(marker_end, 1)
-    updated = prefix.rstrip() + "\n" + block + "\n" + suffix.lstrip()
-else:
-    updated = content.rstrip() + "\n\n" + block + "\n"
-
-with open(index_path, "w", encoding="utf-8") as handle:
-    handle.write(updated)
+with open(toc_path, "w", encoding="utf-8") as handle:
+    handle.write(block)
 PY
 fi
 
-print_success "Generated ${NEONSIGNAL_SPHINX_BENCHMARK_INDEX}"
+print_success "Generated ${benchmark_toc_file}"
 
 print_step "Regenerating AI conversations index"
+
+ai_toc_file="$NEONSIGNAL_SPHINX_AI_TARGET_DIR/_toc.generated.md"
 
 declare -a plan_docs=()
 while IFS= read -r -d '' file; do
@@ -145,39 +135,25 @@ IFS=$'\n' plan_docs=($(sort <<<"${plan_docs[*]}"))
 unset IFS
 
 if [[ ${#plan_docs[@]} -gt 0 ]]; then
-  python3 - "$NEONSIGNAL_SPHINX_AI_INDEX" "${plan_docs[@]}" <<'PY'
+  python3 - "$ai_toc_file" "${plan_docs[@]}" <<'PY'
 import sys
 
-index_path = sys.argv[1]
+toc_path = sys.argv[1]
 docs = sys.argv[2:]
 
-marker_start = "<!-- AI CONVERSATIONS TOCTREE START -->"
-marker_end = "<!-- AI CONVERSATIONS TOCTREE END -->"
-
 block_lines = [
-    marker_start,
     "```{toctree}",
     ":maxdepth: 1",
     "",
 ]
 block_lines.extend([f"{name[:-3]}" for name in docs])
-block_lines.extend(["```", marker_end])
-block = "\n".join(block_lines)
+block_lines.append("```")
+block = "\n".join(block_lines) + "\n"
 
-with open(index_path, "r", encoding="utf-8") as handle:
-    content = handle.read()
-
-if marker_start in content and marker_end in content:
-    prefix, rest = content.split(marker_start, 1)
-    _, suffix = rest.split(marker_end, 1)
-    updated = prefix.rstrip() + "\n" + block + "\n" + suffix.lstrip()
-else:
-    updated = content.rstrip() + "\n\n" + block + "\n"
-
-with open(index_path, "w", encoding="utf-8") as handle:
-    handle.write(updated)
+with open(toc_path, "w", encoding="utf-8") as handle:
+    handle.write(block)
 PY
-  print_success "Generated ${NEONSIGNAL_SPHINX_AI_INDEX}"
+  print_success "Generated ${ai_toc_file}"
 else
   print_warning "No plan docs found for AI conversations index"
 fi
