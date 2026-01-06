@@ -1,6 +1,6 @@
 alabaster==1.0.0
 babel==2.17.0
-certifi==2025.11.12
+certifi==2026.1.4
 charset-normalizer==3.4.4
 docutils==0.21.2
 idna==3.11
@@ -21,7 +21,7 @@ setuptools==80.9.0
 snowballstemmer==3.0.1
 Sphinx==8.2.3
 sphinx-copybutton==0.5.2
--e git+ssh://git@github.com/nutsloop/neonsignal.git@d277dcf6a4c72d16f7f490209541d1e5edd161f5#egg=sphinx_synthwave_theme&subdirectory=themes/sphinx-synthwave-theme
+-e git+ssh://git@github.com/nutsloop/neonsignal.git@d66b1eb86523584abeeb69532545605e169f1b19#egg=sphinx_synthwave_theme&subdirectory=themes/sphinx-synthwave-theme
 sphinx_design==0.6.1
 sphinxcontrib-applehelp==2.0.0
 sphinxcontrib-devhelp==2.0.0
