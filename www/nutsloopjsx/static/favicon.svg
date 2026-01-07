@@ -1,13 +1,171 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
-  <title>neonsignal</title>
+<!-- favicon.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#15ffc4"/>
-      <stop offset="100%" stop-color="#00b3ff"/>
+    <!-- Neon gradient used for subtle accents -->
+    <linearGradient id="neon" x1="120" y1="120" x2="392" y2="392" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#46D9FF"/>
+      <stop offset="0.45" stop-color="#FF4EDB"/>
+      <stop offset="0.78" stop-color="#FF9A3C"/>
+      <stop offset="1" stop-color="#7C5CFF"/>
     </linearGradient>
+
+    <!-- Vinyl dark radial -->
+    <radialGradient id="vinylFill" cx="50%" cy="50%" r="60%">
+      <stop offset="0" stop-color="#000"/>
+      <stop offset="0.55" stop-color="#05050A"/>
+      <stop offset="1" stop-color="#000"/>
+    </radialGradient>
+
+    <!-- Soft glow (kept subtle) -->
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Tiny glow for particles -->
+    <filter id="tinyGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
-  <rect x="6" y="6" width="52" height="52" rx="8" fill="#0a0f1a" stroke="#15ffc4" stroke-width="2"/>
-  <path d="M16 44 L16 20 L24 28 L32 20 L32 44" fill="none" stroke="url(#glow)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M36 44 L36 20 L48 20" fill="none" stroke="url(#glow)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="48" cy="44" r="3" fill="#15ffc4"/>
+
+  <!-- background total black -->
+  <rect width="512" height="512" fill="#000"/>
+
+  <!-- =========================
+       OUTER ORBIT (VINYL STYLE)
+       ========================= -->
+  <!-- Vinyl disc base -->
+  <circle cx="256" cy="256" r="212" fill="url(#vinylFill)"/>
+
+  <!-- Vinyl edge ring -->
+  <circle cx="256" cy="256" r="212" fill="none" stroke="#2A2A34" stroke-width="28" opacity="0.65"/>
+  <!-- Subtle neon rim -->
+  <circle cx="256" cy="256" r="212" fill="none" stroke="url(#neon)" stroke-width="2.5" opacity="0.45" filter="url(#softGlow)"/>
+
+  <!-- Grooves (movement effects less prominent) -->
+  <g opacity="0.35">
+    <circle cx="256" cy="256" r="200" fill="none" stroke="#1C1C26" stroke-width="1"/>
+    <circle cx="256" cy="256" r="188" fill="none" stroke="#1C1C26" stroke-width="1"/>
+    <circle cx="256" cy="256" r="176" fill="none" stroke="#1C1C26" stroke-width="1"/>
+    <circle cx="256" cy="256" r="164" fill="none" stroke="#1C1C26" stroke-width="1"/>
+    <circle cx="256" cy="256" r="152" fill="none" stroke="#1C1C26" stroke-width="1"/>
+    <circle cx="256" cy="256" r="140" fill="none" stroke="#1C1C26" stroke-width="1"/>
+    <circle cx="256" cy="256" r="128" fill="none" stroke="#1C1C26" stroke-width="1"/>
+    <circle cx="256" cy="256" r="116" fill="none" stroke="#1C1C26" stroke-width="1"/>
+  </g>
+
+  <!-- Outer orbit: data particles -->
+  <g filter="url(#tinyGlow)">
+    <!-- ring of small squares around ~r=200 -->
+    <!-- palette: cyan / magenta / orange / violet -->
+    <rect x="254" y="46"  width="5" height="5" rx="1.2" fill="#46D9FF" opacity="0.85"/>
+    <rect x="310" y="55"  width="4" height="4" rx="1.1" fill="#FF4EDB" opacity="0.70"/>
+    <rect x="360" y="85"  width="5" height="5" rx="1.2" fill="#7C5CFF" opacity="0.75"/>
+    <rect x="401" y="132" width="4" height="4" rx="1.1" fill="#FF9A3C" opacity="0.75"/>
+    <rect x="428" y="189" width="5" height="5" rx="1.2" fill="#46D9FF" opacity="0.70"/>
+    <rect x="438" y="252" width="4" height="4" rx="1.1" fill="#FF4EDB" opacity="0.80"/>
+    <rect x="428" y="316" width="5" height="5" rx="1.2" fill="#7C5CFF" opacity="0.65"/>
+    <rect x="399" y="372" width="4" height="4" rx="1.1" fill="#FF9A3C" opacity="0.80"/>
+    <rect x="354" y="414" width="5" height="5" rx="1.2" fill="#46D9FF" opacity="0.75"/>
+    <rect x="296" y="438" width="4" height="4" rx="1.1" fill="#FF4EDB" opacity="0.75"/>
+    <rect x="232" y="446" width="5" height="5" rx="1.2" fill="#7C5CFF" opacity="0.70"/>
+    <rect x="171" y="435" width="4" height="4" rx="1.1" fill="#FF9A3C" opacity="0.75"/>
+    <rect x="117" y="404" width="5" height="5" rx="1.2" fill="#46D9FF" opacity="0.65"/>
+    <rect x="77"  y="357" width="4" height="4" rx="1.1" fill="#FF4EDB" opacity="0.80"/>
+    <rect x="55"  y="299" width="5" height="5" rx="1.2" fill="#7C5CFF" opacity="0.70"/>
+    <rect x="47"  y="236" width="4" height="4" rx="1.1" fill="#FF9A3C" opacity="0.75"/>
+    <rect x="58"  y="173" width="5" height="5" rx="1.2" fill="#46D9FF" opacity="0.75"/>
+    <rect x="88"  y="118" width="4" height="4" rx="1.1" fill="#FF4EDB" opacity="0.70"/>
+    <rect x="134" y="76"  width="5" height="5" rx="1.2" fill="#7C5CFF" opacity="0.80"/>
+    <rect x="192" y="54"  width="4" height="4" rx="1.1" fill="#FF9A3C" opacity="0.75"/>
+  </g>
+
+  <!-- Inner orbit ring (subtle delimiter) -->
+  <circle cx="256" cy="256" r="165" fill="none" stroke="url(#neon)" stroke-width="2" opacity="0.22"/>
+
+  <!-- =========================
+       INNER ORBIT (CASSETTE)
+       ========================= -->
+  <!-- Infinity tape: less prominent than outer orbit -->
+  <g opacity="0.60">
+    <!-- glow stroke -->
+    <path d="
+      M 256 244
+      C 220 244 200 190 182 236
+      C 166 276 214 302 256 276
+      C 298 302 346 276 330 236
+      C 312 190 292 244 256 244
+      Z"
+      fill="none" stroke="url(#neon)" stroke-width="10"
+      stroke-linecap="round" stroke-linejoin="round"
+      filter="url(#softGlow)"/>
+
+    <!-- inner dark stroke to hint tape depth -->
+    <path d="
+      M 256 244
+      C 220 244 200 190 182 236
+      C 166 276 214 302 256 276
+      C 298 302 346 276 330 236
+      C 312 190 292 244 256 244
+      Z"
+      fill="none" stroke="#07070D" stroke-width="6"
+      stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
+  </g>
+
+  <!-- Tape data particles (dots) -->
+  <g filter="url(#tinyGlow)" opacity="0.70">
+    <circle cx="198" cy="236" r="2.2" fill="#46D9FF" opacity="0.9"/>
+    <circle cx="210" cy="214" r="2.0" fill="#FF4EDB" opacity="0.8"/>
+    <circle cx="232" cy="205" r="2.2" fill="#7C5CFF" opacity="0.85"/>
+    <circle cx="255" cy="206" r="2.0" fill="#FF9A3C" opacity="0.8"/>
+    <circle cx="277" cy="214" r="2.2" fill="#46D9FF" opacity="0.85"/>
+    <circle cx="300" cy="236" r="2.0" fill="#FF4EDB" opacity="0.8"/>
+    <circle cx="314" cy="258" r="2.2" fill="#7C5CFF" opacity="0.85"/>
+    <circle cx="298" cy="280" r="2.0" fill="#FF9A3C" opacity="0.8"/>
+    <circle cx="256" cy="287" r="2.2" fill="#46D9FF" opacity="0.85"/>
+    <circle cx="214" cy="280" r="2.0" fill="#FF4EDB" opacity="0.8"/>
+    <circle cx="198" cy="258" r="2.2" fill="#7C5CFF" opacity="0.85"/>
+  </g>
+
+  <!-- Two spools, well defined -->
+  <g>
+    <!-- LEFT SPOOL -->
+    <g transform="translate(196 256)">
+      <circle r="40" fill="#0B0B12" stroke="#3A3A48" stroke-width="2.4" opacity="0.95"/>
+      <circle r="24" fill="none" stroke="url(#neon)" stroke-width="2.2" opacity="0.55" filter="url(#tinyGlow)"/>
+      <circle r="12" fill="#000"/>
+      <!-- holes -->
+      <g opacity="0.95">
+        <rect x="-2" y="-30" width="4" height="10" rx="2" fill="#000" transform="rotate(0)"/>
+        <rect x="-2" y="-30" width="4" height="10" rx="2" fill="#000" transform="rotate(60)"/>
+        <rect x="-2" y="-30" width="4" height="10" rx="2" fill="#000" transform="rotate(120)"/>
+        <rect x="-2" y="-30" width="4" height="10" rx="2" fill="#000" transform="rotate(180)"/>
+        <rect x="-2" y="-30" width="4" height="10" rx="2" fill="#000" transform="rotate(240)"/>
+        <rect x="-2" y="-30" width="4" height="10" rx="2" fill="#000" transform="rotate(300)"/>
+      </g>
+    </g>
+
+    <!-- RIGHT SPOOL -->
+    <g transform="translate(316 256)">
+      <circle r="40" fill="#0B0B12" stroke="#3A3A48" stroke-width="2.4" opacity="0.95"/>
+      <circle r="24" fill="none" stroke="url(#neon)" stroke-width="2.2" opacity="0.55" filter="url(#tinyGlow)"/>
+      <circle r="12" fill="#000"/>
+      <!-- holes -->
+      <g opacity="0.95">
+        <rect x="-2" y="-30" width="4" height="10" rx="2" fill="#000" transform="rotate(0)"/>
+        <rect x="-2" y="-30" width="4" height="10" rx="2" fill="#000" transform="rotate(60)"/>
+        <rect x="-2" y="-30" width="4" height="10" rx="2" fill="#000" transform="rotate(120)"/>
+        <rect x="-2" y="-30" width="4" height="10" rx="2" fill="#000" transform="rotate(180)"/>
+        <rect x="-2" y="-30" width="4" height="10" rx="2" fill="#000" transform="rotate(240)"/>
+        <rect x="-2" y="-30" width="4" height="10" rx="2" fill="#000" transform="rotate(300)"/>
+      </g>
+    </g>
+  </g>
 </svg>
