@@ -30,6 +30,7 @@ html_theme_options = {
 
 templates_path = ["_templates"]
 html_static_path = ["_static"]
+html_extra_path = ["_static/favicon.svg"]
 html_sidebars = {
     "**": ["globaltoc.html", "relations.html", "searchbox.html"],
 }
