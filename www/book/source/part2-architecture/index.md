@@ -1,4 +1,4 @@
-# Part 2: Core Architecture
+# Core Architecture
 
 This section provides a detailed look into the core architecture of the Neonsignal server, from its low-level event loop to the virtual hosting and configuration systems.
 

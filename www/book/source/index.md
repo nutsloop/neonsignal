@@ -84,7 +84,7 @@ getting-started
 
 ```{toctree}
 :maxdepth: 2
-:caption: Part 1: The NeonSignal Philosophy
+:caption: Part 1
 
 part1-philosophy/index
 part1-philosophy/neonecho
@@ -92,7 +92,7 @@ part1-philosophy/neonecho
 
 ```{toctree}
 :maxdepth: 2
-:caption: Part 2: Core Architecture
+:caption: Part 2
 
 part2-architecture/index
 part2-architecture/virtual-hosting
@@ -100,7 +100,7 @@ part2-architecture/virtual-hosting
 
 ```{toctree}
 :maxdepth: 2
-:caption: Part 3: Features & Implementation
+:caption: Part 3
 
 part3-features/index
 part3-features/sse
@@ -110,7 +110,7 @@ part3-features/http2-correctness
 
 ```{toctree}
 :maxdepth: 2
-:caption: Part 4: Operations & Deployment
+:caption: Part 4
 
 part4-operations/index
 part4-operations/deployment
@@ -119,7 +119,7 @@ part4-operations/benchmarking
 
 ```{toctree}
 :maxdepth: 2
-:caption: Part 5: Project Health & Appendix
+:caption: Part 5
 
 part5-project-health/index
 ```

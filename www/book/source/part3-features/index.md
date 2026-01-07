@@ -1,4 +1,4 @@
-# Part 3: Features & Implementation
+# Features & Implementation
 
 This section covers the implementation details of Neonsignal's key features, including its API design, real-time event streaming with SSE, performance optimizations, and HTTP/2 protocol correctness measures.
 

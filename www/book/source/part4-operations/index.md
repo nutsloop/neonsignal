@@ -1,4 +1,4 @@
-# Part 4: Operations & Deployment
+# Operations & Deployment
 
 This section provides practical guides for setting up, deploying, and maintaining a Neonsignal server.
 

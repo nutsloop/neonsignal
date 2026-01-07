@@ -1,4 +1,4 @@
-# Part 5: Project Health & Appendix
+# Project Health
 
 This final section provides a transparent look at the state of the Neonsignal codebase and includes some miscellaneous content.
 
