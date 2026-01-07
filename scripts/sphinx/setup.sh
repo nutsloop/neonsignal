@@ -60,4 +60,4 @@ if [[ -d "$NEONSIGNAL_SPHINX_THEME_DIR" ]]; then
 else
   print_warning "Synthwave theme not found at ${NEONSIGNAL_SPHINX_THEME_DIR}"
 fi
-python -m pip freeze > "$NEONSIGNAL_SPHINX_BOOK_DIR/requirements.txt"
+python -m pip freeze | grep -v sphinx-synthwave-theme > "$NEONSIGNAL_SPHINX_BOOK_DIR/requirements.txt"
