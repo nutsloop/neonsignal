@@ -1,0 +1,22 @@
+Third-Party Notices
+===================
+
+This project includes or links to the following third-party components.
+
+OpenSSL (system dependency)
+License: Apache-2.0
+Source: https://www.openssl.org/
+Notes: The build requires OpenSSL >= 3.0.0 via pkg-config.
+
+nghttp2 (system dependency)
+License: MIT
+Source: https://nghttp2.org/
+Notes: The build requires libnghttp2 via pkg-config.
+
+libmdbx (subproject fallback)
+License: Apache-2.0
+Source: https://libmdbx.dqdkfa.ru/
+Files: subprojects/libmdbx/LICENSE, subprojects/libmdbx/NOTICE,
+       subprojects/libmdbx/COPYRIGHT
+Notes: If you redistribute libmdbx, the Apache 2.0 NOTICE file must be
+       included alongside the license.
