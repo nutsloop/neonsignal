@@ -51,7 +51,6 @@ private:
   std::atomic<std::uint64_t> served_files_{0};
   std::atomic<std::uint64_t> page_views_{0};
   std::atomic<std::uint64_t> event_clients_{0};
-  int shutdown_fd_{-1};
 };
 
 } // namespace neonsignal

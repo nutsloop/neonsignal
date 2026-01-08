@@ -1,6 +1,6 @@
 #include "neonsignal/thread_pool.h++"
 
-#include <pthread.h>
+#include "neonsignal/platform_utils.h++"
 
 #include <format>
 #include <iostream>
@@ -16,10 +16,7 @@ ThreadPool::ThreadPool(std::size_t thread_count, const ServerHostPort &server_co
   for (std::size_t i = 0; i < thread_count; ++i) {
     threads_.emplace_back([this, i, server_config] {
       std::string thread_name = std::format("neonsignal->({})", std::to_string(i));
-      if (thread_name.size() > 15) {
-        thread_name.resize(15);
-      }
-      pthread_setname_np(pthread_self(), thread_name.c_str());
+      platform_utils::set_thread_name(thread_name);
       std::cerr << std::format("@{}:{}", server_config.host, server_config.port) << std::endl;
       worker_();
     });

@@ -1,9 +1,13 @@
 #pragma once
 
+#include "neonsignal/event_mask.h++"
+#include "neonsignal/event_loop_backend.h++"
+
 #include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <unordered_map>
 
@@ -13,6 +17,12 @@ class EventLoop {
 public:
   EventLoop();
   ~EventLoop();
+
+  // Non-copyable, non-movable
+  EventLoop(const EventLoop&) = delete;
+  EventLoop& operator=(const EventLoop&) = delete;
+  EventLoop(EventLoop&&) = delete;
+  EventLoop& operator=(EventLoop&&) = delete;
 
   void add_fd(int fd, std::uint32_t events,
               std::function<void(std::uint32_t)> callback);
@@ -26,8 +36,14 @@ public:
   void shutdown_graceful(std::chrono::seconds timeout = std::chrono::seconds{30});
 
   // Register a periodic timer callback
-  void add_timer(std::chrono::milliseconds interval,
-                 std::function<void()> callback);
+  int add_timer(std::chrono::milliseconds interval,
+                std::function<void()> callback);
+
+  // Cancel a timer by id
+  void cancel_timer(int timer_id);
+
+  // Add signal handler for graceful shutdown
+  void add_signal(int signum, std::function<void()> callback);
 
   // Check if running
   [[nodiscard]] bool is_running() const {
@@ -41,13 +57,11 @@ public:
   }
 
 private:
-  int epoll_fd_;
+  std::unique_ptr<EventLoopBackend> backend_;
   std::atomic<bool> running_{false};
   std::atomic<bool> shutdown_requested_{false};
-  mutable std::mutex callbacks_mutex_;  // mutable to allow locking in const methods
+  mutable std::mutex callbacks_mutex_;
   std::unordered_map<int, std::function<void(std::uint32_t)>> callbacks_;
-  int timer_fd_{-1};
-  std::function<void()> timer_callback_;
 };
 
 } // namespace neonsignal

@@ -1,8 +1,6 @@
 #include "neonsignal/http2_listener.h++"
 #include "neonsignal/event_loop.h++"
 
-#include <sys/epoll.h>
-
 #include <mutex>
 
 namespace neonsignal {

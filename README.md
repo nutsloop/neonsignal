@@ -37,6 +37,23 @@ Complete guides covering:
 - Operations — Production deployment with systemd, Let's Encrypt, and monitoring
 - Benchmarks — Performance analysis and optimization techniques
 
+## Build (macOS)
+
+NeonSignal targets Oracle Linux 10, but it can be built on macOS with Homebrew.
+
+```bash
+brew install meson ninja pkg-config cmake openssl@3 nghttp2 libmdbx
+
+# Apple Silicon
+export PKG_CONFIG_PATH=\"/opt/homebrew/opt/openssl@3/lib/pkgconfig:/opt/homebrew/opt/nghttp2/lib/pkgconfig:/opt/homebrew/opt/libmdbx/lib/pkgconfig:$PKG_CONFIG_PATH\"
+
+# Intel macOS (use /usr/local/opt instead of /opt/homebrew/opt)
+# export PKG_CONFIG_PATH=\"/usr/local/opt/openssl@3/lib/pkgconfig:/usr/local/opt/nghttp2/lib/pkgconfig:/usr/local/opt/libmdbx/lib/pkgconfig:$PKG_CONFIG_PATH\"
+
+meson setup build
+meson compile -C build
+```
+
 ## Contributing
 
 We welcome contributions to NeonSignal! Please follow these guidelines:

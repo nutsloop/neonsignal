@@ -1,7 +1,8 @@
 #include "neonsignal/redirect_service.h++"
 
+#include "neonsignal/event_mask.h++"
+
 #include <fcntl.h>
-#include <sys/epoll.h>
 #include <sys/socket.h>
 
 namespace neonsignal {
@@ -19,7 +20,7 @@ void RedirectService::register_connection_(int client_fd) {
   conn.fd = client_fd;
   connections_.emplace(client_fd, std::move(conn));
 
-  loop_.add_fd(client_fd, EPOLLIN | EPOLLET,
+  loop_.add_fd(client_fd, EventMask::Read | EventMask::Edge,
                [this, client_fd](const std::uint32_t events) { handle_io_(client_fd, events); });
 }
 

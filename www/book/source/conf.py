@@ -9,7 +9,7 @@ sys.path.insert(0, str(theme_path))
 
 project = "neonsignal"
 author = "Simone Del Popolo"
-release = "0.1.0"
+release = "0.2.0"
 
 extensions = [
     "myst_parser",

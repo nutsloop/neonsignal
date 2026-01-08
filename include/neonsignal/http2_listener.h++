@@ -2,12 +2,12 @@
 
 #include "neonsignal/neonsignal.h++"
 #include "neonsignal/database.h++"
+#include "neonsignal/event_mask.h++"
 #include "neonsignal/hpack_decoder.h++"
 #include "neonsignal/vhost.h++"
 #include "neonsignal/webauthn.h++"
 
 #include <openssl/ssl.h>
-#include <sys/epoll.h>
 
 #include <atomic>
 #include <chrono>
@@ -34,7 +34,7 @@ struct Http2Connection {
   std::vector<std::uint8_t> read_buf;
   std::vector<std::uint8_t> write_buf;
   std::size_t write_offset{0};
-  std::uint32_t events{EPOLLIN};
+  std::uint32_t events{EventMask::Read};
   bool closed{false};
   std::string last_path = "/";
   std::unordered_map<std::uint32_t, std::vector<std::uint8_t>> header_blocks;
@@ -174,7 +174,7 @@ private:
 
   std::atomic<bool> redirect_service_ok_{false};
   int redirect_probe_port_{9090};
-  int redirect_timer_fd_{-1};
+  int redirect_timer_id_{-1};
   WebAuthnManager auth_;
   std::unique_ptr<ApiHandler> api_handler_;
   VHostResolver vhost_resolver_;

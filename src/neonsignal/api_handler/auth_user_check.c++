@@ -1,6 +1,7 @@
 #include "neonsignal/api_handler.h++"
 
 #include "neonsignal/event_loop.h++"
+#include "neonsignal/event_mask.h++"
 #include "neonsignal/http2_listener_helpers.h++"
 
 namespace neonsignal {
@@ -15,7 +16,7 @@ bool ApiHandler::auth_user_check(
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
     build_response_frames(conn->write_buf, stream_id, 400, "application/json",
                           body_bytes);
-    conn->events |= EPOLLOUT;
+    conn->events |= EventMask::Write;
     loop_.update_fd(conn->fd, conn->events);
     return true;
   }
@@ -26,7 +27,7 @@ bool ApiHandler::auth_user_check(
   std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
   build_response_frames(conn->write_buf, stream_id, 200, "application/json",
                         body_bytes);
-  conn->events |= EPOLLOUT;
+  conn->events |= EventMask::Write;
   loop_.update_fd(conn->fd, conn->events);
   return true;
 }

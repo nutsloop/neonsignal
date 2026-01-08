@@ -1,10 +1,10 @@
 #include "neonsignal/http2_listener.h++"
+#include "neonsignal/event_mask.h++"
 
 #include "neonsignal/http2_listener_helpers.h++"
 
 #include <fcntl.h>
 #include <openssl/ssl.h>
-#include <sys/epoll.h>
 #include <unistd.h>
 
 #include <chrono>
@@ -34,7 +34,7 @@ void Http2Listener::handle_connection_(int client_fd) {
 
   conn->handshake_deadline =
       std::chrono::steady_clock::now() + std::chrono::seconds(5);
-  conn->events = EPOLLIN | EPOLLOUT;
+  conn->events = EventMask::Read | EventMask::Write;
   conn->decoder = std::make_unique<HpackDecoder>();
 
   std::cerr << "Accepted HTTP/2-capable TLS connection fd=" << client_fd

@@ -1,42 +1,21 @@
 #include "neonsignal/http2_listener.h++"
 #include "neonsignal/event_loop.h++"
+#include "neonsignal/event_mask.h++"
 #include "neonsignal/http2_listener_helpers.h++"
 
 #include <chrono>
 #include <iostream>
-#include <sys/epoll.h>
-#include <sys/timerfd.h>
-#include <unistd.h>
+#include <thread>
 
 namespace neonsignal {
 
 void Http2Listener::start_redirect_monitor_() {
-  if (redirect_timer_fd_ != -1) {
+  if (redirect_timer_id_ != -1) {
     return;
   }
 
-  redirect_timer_fd_ = ::timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
-  if (redirect_timer_fd_ == -1) {
-    std::cerr << "failed to create redirect monitor timer\n";
-    return;
-  }
-
-  itimerspec spec{};
-  spec.it_interval.tv_sec = 1;
-  spec.it_value.tv_sec = 1;
-  if (timerfd_settime(redirect_timer_fd_, 0, &spec, nullptr) == -1) {
-    std::cerr << "failed to start redirect monitor timer\n";
-    close(redirect_timer_fd_);
-    redirect_timer_fd_ = -1;
-    return;
-  }
-
-  loop_.add_fd(redirect_timer_fd_, EPOLLIN, [this](std::uint32_t) {
+  redirect_timer_id_ = loop_.add_timer(std::chrono::seconds(1), [this]() {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    std::uint64_t expirations = 0;
-    if (read(redirect_timer_fd_, &expirations, sizeof(expirations)) < 0) {
-      return;
-    }
     bool ok = probe_redirect_service_();
     redirect_service_ok_.store(ok);
 
@@ -53,7 +32,7 @@ void Http2Listener::start_redirect_monitor_() {
         }
         auto data_frame = build_frame(0x0 /* DATA */, 0x0, stream_id, body_bytes);
         c->write_buf.insert(c->write_buf.end(), data_frame.begin(), data_frame.end());
-        c->events |= EPOLLOUT;
+        c->events |= EventMask::Write;
         loop_.update_fd(c->fd, c->events);
       });
   });
