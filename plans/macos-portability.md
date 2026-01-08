@@ -1,5 +1,7 @@
-MacOS Portability Plan
-======================
+# macOS Portability Plan
+
+Status: Done on the OSx branch (tag `0.2.0`). The steps below reflect the
+implemented changes and the OSx README build notes.
 
 Goal: Make the C++ server build and run on macOS while preserving Linux
 behavior. The focus is on event loop portability, socket setup, signal
@@ -32,6 +34,8 @@ pthread_setname_np and MSG_NOSIGNAL.
 Inventory of Linux-only APIs
 ----------------------------
 
+Status: Addressed in the OSx branch.
+
 Event loop and I/O:
 - epoll: include/neonsignal/http2_listener.h++, src/neonsignal/event_loop.c++,
   src/neonsignal/event_loop/*.c++, src/neonsignal/http2_listener/*.c++,
@@ -51,27 +55,27 @@ Threading:
 - pthread_setname_np signature mismatch:
   src/redirect_main.c++, src/neonsignal/thread_pool.c++, src/neonsignal/logging.c++
 
-Items to verify (likely portable, confirm):
-- libmdbx: Should build on macOS, verify meson finds it correctly
+Items to verify (still recommended on macOS):
+- libmdbx: Homebrew install works; ensure PKG_CONFIG_PATH includes libmdbx
+  (see macOS build notes)
 - /proc filesystem: Search codebase for any /proc/self/* usage (none expected)
-- OpenSSL: Homebrew installs to non-standard paths (see Step 6)
+- OpenSSL: Homebrew installs to non-standard paths (see macOS build notes)
 
 
-Step 1: Event flag abstraction and header cleanup
--------------------------------------------------
+Step 1: Event flag abstraction and header cleanup (done)
+--------------------------------------------------------
 
-- Introduce OS-neutral event flags (READ, WRITE, ERR, HUP, EDGE) in a new
-  header such as include/neonsignal/event_mask.h++ or in
-  include/neonsignal/event_loop.h++.
-- Replace EPOLL* usage with new flags in:
+- Added include/neonsignal/event_mask.h++ and wired it into
+  include/neonsignal/event_loop.h++ and include/neonsignal/http2_listener.h++.
+- Replaced EPOLL* usage with EventMask in:
   include/neonsignal/http2_listener.h++,
   src/neonsignal/http2_listener/handle_io_.c++,
   src/neonsignal/http2_listener/start.c++,
   src/neonsignal/redirect_service/*.c++,
   src/neonsignal/server/run.c++,
   src/neonsignal/api_handler/*.c++
-- Remove <sys/epoll.h> from include/neonsignal/http2_listener.h++ and keep
-  OS headers private to backend implementations.
+- Removed <sys/epoll.h> from public headers; OS-specific headers stay in
+  backend implementations.
 
 EDGE-TRIGGER SEMANTICS WARNING:
   EPOLLET (Linux) and EV_CLEAR (macOS kqueue) are similar but not identical:
@@ -86,33 +90,19 @@ EDGE-TRIGGER SEMANTICS WARNING:
   Test case: Large request body that arrives in multiple chunks.
 
 
-Step 2: Split EventLoop backends (epoll vs kqueue)
---------------------------------------------------
+Step 2: Split EventLoop backends (epoll vs kqueue) (done)
+---------------------------------------------------------
 
-- Create a backend interface (e.g., include/neonsignal/event_loop_backend.h++).
-- Refactor include/neonsignal/event_loop.h++ to store a backend pointer
-  instead of epoll_fd_/timer_fd_ members.
-- Move Linux implementation into new files:
-  src/neonsignal/event_loop/linux/backend.c++,
-  src/neonsignal/event_loop/linux/add_fd.c++,
-  src/neonsignal/event_loop/linux/update_fd.c++,
-  src/neonsignal/event_loop/linux/remove_fd.c++,
-  src/neonsignal/event_loop/linux/run.c++,
-  src/neonsignal/event_loop/linux/add_timer.c++
-- Add macOS kqueue implementation in:
-  src/neonsignal/event_loop/darwin/backend.c++,
-  src/neonsignal/event_loop/darwin/add_fd.c++,
-  src/neonsignal/event_loop/darwin/update_fd.c++,
-  src/neonsignal/event_loop/darwin/remove_fd.c++,
-  src/neonsignal/event_loop/darwin/run.c++,
-  src/neonsignal/event_loop/darwin/add_timer.c++
-- Keep the public EventLoop methods in the existing per-method files
-  (src/neonsignal/event_loop/*.c++) as thin delegators to the backend to
-  preserve the repository file layout rules.
+- Added include/neonsignal/event_loop_backend.h++ and updated
+  include/neonsignal/event_loop.h++ to use a backend instance.
+- Implemented Linux backend in src/neonsignal/event_loop/linux/backend.c++
+  and macOS backend in src/neonsignal/event_loop/darwin/backend.c++.
+- Kept EventLoop method files in src/neonsignal/event_loop/*.c++ as
+  delegators to preserve the per-method file layout.
 
 
-Step 3: Timers and signals
---------------------------
+Step 3: Timers and signals (done)
+---------------------------------
 
 TIMER ABSTRACTION COMPLEXITY:
   timerfd (Linux) and EVFILT_TIMER (macOS) have different models:
@@ -129,32 +119,32 @@ TIMER ABSTRACTION COMPLEXITY:
 
   The backend translates this to timerfd or EVFILT_TIMER internally.
 
-- Replace timerfd usage in src/neonsignal/event_loop/add_timer.c++ and
-  src/neonsignal/http2_listener/start_redirect_monitor_.c++ with backend
-  timers (kqueue EVFILT_TIMER on macOS, timerfd on Linux).
-- Replace signalfd usage in src/neonsignal/server/run.c++ with a portable
-  signal integration (kqueue EVFILT_SIGNAL or a self-pipe + signal handler).
-- Ensure EventLoop callback signatures remain consistent across platforms.
+- Replaced timerfd usage with backend timers in
+  src/neonsignal/event_loop/add_timer.c++ and
+  src/neonsignal/http2_listener/start_redirect_monitor_.c++.
+- Implemented signal hooks in src/neonsignal/event_loop/add_signal.c++ and
+  switched src/neonsignal/server/run.c++ to use them.
+- Added src/neonsignal/event_loop/cancel_timer.c++ to complete the timer API.
 
 
-Step 4: Socket accept and flags
--------------------------------
+Step 4: Socket accept and flags (done)
+--------------------------------------
 
-- Add portable helpers in include/neonsignal/socket_utils.h++ and
-  src/neonsignal/socket_utils/*.c++ for:
+- Added portable helpers in include/neonsignal/socket_utils.h++ and
+  src/neonsignal/socket_utils/socket_utils.c++ for:
   - accept_nonblocking(): accept() + set_nonblocking() + set_cloexec()
   - set_nonblocking(): fcntl(fd, F_SETFL, O_NONBLOCK)
   - set_cloexec(): fcntl(fd, F_SETFD, FD_CLOEXEC)
-- Update accept4 usage in:
+- Updated accept4 usage in:
   src/neonsignal/http2_listener/handle_accept_.c++,
   src/neonsignal/redirect_service/handle_accept_.c++
-- Update socket creation flag usage in:
+- Updated socket creation flag usage in:
   src/neonsignal/http2_listener/helper/make_listen_socket.c++,
   src/neonsignal/redirect_service/setup_listener_.c++
 
 
-Step 5: SIGPIPE and thread naming
----------------------------------
+Step 5: SIGPIPE and thread naming (done)
+----------------------------------------
 
 Use inline #ifdef for these small differences:
 
@@ -179,56 +169,33 @@ pthread_setname_np (thread naming):
   Update: src/redirect_main.c++, src/neonsignal/thread_pool.c++,
           src/neonsignal/logging.c++
 
+glibc-only malloc_trim:
+  Guarded malloc_trim(0) behind __GLIBC__ in
+  src/neonsignal/http2_listener/handle_io_.c++.
 
-Step 6: Meson build changes
----------------------------
+
+Step 6: Meson build changes (done)
+----------------------------------
 
 Source file selection:
-  if host_machine.system() == 'linux'
-    event_loop_sources = files(
-      'event_loop/linux/backend.c++',
-      'event_loop/linux/add_fd.c++',
-      ...
-    )
-  elif host_machine.system() == 'darwin'
-    event_loop_sources = files(
-      'event_loop/darwin/backend.c++',
-      'event_loop/darwin/add_fd.c++',
-      ...
-    )
-  endif
+  Implemented backend selection and shared sources in src/meson.build
+  using host_machine.system() to pick the linux/ or darwin/ backend.
 
-OpenSSL and dependency discovery on macOS:
-  Homebrew installs to different paths based on architecture:
-  - Apple Silicon: /opt/homebrew/opt/openssl@3
-  - Intel Mac: /usr/local/opt/openssl@3
+macOS build notes (as documented in the OSx README):
+  brew install meson ninja pkg-config cmake openssl@3 nghttp2 libmdbx
 
-  Add to meson.build or document for users:
-    if host_machine.system() == 'darwin'
-      # User must set PKG_CONFIG_PATH before running meson setup
-      # export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@3/lib/pkgconfig:$PKG_CONFIG_PATH"
-    endif
-
-  Alternatively, use meson's dependency() with fallback paths:
-    openssl_dep = dependency('openssl', version: '>=3.0',
-      required: true,
-      include_type: 'system')
-
-macOS dependency installation (document in README):
   # Apple Silicon
-  brew install openssl@3 nghttp2 libmdbx pkg-config meson
+  export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@3/lib/pkgconfig:/opt/homebrew/opt/nghttp2/lib/pkgconfig:/opt/homebrew/opt/libmdbx/lib/pkgconfig:$PKG_CONFIG_PATH"
 
-  # Before building
-  export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@3/lib/pkgconfig"
-  export PKG_CONFIG_PATH="/opt/homebrew/opt/libmdbx/lib/pkgconfig:$PKG_CONFIG_PATH"
-  export PKG_CONFIG_PATH="/opt/homebrew/opt/nghttp2/lib/pkgconfig:$PKG_CONFIG_PATH"
+  # Intel macOS (use /usr/local/opt instead of /opt/homebrew/opt)
+  # export PKG_CONFIG_PATH="/usr/local/opt/openssl@3/lib/pkgconfig:/usr/local/opt/nghttp2/lib/pkgconfig:/usr/local/opt/libmdbx/lib/pkgconfig:$PKG_CONFIG_PATH"
 
   meson setup build
   meson compile -C build
 
 
-Step 7: Verification and testing
---------------------------------
+Step 7: Verification and testing (manual checklist)
+---------------------------------------------------
 
 Toolchain requirements:
 - Xcode 15+ / clang 16+ with libc++ and std::format support
