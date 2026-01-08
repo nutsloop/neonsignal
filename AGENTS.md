@@ -1,5 +1,8 @@
 # Repository Guidelines
 
+## Policy
+- WARNING: Never run `sudo` unless the user explicitly requests it; even then, always ask for confirmation before running any `sudo` command.
+
 ## Project Structure & Module Organization
 - Core server lives in `src/` with HTTP/2 and TLS pieces under `src/neonsignal/` (event loop, thread pool, router, HPACK via nghttp2, HTTP/2 listener). Public headers mirror this in `include/neonsignal/`.
 - Entry point is `src/main.c++`; the Meson target outputs `build/src/neonsignal`.
