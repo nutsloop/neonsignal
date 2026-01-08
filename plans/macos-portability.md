@@ -8,8 +8,7 @@ behavior. The focus is on event loop portability, socket setup, signal
 handling, and build configuration.
 
 
-Design Decision: Abstraction vs Conditional Compilation
--------------------------------------------------------
+## Design Decision: Abstraction vs Conditional Compilation
 
 Two approaches are viable:
 
@@ -31,8 +30,7 @@ signals. Use Option B (inline #ifdef) for small one-off differences like
 pthread_setname_np and MSG_NOSIGNAL.
 
 
-Inventory of Linux-only APIs
-----------------------------
+## Inventory of Linux-only APIs
 
 Status: Addressed in the OSx branch.
 
@@ -62,8 +60,7 @@ Items to verify (still recommended on macOS):
 - OpenSSL: Homebrew installs to non-standard paths (see macOS build notes)
 
 
-Step 1: Event flag abstraction and header cleanup (done)
---------------------------------------------------------
+## Step 1: Event flag abstraction and header cleanup (done)
 
 - Added include/neonsignal/event_mask.h++ and wired it into
   include/neonsignal/event_loop.h++ and include/neonsignal/http2_listener.h++.
@@ -90,8 +87,7 @@ EDGE-TRIGGER SEMANTICS WARNING:
   Test case: Large request body that arrives in multiple chunks.
 
 
-Step 2: Split EventLoop backends (epoll vs kqueue) (done)
----------------------------------------------------------
+## Step 2: Split EventLoop backends (epoll vs kqueue) (done)
 
 - Added include/neonsignal/event_loop_backend.h++ and updated
   include/neonsignal/event_loop.h++ to use a backend instance.
@@ -101,8 +97,7 @@ Step 2: Split EventLoop backends (epoll vs kqueue) (done)
   delegators to preserve the per-method file layout.
 
 
-Step 3: Timers and signals (done)
----------------------------------
+## Step 3: Timers and signals (done)
 
 TIMER ABSTRACTION COMPLEXITY:
   timerfd (Linux) and EVFILT_TIMER (macOS) have different models:
@@ -127,8 +122,7 @@ TIMER ABSTRACTION COMPLEXITY:
 - Added src/neonsignal/event_loop/cancel_timer.c++ to complete the timer API.
 
 
-Step 4: Socket accept and flags (done)
---------------------------------------
+## Step 4: Socket accept and flags (done)
 
 - Added portable helpers in include/neonsignal/socket_utils.h++ and
   src/neonsignal/socket_utils/socket_utils.c++ for:
@@ -143,8 +137,7 @@ Step 4: Socket accept and flags (done)
   src/neonsignal/redirect_service/setup_listener_.c++
 
 
-Step 5: SIGPIPE and thread naming (done)
-----------------------------------------
+## Step 5: SIGPIPE and thread naming (done)
 
 Use inline #ifdef for these small differences:
 
@@ -174,8 +167,7 @@ glibc-only malloc_trim:
   src/neonsignal/http2_listener/handle_io_.c++.
 
 
-Step 6: Meson build changes (done)
-----------------------------------
+## Step 6: Meson build changes (done)
 
 Source file selection:
   Implemented backend selection and shared sources in src/meson.build
@@ -184,18 +176,17 @@ Source file selection:
 macOS build notes (as documented in the OSx README):
   brew install meson ninja pkg-config cmake openssl@3 nghttp2 libmdbx
 
-  # Apple Silicon
+  ###### Apple Silicon
   export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@3/lib/pkgconfig:/opt/homebrew/opt/nghttp2/lib/pkgconfig:/opt/homebrew/opt/libmdbx/lib/pkgconfig:$PKG_CONFIG_PATH"
-
-  # Intel macOS (use /usr/local/opt instead of /opt/homebrew/opt)
-  # export PKG_CONFIG_PATH="/usr/local/opt/openssl@3/lib/pkgconfig:/usr/local/opt/nghttp2/lib/pkgconfig:/usr/local/opt/libmdbx/lib/pkgconfig:$PKG_CONFIG_PATH"
+  
+  ###### Intel macOS (use /usr/local/opt instead of /opt/homebrew/opt)
+  export PKG_CONFIG_PATH="/usr/local/opt/openssl@3/lib/pkgconfig:/usr/local/opt/nghttp2/lib/pkgconfig:/usr/local/opt/libmdbx/lib/pkgconfig:$PKG_CONFIG_PATH"
 
   meson setup build
   meson compile -C build
 
 
-Step 7: Verification and testing (manual checklist)
----------------------------------------------------
+## Step 7: Verification and testing (manual checklist)
 
 Toolchain requirements:
 - Xcode 15+ / clang 16+ with libc++ and std::format support
@@ -235,8 +226,7 @@ Known differences to document:
 - kqueue has different error reporting than epoll for some edge cases
 
 
-Future Considerations
----------------------
+## Future Considerations
 
 BSD support:
   kqueue implementation would also work on FreeBSD/OpenBSD with minimal
