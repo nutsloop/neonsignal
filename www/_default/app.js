@@ -33,12 +33,14 @@
   setInterval(cycleTitle, 2500);
 
   var links = document.querySelectorAll(".domain-list a");
-  links.forEach(function (link) {
-    link.addEventListener("mouseenter", function () {
-      link.style.textShadow = "0 0 12px rgba(0, 255, 213, 0.6)";
+  if(links.length > 0) {
+    links.forEach(function (link) {
+      link.addEventListener("mouseenter", function () {
+        link.style.textShadow = "0 0 12px rgba(0, 255, 213, 0.6)";
+      });
+      link.addEventListener("mouseleave", function () {
+        link.style.textShadow = "";
+      });
     });
-    link.addEventListener("mouseleave", function () {
-      link.style.textShadow = "";
-    });
-  });
+  }
 })();
