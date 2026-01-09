@@ -174,17 +174,18 @@ Source file selection:
   using host_machine.system() to pick the linux/ or darwin/ backend.
 
 macOS build notes (as documented in the OSx README):
+```shell
   brew install meson ninja pkg-config cmake openssl@3 nghttp2 libmdbx
 
-  ###### Apple Silicon
+  #Apple Silicon
   export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@3/lib/pkgconfig:/opt/homebrew/opt/nghttp2/lib/pkgconfig:/opt/homebrew/opt/libmdbx/lib/pkgconfig:$PKG_CONFIG_PATH"
   
-  ###### Intel macOS (use /usr/local/opt instead of /opt/homebrew/opt)
-  export PKG_CONFIG_PATH="/usr/local/opt/openssl@3/lib/pkgconfig:/usr/local/opt/nghttp2/lib/pkgconfig:/usr/local/opt/libmdbx/lib/pkgconfig:$PKG_CONFIG_PATH"
+  #Intel macOS (use /usr/local/opt instead of /opt/homebrew/opt)
+  #export PKG_CONFIG_PATH="/usr/local/opt/openssl@3/lib/pkgconfig:/usr/local/opt/nghttp2/lib/pkgconfig:/usr/local/opt/libmdbx/lib/pkgconfig:$PKG_CONFIG_PATH"
 
   meson setup build
   meson compile -C build
-
+```
 
 ## Step 7: Verification and testing (manual checklist)
 
@@ -197,6 +198,7 @@ Build verification:
   meson compile -C build
 
 Smoke tests (manual):
+```shell
   # Start server
   ./build/src/neonsignal &
 
@@ -211,6 +213,7 @@ Smoke tests (manual):
 
   # Test file upload (exercises chunked read handling)
   curl -k --http2 -X POST -F "file=@largefile.bin" https://localhost:9443/api/incoming_data
+```
 
 Platform-specific edge cases to test:
 - [ ] SIGINT/SIGTERM handling (graceful shutdown)
