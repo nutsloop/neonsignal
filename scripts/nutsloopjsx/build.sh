@@ -11,10 +11,7 @@ print_step "Creating directories"
 mkdir -p "$NEONSIGNAL_NUTSLOOPJSX_BUILD_DIR" "$NEONSIGNAL_NUTSLOOPJSX_PUBLIC_DIR" "$NEONSIGNAL_NEONJSX_BUILD_DIR"
 
 print_step "Transpiling NeonJSX runtime"
-print_substep "Source: ${NEONSIGNAL_NEONJSX_SOURCE_DIR}/runtime.ts"
-print_substep "Output: ${NEONSIGNAL_NEONJSX_BUILD_DIR}"
-npx babel "$NEONSIGNAL_NEONJSX_SOURCE_DIR/runtime.ts" --extensions .ts --out-dir "$NEONSIGNAL_NEONJSX_BUILD_DIR"
-print_success "Runtime transpiled"
+"$NEONSIGNAL_NEONJSX_BUILD_SCRIPT"
 
 print_step "Transpiling NutsloopJSX source"
 print_substep "Source: ${NEONSIGNAL_NUTSLOOPJSX_SOURCE_DIR}"

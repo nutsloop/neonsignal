@@ -4,8 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "clean:neonjsx": "bash neonjsx/clean.sh",
-    "build:neonjsx": "bash neonjsx/build.sh",
+    "clean:neonjsx": "bash scripts/neonjsx/clean.sh",
+    "build:neonjsx": "bash scripts/neonjsx/build.sh",
+    "all:neonjsx": "bash scripts/neonjsx/all.sh",
     "clean:neonsignal": "bash scripts/neonsignaljsx/clean.sh",
     "build:neonsignal": "bash scripts/neonsignaljsx/build.sh",
     "all:neonsignal": "bash scripts/neonsignaljsx/all.sh",
@@ -26,11 +27,11 @@
     "@babel/core": "8.0.0-beta.3",
     "@babel/plugin-transform-react-jsx": "8.0.0-beta.3",
     "@babel/preset-typescript": "8.0.0-beta.3",
-    "@typescript-eslint/eslint-plugin": "^8.50.1",
-    "@typescript-eslint/parser": "^8.50.1",
+    "@typescript-eslint/eslint-plugin": "^8.52.0",
+    "@typescript-eslint/parser": "^8.52.0",
     "esbuild": "^0.27.2",
     "eslint": "^9.39.2",
-    "eslint-plugin-perfectionist": "^5.1.0",
+    "eslint-plugin-perfectionist": "^5.3.1",
     "typescript": "^5.9.3"
   }
 }
