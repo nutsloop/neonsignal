@@ -36,8 +36,7 @@ NeonSignal uses multiple languages that need LSP support:
 ### Helix
 
 ```bash
-git clone https://github.com/helix-editor/helix
-cd helix
+git clone https://github.com/helix-editor/helix && cd helix
 
 # Optimized
 cargo install \
@@ -46,58 +45,19 @@ cargo install \
    --path helix-term \
    --locked
 
+mkdir -p ~/.config/helix/{runtime, themes}
+
+# Runtime setup (required for Cargo/source builds)
+# Copy runtime into ~/.config/helix (recommended)
+cp -a ./runtime/. ~/.config/helix/runtime/
+
 # If installed via Cargo, you MUST set up the runtime:
 hx --grammar fetch
 hx --grammar build
 
-# Runtime setup (required for Cargo/source builds)
-# Option A: Copy runtime into ~/.config/helix (recommended)
-mkdir -p ~/.config/helix/runtime
-cp -a .runtime/. ~/.config/helix/runtime/
-
-# Option B: Point HELIX_RUNTIME at the runtime directory
-# export HELIX_RUNTIME=~/.config/helix/runtime #bash
-# set -Ux HELIX_RUNTIME $HOME/.config/helix/runtime #fish
-
-# Verify
+# Verify version
 hx --version
-hx --health cpp
-```
 
-### Language Servers
-
-```bash
-# C++ (clangd from LLVM)
-sudo dnf install clang-tools-extra
-
-# TypeScript
-npm install -g typescript typescript-language-server
-
-# Python
-pip install python-lsp-server
-
-# Bash
-npm install -g bash-language-server
-
-# Markdown
-wget -O marksman https://github.com/artempyanykh/marksman/releases/download/2025-12-13/marksman-linux-arm64 &&
-chmod +x marksman && mv marksman ~/.local/bin
-
-# TOML
-cargo install taplo-cli --locked
-
-# CSS/HTML
-npm install -g vscode-langservers-extracted
-```
-
-### Verify Health
-
-```bash
-hx --health c++
-hx --health typescript
-hx --health python
-hx --health bash
-hx --health markdown
 ```
 
 ## Configuration
@@ -230,6 +190,32 @@ Helix checks for changes when you switch buffers. If an external process edits a
 **Why this is manual:**
 
 Helix prompts when a file changes on disk to avoid clobbering unsaved edits.
+
+## Language Servers
+
+```bash
+# C++ (clangd from LLVM)
+sudo dnf install clang-tools-extra
+
+# TypeScript
+npm install -g typescript typescript-language-server
+
+# Python
+pip install python-lsp-server
+
+# Bash
+npm install -g bash-language-server
+
+# Markdown
+wget -O marksman https://github.com/artempyanykh/marksman/releases/download/2025-12-13/marksman-linux-arm64 &&
+chmod +x marksman && mv marksman ~/.local/bin
+
+# TOML
+cargo install taplo-cli --locked
+
+# CSS/HTML
+npm install -g vscode-langservers-extracted
+```
 
 ### Language Config (`~/.config/helix/languages.toml`)
 
@@ -381,6 +367,17 @@ auto-format = true
 formatter = { command = "prettier", args = ["--parser", "json"] }
 ```
 
+```bash
+
+# Verify language servers
+
+hx --health c++
+hx --health typescript
+hx --health python
+hx --health bash
+hx --health markdown
+```
+
 ## Custom Synthwave Theme (`~/.config/helix/themes/synthwave.toml`)
 
 ```toml
@@ -525,32 +522,6 @@ inherits = "dark_plus"
 "diff.delta.gutter" = { fg = "#f9f002" }
 ```
 
-## Project-Specific Setup
-
-### Generate `compile_commands.json` for clangd
-
-```bash
-# In project root
-cd /home/core/code/neonsignal
-meson setup build --buildtype=debug
-# compile_commands.json is auto-generated in build/
-
-# Symlink for clangd
-ln -sf build/compile_commands.json .
-```
-
-### `.helix/` Directory (Project-Local Config)
-
-Create `/home/core/code/neonsignal/.helix/languages.toml`:
-
-```toml
-# Project-specific overrides
-
-[[language]]
-name = "cpp"
-file-types = ["c++", "h++"]  # NeonSignal uses .c++ and .h++ extensions
-```
-
 ## Essential Keybindings Reference
 
 ### Navigation
@@ -644,24 +615,6 @@ file-types = ["c++", "h++"]  # NeonSignal uses .c++ and .h++ extensions
 1. `]g` next git hunk
 2. `[g` previous git hunk
 3. `Space g` (if configured) git commands
-```
-
-## Integration with NeonSignal Scripts
-
-Add to shell profile (`~/.bashrc` or `~/.zshrc`):
-
-```bash
-# Quick edit NeonSignal
-alias ns="cd /home/core/code/neonsignal && hx ."
-alias nss="cd /home/core/code/neonsignal/src && hx ."
-alias nsd="cd /home/core/code/neonsignal/docs && hx ."
-alias nsp="cd /home/core/code/neonsignal/plans && hx ."
-
-# Edit specific areas
-alias ns-src="hx /home/core/code/neonsignal/src/neonsignal/"
-alias ns-include="hx /home/core/code/neonsignal/include/neonsignal/"
-alias ns-scripts="hx /home/core/code/neonsignal/scripts/"
-alias ns-theme="hx /home/core/code/neonsignal/tools/sphinx-synthwave-theme/"
 ```
 
 ## Troubleshooting
