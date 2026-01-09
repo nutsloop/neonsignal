@@ -378,7 +378,9 @@ hx --health bash
 hx --health markdown
 ```
 
-## Custom Synthwave Theme (`~/.config/helix/themes/synthwave.toml`)
+## Helix Themes and how to find it!
+
+### Custom Synthwave Theme (`~/.config/helix/themes/synthwave.toml`)
 
 ```toml
 # ═══════════════════════════════════════════════════════════════════════════
