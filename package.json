@@ -4,20 +4,16 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "clean:neonjsx": "bash scripts/neonjsx/clean.sh",
-    "build:neonjsx": "bash scripts/neonjsx/build.sh",
-    "all:neonjsx": "bash scripts/neonjsx/all.sh",
     "clean:_default": "bash scripts/_default/clean.sh",
     "build:_default": "bash scripts/_default/build.sh",
     "all:_default": "bash scripts/_default/all.sh",
     "lint": "bash scripts/eslint/lint.sh",
     "lint-fix": "bash scripts/eslint/lint-fix.sh"
   },
+  "dependencies": {
+    "@nutsloop/neonjsx": "^1.0.0"
+  },
   "devDependencies": {
-    "@babel/cli": "8.0.0-beta.3",
-    "@babel/core": "8.0.0-beta.3",
-    "@babel/plugin-transform-react-jsx": "8.0.0-beta.3",
-    "@babel/preset-typescript": "8.0.0-beta.3",
     "@typescript-eslint/eslint-plugin": "^8.52.0",
     "@typescript-eslint/parser": "^8.52.0",
     "esbuild": "^0.27.2",

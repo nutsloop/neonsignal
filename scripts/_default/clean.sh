@@ -15,4 +15,12 @@ else
   print_substep "Public directory does not exist"
 fi
 
+print_step "Removing build directory"
+if [[ -d "$NEONSIGNAL_DEFAULT_BUILD_DIR" ]]; then
+  rm -rf "$NEONSIGNAL_DEFAULT_BUILD_DIR"
+  print_success "Removed build directory: ${NEONSIGNAL_DEFAULT_BUILD_DIR}"
+else
+  print_substep "Build directory does not exist"
+fi
+
 print_success "Default vhost clean complete"
