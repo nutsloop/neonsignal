@@ -40,6 +40,7 @@ EXCLUSIONS=(
   '--glob' '!www/book/**'
   '--glob' '!AI-threads/**'
   '--glob' '!instructions/**'
+  '--glob' '!benchmarks/**'
   '--glob' '!AGENTS.md'
   '--glob' '!CLAUDE.md'
   '--glob' '!README.md'
