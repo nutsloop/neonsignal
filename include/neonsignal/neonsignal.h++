@@ -1,9 +1,9 @@
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <atomic>
 
 #include <openssl/ssl.h>
 
@@ -22,7 +22,6 @@ struct ServerConfig {
   std::string public_root = "public";
   std::string rp_id = "neonsignal.nutsloop.host";
   std::string origin = "https://neonsignal.nutsloop.host";
-  std::string credentials_path = "config/credentials.json";
   std::string db_path = "data/neonsignal.mdb";
 };
 
@@ -38,7 +37,7 @@ public:
 
 private:
   struct SSLContextDeleter {
-    void operator()(SSL_CTX* ctx) const;
+    void operator()(SSL_CTX *ctx) const;
   };
 
   ServerConfig config_;
