@@ -15,34 +15,77 @@
 }
 
 @keyframes flicker {
-  0%, 100% { opacity: 1; }
-  92% { opacity: 1; }
-  93% { opacity: 0.8; }
-  94% { opacity: 1; }
-  96% { opacity: 0.4; }
-  97% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  92% {
+    opacity: 1;
+  }
+
+  93% {
+    opacity: 0.8;
+  }
+
+  94% {
+    opacity: 1;
+  }
+
+  96% {
+    opacity: 0.4;
+  }
+
+  97% {
+    opacity: 1;
+  }
 }
 
 @keyframes glitch {
-  0%, 100% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
+
+  0%,
+  100% {
+    transform: translate(0);
+  }
+
+  20% {
+    transform: translate(-2px, 2px);
+  }
+
+  40% {
+    transform: translate(-2px, -2px);
+  }
+
+  60% {
+    transform: translate(2px, 2px);
+  }
+
+  80% {
+    transform: translate(2px, -2px);
+  }
 }
 
 @keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(100vh);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     text-shadow:
       0 0 10px var(--neon-cyan),
       0 0 20px var(--neon-cyan),
       0 0 40px var(--neon-cyan);
   }
+
   50% {
     text-shadow:
       0 0 5px var(--neon-cyan),
@@ -52,11 +95,14 @@
 }
 
 @keyframes pulse-glow-pink {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow:
       0 0 10px var(--neon-pink),
       0 0 20px var(--neon-pink);
   }
+
   50% {
     box-shadow:
       0 0 5px var(--neon-pink),
@@ -69,6 +115,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -76,19 +123,36 @@
 }
 
 @keyframes vhs-tracking {
-  0% { transform: translateX(0); }
-  10% { transform: translateX(-1px); }
-  20% { transform: translateX(1px); }
-  30% { transform: translateX(0); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+
+  10% {
+    transform: translateX(-1px);
+  }
+
+  20% {
+    transform: translateX(1px);
+  }
+
+  30% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
 
 @keyframes horizon-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow:
       0 0 60px rgba(255, 42, 109, 0.3),
       0 0 120px rgba(157, 78, 221, 0.2);
   }
+
   50% {
     box-shadow:
       0 0 80px rgba(255, 42, 109, 0.5),
@@ -96,9 +160,95 @@
   }
 }
 
+@keyframes landing-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes landing-sheen {
+  0% {
+    transform: translateX(-35%) rotate(8deg);
+    opacity: 0;
+  }
+
+  25% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+
+  75% {
+    opacity: 0.45;
+  }
+
+  100% {
+    transform: translateX(35%) rotate(8deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle {
+
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.6);
+  }
+
+  40% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+
+  60% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes birthday-sheen {
+  0% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.5;
+  }
+
+  60% {
+    transform: translateX(120%);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}
+
 @keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 * {
@@ -211,13 +361,11 @@ body {
 .scanlines {
   position: fixed;
   inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.1) 2px,
-    rgba(0, 0, 0, 0.1) 4px
-  );
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.1) 2px,
+      rgba(0, 0, 0, 0.1) 4px);
   pointer-events: none;
   z-index: 1000;
 }
@@ -483,7 +631,7 @@ h3 {
   font-feature-settings: "liga" 0, "calt" 0;
   color: var(--neon-cyan);
   text-shadow: 0 0 20px rgba(102, 204, 255, 0.5),
-               0 0 40px rgba(102, 204, 255, 0.3);
+    0 0 40px rgba(102, 204, 255, 0.3);
   margin: 0 0 18px;
   white-space: pre;
   overflow-x: auto;
@@ -497,6 +645,14 @@ h3 {
 .landing-hero {
   text-align: center;
   padding: 3.25rem 2.5rem;
+  background:
+    radial-gradient(circle at 12% 15%, rgba(0, 255, 249, 0.2), transparent 42%),
+    radial-gradient(circle at 88% 18%, rgba(255, 42, 109, 0.2), transparent 45%),
+    radial-gradient(circle at 50% 100%, rgba(157, 78, 221, 0.25), transparent 60%),
+    var(--panel-glass);
+  box-shadow:
+    0 0 40px rgba(0, 255, 249, 0.2),
+    0 0 80px rgba(255, 42, 109, 0.15);
 }
 
 .landing-hero .lede {
@@ -507,6 +663,127 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.landing-hero h1 {
+  /*background: linear-gradient(120deg, #f5faff 0%, var(--neon-cyan) 35%, var(--neon-pink) 70%, #f5faff 100%);
+  background-size: 220% 220%;*/
+  animation:
+    pulse-glow 3s ease-in-out infinite,
+    flicker 10s linear infinite,
+    landing-shift 8s ease-in-out infinite;
+}
+
+.landing-hero .landing-sheen {
+  position: absolute;
+  inset: -30%;
+  background: linear-gradient(120deg,
+      transparent 25%,
+      rgba(255, 255, 255, 0.08) 45%,
+      rgba(0, 255, 249, 0.25) 52%,
+      rgba(255, 255, 255, 0.08) 58%,
+      transparent 75%);
+  mix-blend-mode: screen;
+  animation: landing-sheen 9s ease-in-out infinite;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.landing-hero .landing-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.landing-hero .sparkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9), rgba(0, 255, 249, 0.1));
+  box-shadow: 0 0 12px rgba(0, 255, 249, 0.65);
+  animation: sparkle 6s ease-in-out infinite;
+}
+
+.landing-hero .sparkle.s1 {
+  top: 12%;
+  left: 18%;
+  animation-delay: 0.2s;
+}
+
+.landing-hero .sparkle.s2 {
+  top: 22%;
+  right: 20%;
+  width: 8px;
+  height: 8px;
+  animation-delay: 1.4s;
+}
+
+.landing-hero .sparkle.s3 {
+  top: 48%;
+  left: 10%;
+  width: 4px;
+  height: 4px;
+  animation-delay: 2.2s;
+}
+
+.landing-hero .sparkle.s4 {
+  bottom: 24%;
+  right: 16%;
+  width: 5px;
+  height: 5px;
+  animation-delay: 0.9s;
+}
+
+.landing-hero .sparkle.s5 {
+  bottom: 18%;
+  left: 32%;
+  width: 7px;
+  height: 7px;
+  animation-delay: 1.9s;
+}
+
+.landing-hero .sparkle.s6 {
+  top: 14%;
+  left: 62%;
+  width: 5px;
+  height: 5px;
+  animation-delay: 2.8s;
+}
+
+.birthday-banner {
+  margin: 1.2rem 0 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 255, 249, 0.4);
+  background: linear-gradient(120deg, rgba(0, 255, 249, 0.18), rgba(255, 42, 109, 0.16));
+  box-shadow: 0 0 18px rgba(0, 255, 249, 0.25), inset 0 0 18px rgba(255, 255, 255, 0.05);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.65rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.birthday-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: translateX(-120%);
+  animation: birthday-sheen 7s ease-in-out infinite;
+}
+
+.birthday-label {
+  font-family: 'Orbitron', sans-serif;
+  color: var(--neon-yellow);
+}
+
+.birthday-date {
+  color: var(--text-main);
 }
 
 .feature-grid {
@@ -970,8 +1247,8 @@ h3 {
   gap: 2px;
   height: 140px;
   background: radial-gradient(circle at 20% 20%, rgba(124, 255, 77, 0.08), transparent 45%),
-              radial-gradient(circle at 80% 0%, rgba(255, 90, 162, 0.12), transparent 40%),
-              #0f0a1c;
+    radial-gradient(circle at 80% 0%, rgba(255, 90, 162, 0.12), transparent 40%),
+    #0f0a1c;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 8px;
   padding: 10px;
@@ -979,8 +1256,8 @@ h3 {
 
 .mem-graph {
   background: radial-gradient(circle at 10% 30%, rgba(255, 107, 214, 0.12), transparent 40%),
-              radial-gradient(circle at 80% 20%, rgba(124, 255, 77, 0.08), transparent 45%),
-              #0f0a1c;
+    radial-gradient(circle at 80% 20%, rgba(124, 255, 77, 0.08), transparent 45%),
+    #0f0a1c;
 }
 
 .cpu-bar {
@@ -1217,13 +1494,13 @@ code {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.switch input:checked + .switch-track {
+.switch input:checked+.switch-track {
   background: linear-gradient(90deg, rgba(255, 42, 109, 0.6), rgba(157, 78, 221, 0.6));
   border-color: rgba(255, 42, 109, 0.6);
   box-shadow: 0 0 14px rgba(255, 42, 109, 0.4);
 }
 
-.switch input:checked + .switch-track .switch-knob {
+.switch input:checked+.switch-track .switch-knob {
   transform: translateX(26px);
   box-shadow: 0 0 10px rgba(255, 42, 109, 0.7);
 }
@@ -1260,14 +1537,14 @@ code {
   transition: all 0.2s ease;
 }
 
-.gear-option input:checked + .gear-pill {
+.gear-option input:checked+.gear-pill {
   color: #05010d;
   border-color: rgba(0, 255, 249, 0.6);
   background: linear-gradient(90deg, rgba(0, 255, 249, 0.8), rgba(255, 42, 109, 0.8));
   box-shadow: 0 0 16px rgba(0, 255, 249, 0.35);
 }
 
-.gear-option input:focus-visible + .gear-pill {
+.gear-option input:focus-visible+.gear-pill {
   border-color: rgba(255, 255, 255, 0.6);
 }
 
@@ -1309,6 +1586,16 @@ body[data-visual="low"] h1,
 body[data-visual="low"] h2 {
   animation: none;
   text-shadow: none;
+}
+
+body[data-visual="low"] .landing-sheen,
+body[data-visual="low"] .landing-sparkles {
+  display: none;
+}
+
+body[data-visual="low"] .birthday-banner::after {
+  animation: none;
+  opacity: 0;
 }
 
 body[data-visual="low"] .stats .card,

@@ -3,6 +3,7 @@
 **NeonSignal** is a high-performance HTTP/2 server written in modern C++23, designed for low-latency, real-time applications. Built as a monolithic repository, it integrates a C++23 server backend with custom JSX frontend runtime, Sphinx documentation, and AI-powered content generation.
 
 **Target Platform:** Oracle Linux 10 (ARM64) on Oracle Cloud Infrastructure (Ampere A1 Compute)
+**Project Birthday:** November 25, 2025
 
 ::::{grid} 2
 :gutter: 3

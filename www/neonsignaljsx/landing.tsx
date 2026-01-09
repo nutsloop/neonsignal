@@ -21,12 +21,25 @@ export const LandingPage = () => (
   <div className="page landing">
     <section className="hero landing-hero">
       <div className="glow" />
+      <div className="landing-sheen" aria-hidden="true" />
+      <div className="landing-sparkles" aria-hidden="true">
+        <span className="sparkle s1" />
+        <span className="sparkle s2" />
+        <span className="sparkle s3" />
+        <span className="sparkle s4" />
+        <span className="sparkle s5" />
+        <span className="sparkle s6" />
+      </div>
       <div className="content">
         <p className="signal-id">Signal ID: NS-CORE-01</p>
         <h1 data-text="NEONSIGNAL">NEONSIGNAL</h1>
         {/*<pre className="ascii-art" aria-label="NeonSignal ASCII Art">{ASCII_ART}</pre>*/}
         <p className="tagline">High-performance HTTP/2 server</p>
         <p className="subtitle">Deterministic latency for the wasteland mesh</p>
+        <div className="birthday-banner">
+          <span className="birthday-label">Project Birthday</span>
+          <span className="birthday-date">November 25, 2025</span>
+        </div>
         <div className="feature-grid">
           <div className="feature">
             <span className="feature-icon">IO</span>
