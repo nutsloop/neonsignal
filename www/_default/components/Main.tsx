@@ -1,5 +1,3 @@
-import { h, Fragment } from '@nutsloop/neonjsx';
-
 import { ConsoleTerminal } from './ConsoleTerminal';
 
 export const Main = () => {

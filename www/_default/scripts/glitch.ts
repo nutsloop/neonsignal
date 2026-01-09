@@ -133,6 +133,7 @@ export class GlitchEffect {
       case 'rgbSplit':
         this.rgbSplit( element );
         break;
+      // skip default
     }
   }
 

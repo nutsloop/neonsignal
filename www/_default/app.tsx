@@ -1,4 +1,4 @@
-import { h, render } from '@nutsloop/neonjsx';
+import { render } from '@nutsloop/neonjsx';
 
 import { Main } from './components/Main';
 import { createConsoleStream, TerminalLine } from './scripts/console-stream';

@@ -1,5 +1,3 @@
-import { h } from '@nutsloop/neonjsx';
-
 /**
  * ConsoleTerminal - Terminal window component
  * The terminal body (id="terminal-output") will be targeted by console-stream.ts
