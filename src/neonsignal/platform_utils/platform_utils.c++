@@ -5,10 +5,15 @@
 namespace neonsignal {
 namespace platform_utils {
 
-void set_thread_name(const std::string& name) {
+void set_thread_name(const std::string &name) {
+#ifdef __APPLE__
+  constexpr std::size_t kMaxNameLen = 63;
+#else
+  constexpr std::size_t kMaxNameLen = 15;
+#endif
   std::string truncated = name;
-  if (truncated.size() > 15) {
-    truncated.resize(15);
+  if (truncated.size() > kMaxNameLen) {
+    truncated.resize(kMaxNameLen);
   }
 
 #ifdef __APPLE__
