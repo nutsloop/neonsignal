@@ -3,7 +3,7 @@
 # NeonSignal Build Script (macOS) - Compile only.
 #
 # Usage:
-#   ./scripts/build/on-build.sh
+#   ./scripts/build/only-build.sh
 # ═══════════════════════════════════════════════════════════════════════════
 
 set -e
@@ -65,7 +65,7 @@ preflight_checks() {
 show_help() {
   print_header "NEONSIGNAL BUILD (macOS, COMPILE ONLY)"
   echo -e "${BOLD}Usage:${RESET}"
-  echo -e "  ${CYAN}./scripts/build/on-build.sh${RESET}"
+  echo -e "  ${CYAN}./scripts/build/only-build.sh${RESET}"
   echo ""
 }
 
