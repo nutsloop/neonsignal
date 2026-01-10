@@ -9,10 +9,12 @@
 /certs/
 /config/
 /data/
-/node_modules/
 /no-git/
+/node_modules/
 /package-lock.json
 /public/
+/subprojects/.wraplock
+/subprojects/ansi/
 /subprojects/libmdbx/
 /www/book/.venv/
 /www/book/source/ai-conversations/*
