@@ -155,6 +155,7 @@ preflight_checks() {
   ensure_command_or_brew meson meson || missing=true
   ensure_command_or_brew ninja ninja || missing=true
   ensure_command_or_brew cmake cmake || missing=true
+  ensure_command_or_brew npm node || missing=true
 
   if [[ "${missing}" == "true" ]]; then
     print_error "Missing required build tools. Aborting."
@@ -186,7 +187,14 @@ patch_libmdbx_subproject() {
 
   if [[ ! -d "${subproject_dir}" ]]; then
     print_step "Fetching libmdbx subproject"
-    (cd "${NEONSIGNAL_ROOT_DIR}" && meson subprojects download libmdbx)
+    if ! (cd "${NEONSIGNAL_ROOT_DIR}" && meson subprojects download libmdbx); then
+      if [[ -f "${cmake_file}" ]]; then
+        print_warning "Meson reported an error fetching libmdbx, but CMakeLists.txt is present."
+      else
+        print_error "Failed to fetch libmdbx subproject."
+        exit 1
+      fi
+    fi
   fi
 
   if [[ ! -f "${cmake_file}" ]]; then
@@ -314,6 +322,18 @@ ls -lh build/src/neonsignal build/src/neonsignal_redirect | while read -r line; 
 done
 
 # Build frontend (_default only)
+
+print_separator
+print_step "Running npm install"
+if ! npm install; then
+  print_error "npm install failed"
+  print_substep "Check npm output above and ensure Node.js is installed."
+  exit 1
+fi
+print_success "npm install complete"
+
+
+
 print_separator
 print_step "Building frontend ${DIM}(_default only)${RESET}"
 "$NEONSIGNAL_DEFAULT_CLEAN_SCRIPT" || true
