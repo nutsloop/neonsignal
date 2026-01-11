@@ -36,10 +36,9 @@ html_sidebars = {
 }
 
 source_suffix = {
+    ".rst": "restructuredtext",
     ".md": "markdown",
 }
-
-exclude_patterns = ["**/*.rst"]
 
 myst_enable_extensions = [
     "colon_fence",
