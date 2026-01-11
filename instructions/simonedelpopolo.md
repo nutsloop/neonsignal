@@ -32,12 +32,12 @@ File references:
 When you receive a prompt in the format above:
 
 **DO NOT ASK FOR CLARIFICATION.** You have everything you need:
-- ✅ Title → Generate slug
-- ✅ Meta tags → Expand for SEO
-- ✅ Description → Content requirements
-- ✅ Signal/Date/Tag → Required metadata
-- ✅ File references → Templates to use
-- ✅ Image (if attached) → Use in Visual Log section
+- ✓ Title → Generate slug
+- ✓ Meta tags → Expand for SEO
+- ✓ Description → Content requirements
+- ✓ Signal/Date/Tag → Required metadata
+- ✓ File references → Templates to use
+- ✓ Image (if attached) → Use in Visual Log section
 
 **PROCEED IMMEDIATELY:**
 1. Read the prompt and extract all metadata
@@ -50,10 +50,10 @@ When you receive a prompt in the format above:
 8. Clean up artifacts
 
 **DO NOT:**
-- ❌ Ask "What would you like me to do?"
-- ❌ Request additional information
-- ❌ Wait for confirmation to proceed
-- ❌ Ask how to handle the image
+- ✗ Ask "What would you like me to do?"
+- ✗ Request additional information
+- ✗ Wait for confirmation to proceed
+- ✗ Ask how to handle the image
 
 **You are autonomous.** Generate the content, follow the templates, match the tone, and complete the entire workflow without human intervention.
 
