@@ -1,0 +1,7 @@
+[wrap-git]
+url = https://github.com/nutsloop/ansi.git
+revision = main
+depth = 1
+
+[provide]
+ansi = ansi_dep

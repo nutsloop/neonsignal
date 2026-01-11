@@ -13,7 +13,9 @@
 /no-git/
 /package-lock.json
 /public/
+*.wraplock
 /subprojects/libmdbx/
+/subprojects/ansi/
 /www/book/.venv/
 /www/book/source/ai-conversations/*
 !/www/book/source/ai-conversations/index.md

@@ -133,12 +133,13 @@ redirect_srcs = [
 executable('neonsignal',
   srcs,
   include_directories : neonsignal_inc,
-  dependencies : [openssl_dep, nghttp2_dep, mdbx_dep],
+  dependencies : [openssl_dep, nghttp2_dep, mdbx_dep, ansi_dep],
   install : true
 )
 
 executable('neonsignal_redirect',
   redirect_srcs,
   include_directories : neonsignal_inc,
+  dependencies : [ansi_dep],
   install : true
 )

@@ -31,4 +31,9 @@ if not mdbx_dep.found()
   mdbx_dep = mdbx_proj.get_variable('mdbx_static_dep')
 endif
 
+ansi_dep = dependency('ansi', required : false, static : true)
+if not ansi_dep.found()
+  ansi_dep = dependency('ansi', fallback : ['ansi', 'ansi_dep'], static : true)
+endif
+
 subdir('src')
