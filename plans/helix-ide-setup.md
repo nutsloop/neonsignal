@@ -1,8 +1,8 @@
-# Plan: Helix as IDE for NeonSignal
+# Helix as IDE
 
 ## Overview
 
-Configure [Helix](https://helix-editor.com/) as the primary development environment for the NeonSignal project. Helix is a post-modern terminal editor with built-in LSP support, tree-sitter syntax highlighting, and a Kakoune-inspired modal editing model.
+Configure [Helix](https://helix-editor.com/) as the primary development environment for Your project. Helix is a post-modern terminal editor with built-in LSP support, tree-sitter syntax highlighting, and a Kakoune-inspired modal editing model.
 
 ## Why Helix
 
@@ -45,15 +45,8 @@ cargo install \
    --path helix-term \
    --locked
 
+# we will use these directories later.
 mkdir -p ~/.config/helix/{runtime, themes}
-
-# Runtime setup (required for Cargo/source builds)
-# Copy runtime into ~/.config/helix (recommended)
-cp -a ./runtime/. ~/.config/helix/runtime/
-
-# If installed via Cargo, you MUST set up the runtime:
-hx --grammar fetch
-hx --grammar build
 
 # Verify version
 hx --version
@@ -158,40 +151,9 @@ max-indent-retain = 40
 "C-space" = "completion"
 ```
 
-### Reload Behavior
-
-Helix does not support an `auto-reload` setting. Use manual reload commands or focus-based prompts when files change on disk.
-
-**Manual reload commands:**
-
-| Command            | Action                |
-|--------------------|-----------------------|
-| `:reload` or `:r`  | Reload current buffer |
-| `:reload-all`      | Reload all buffers    |
-
-**Optional keybindings:**
-
-```toml
-[keys.normal]
-#"C-r" = ":reload"
-"C-r" = ":reload-all"
-
-[keys.normal.space]
-"R" = ":reload-all"
-```
-
-**Focus-based reload:**
-
-Helix checks for changes when you switch buffers. If an external process edits a file:
-
-1. Switch to another buffer (`H` or `L`)
-2. Switch back and Helix will prompt if the file changed
-
-**Why this is manual:**
-
-Helix prompts when a file changes on disk to avoid clobbering unsaved edits.
-
 ## Language Servers
+
+Let's install the LSP and make them available on the system.
 
 ```bash
 # C++ (clangd from LLVM)
@@ -219,10 +181,15 @@ npm install -g vscode-langservers-extracted
 
 ### Language Config (`~/.config/helix/languages.toml`)
 
+Now let's configure Helix behaviour for the LSP
+
 ```toml
 # ═══════════════════════════════════════════════════════════════════════════
 # C++ Configuration for NeonSignal
 # ═══════════════════════════════════════════════════════════════════════════
+
+# at the moment we need just these grammars
+use-grammars = { only = [ "cpp", "c", "rust", "python", "bash", "markdown", "toml", "json" ] }
 
 [[language]]
 name = "cpp"
@@ -369,6 +336,10 @@ formatter = { command = "prettier", args = ["--parser", "json"] }
 
 ```bash
 
+# let's fetch what we need :)
+hx --grammar fetch
+hx --grammar build
+
 # Verify language servers
 
 hx --health c++
@@ -376,9 +347,13 @@ hx --health typescript
 hx --health python
 hx --health bash
 hx --health markdown
+
+# now a bit of cleaning ;)
+rm -rf ~/.config/helix/runtime/grammars/sources
+
 ```
 
-## Helix Themes and how to find it!
+## Helix Themes and how to find them!
 
 ### Custom Synthwave Theme (`~/.config/helix/themes/synthwave.toml`)
 
@@ -525,6 +500,40 @@ inherits = "dark_plus"
 ```
 
 ## Essential Keybindings Reference
+
+### Reload Behavior
+
+Helix does not support an `auto-reload` setting. Use manual reload commands or focus-based prompts when files change on disk.
+
+**Manual reload commands:**
+
+| Command            | Action                |
+|--------------------|-----------------------|
+| `:reload` or `:r`  | Reload current buffer |
+| `:reload-all`      | Reload all buffers    |
+
+**Optional keybindings:**
+
+```toml
+[keys.normal]
+#"C-r" = ":reload"
+"C-r" = ":reload-all"
+
+[keys.normal.space]
+"R" = ":reload-all"
+```
+
+**Focus-based reload:**
+
+Helix checks for changes when you switch buffers. If an external process edits a file:
+
+1. Switch to another buffer (`H` or `L`)
+2. Switch back and Helix will prompt if the file changed
+
+**Why this is manual:**
+
+Helix prompts when a file changes on disk to avoid clobbering unsaved edits.
+
 
 ### Navigation
 
