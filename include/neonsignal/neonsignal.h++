@@ -22,7 +22,6 @@ struct ServerConfig {
   std::string public_root = "public";
   std::string rp_id = "neonsignal.nutsloop.host";
   std::string origin = "https://neonsignal.nutsloop.host";
-  std::string credentials_path = "config/credentials.json";
   std::string db_path = "data/neonsignal.mdb";
 };
 
