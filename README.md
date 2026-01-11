@@ -1,4 +1,5 @@
 # NeonSignal
+> WARNING: This repository is for local development purposes only.
 
 A high-performance HTTP/2 server written in modern C++23, designed for low-latency, real-time applications. Built as a monolithic repository integrating a C++23 server backend with custom JSX frontend runtime, Sphinx documentation, and AI-powered content generation.
 

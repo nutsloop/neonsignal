@@ -3,40 +3,273 @@
 ## Policy
 - WARNING: Never run `sudo` unless the user explicitly requests it; even then, always ask for confirmation before running any `sudo` command.
 
-## Project Structure & Module Organization
-- Core server lives in `src/` with HTTP/2 and TLS pieces under `src/neonsignal/` (event loop, thread pool, router, HPACK via nghttp2, HTTP/2 listener). Public headers mirror this in `include/neonsignal/`.
-- Entry point is `src/main.c++`; the Meson target outputs `build/src/neonsignal`.
-- Front-end runtime lives in `neonjsx/` (shared `runtime.ts` + `jsx.d.ts`). App sources live in `neonsignaljsx/` and `nutsloopjsx/`. Bundled assets land in `public/` (`app.js`, `app.js.map`, static HTML/CSS/JS, certs live in `certs/`).
-- Build files: root `meson.build` plus `package.json`, `tsconfig.json`; node modules are vendored in `node_modules/`.
+### use of Emoticons
+**IMPORTANT:** Avoid emoji in docs/logs/source everywhere; use plain Unicode symbols.
+Recommended Unicode symbols:
+- ✓ check
+- ✗ cross
+- • bullet
+- ‣ bullet (alt)
+- ◦ bullet (alt)
+- → arrow right
+- ← arrow left
+- ↑ arrow up
+- ↓ arrow down
+- ↳ return/branch
+- ⇢ arrow right (alt)
+- ⇒ implies
+- ⇐ implies (rev)
+- ⇔ iff
+- ↔ bidirectional
+- ⟶ long arrow
+- ⟵ long arrow (rev)
+- ⟷ long bidirectional
+- ∎ end marker
+- □ empty square
+- ■ filled square
+- ◆ filled diamond
+- ◇ empty diamond
+- ○ empty circle
+- ● filled circle
+- ▸ triangle right
+- ▾ triangle down
+- ▲ triangle up
+- ▼ triangle down (alt)
+- ⌁ wave
+- ⋯ ellipsis (midline)
+- ≈ approximately
+- ≠ not equal
+- ≤ less-than-or-equal
+- ≥ greater-than-or-equal
+- ± plus/minus
+- ∞ infinity
+- ∅ empty set
+- ∈ member of
+- ∉ not member of
+- ⊂ subset
+- ⊃ superset
+- ¬ logical not
 
-## Build, Test, and Development Commands
-- Configure & build C++: `meson setup build` (once), then `meson compile -C build`. Run with `./build/src/neonsignal`.
-- Front-end bundle (neonsignal app): `npm run neonsignal.nutsloop.host` (transpiles `neonsignaljsx/` to `build/neonsignaljsx/`, bundles to `public/neonsignal.nutsloop.host/app.js`).
-- Front-end bundle (nutsloop app): `npm run build:nutsloop` (transpiles `nutsloopjsx/`, bundles to `public/nutsloop.host/app.js`).
-- Clean front-end artifacts (neonsignal app): `npm run clean:neonsignal`.
-- No formal test suite yet; favor targeted manual checks (curl, browser with HTTP/2 ALPN, `h2load` for load) and add tests alongside new modules when practical.
+Expressive symbols:
+- ✦ star
+- ✧ star (outline)
+- ✶ star (alt)
+- ✷ star (alt)
+- ✸ star (alt)
+- ✹ star (alt)
+- ✺ star (alt)
+- ✻ star (alt)
+- ✼ star (alt)
+- ✽ star (alt)
+- ✾ star (alt)
+- ✿ floral
+- ❀ floral (alt)
+- ❁ floral (alt)
+- ❂ sun
+- ❃ floral (alt)
+- ❄ snowflake
+- ❅ snowflake (alt)
+- ❆ snowflake (alt)
+- ❇ sparkle
+- ❈ sparkle (alt)
+- ❉ sparkle (alt)
+- ❊ sparkle (alt)
+- ❋ sparkle (alt)
+- ❖ ornamental diamond
+- ✱ asterisk star
+- ✲ asterisk star (alt)
+- ✳ asterisk star (alt)
+- ❘ light vertical
+- ❘̸ barred vertical
+- ❙ heavy vertical
+- ❚ heavy vertical (alt)
+- ❛ single quote (ornate)
+- ❜ single quote (ornate)
+- ❝ double quote (ornate)
+- ❞ double quote (ornate)
+- ❦ floral heart
+- ❧ rotated floral heart
+- ❥ heart (ornate)
+- ❍ ring
+- ⊕ circled plus
+- ⊗ circled times
+- ⊙ circled dot
+- ⊚ circled dot (alt)
+- ⊛ circled star
+- ⊜ circled equal
+- ♠ spade (ace)
+- ♥ heart (ace)
+- ♦ diamond (ace)
+- ♣ club (ace)
+- ✦ future...
 
-## Coding Style & Naming Conventions
-- Use C++23 features; prefer `std::format` for logging/string assembly over manual concatenation/streams. C++ uses 2-space indentation, RAII, and standard library utilities; prefer `std::unique_ptr`/`std::shared_ptr` as appropriate. Keep headers in `include/neonsignal/` paired with `src/neonsignal/` implementations.
-- Favor self-documenting names (`event_loop`, `http2_listener`, `router`). Keep files lowercase with `snake_case.c++`/`.h++`.
-- private member of classes always suffixed with a low-dash `_`
-- the implementation of methods of a class should be stored into a file named after the method under a directory named after the class. constructors are implemented in the c++ file named after the class.
-- TypeScript/JSX uses the custom JSX factory `h`/`Fragment`; keep components in PascalCase files under `neonsignaljsx/` or `nutsloopjsx/` as appropriate.
-- Run formatters if added; otherwise match existing style and keep comments minimal and purposeful.
+## Project Overview
 
-## Testing Guidelines
-- Add lightweight unit/integration tests near new code (e.g., `tests/` or module-adjacent) when introducing behavior that can regress (routing, HPACK handling, SSE streams).
-- Name tests after the behavior under test; prefer deterministic cases that do not require network.
-- For manual checks, document the command you used (e.g., `curl -k --http2 https://10.0.0.10:9443/`).
+NeonSignal is a C++23 HTTP/2 server with TLS/SSL, featuring a custom JSX frontend runtime and Sphinx documentation. The server uses epoll-based event handling, nghttp2 for HTTP/2 frames, and libmdbx for embedded storage.
 
-## Commit & Pull Request Guidelines
-- Always wait to commit when requested, never do for every change
-- Use concise, descriptive commits; conventional prefixes seen here (`feat:`, `fix:`, `chore:`). Example: `feat: add SSE memory stream`.
-- Always follow the subject with a blank line and a short body explaining the change (what/why); keep commits scoped and avoid committing build artifacts unless required.
-- PRs should summarize changes, mention affected modules, list verification steps (builds, curl/browser checks, load tests), and include screenshots/GIFs for UI updates.
-- Use detailed description for every commit
-- try to logical commit file related by mean.
+## Dependencies
+
+- C++/backend: OpenSSL, nghttp2 (HPACK), libmdbx.
+- Build tooling: Meson.
+- Frontend toolchain: Node.js + npm, Babel, TypeScript, esbuild, ESLint.
+- Docs: Python 3, Sphinx, myst-parser, sphinx-copybutton, sphinx-design, sphinx-synthwave-theme.
+
+## Build Commands
+
+### C++ Backend (Meson)
+```bash
+meson setup build                    # First-time setup
+meson setup --reconfigure build      # Reconfigure existing build dir
+meson setup --wipe build             # Wipe and reconfigure from scratch
+meson compile -C build               # Build
+./build/src/neonsignal               # Run main server
+./build/src/neonsignal_redirect      # Run HTTP→HTTPS redirector
+```
+
+### Frontend (TypeScript/JSX)
+```bash
+npm install                          # Install dependencies
+npm run build:neonjsx                # Build shared JSX runtime
+npm run build:neonsignal             # Build neonsignal app
+npm run build:nutsloop               # Build nutsloop app
+npm run build:simonedelpopolo        # Build simonedelpopolo app
+npm run build:_default               # Build default app
+npm run clean:neonjsx                # Clean shared JSX runtime
+npm run clean:neonsignal             # Clean neonsignal app
+npm run clean:nutsloop               # Clean nutsloop app
+npm run clean:simonedelpopolo        # Clean simonedelpopolo app
+npm run clean:_default               # Clean default app
+npm run all:neonjsx                  # Clean + build shared JSX runtime
+npm run all:neonsignal               # Clean + build neonsignal app
+npm run all:nutsloop                 # Clean + build nutsloop app
+npm run all:simonedelpopolo          # Clean + build simonedelpopolo app
+npm run all:_default                 # Clean + build default app
+npm run lint                         # Lint TypeScript
+npm run lint-fix                     # Auto-fix lint issues
+```
+
+### Sphinx Documentation
+```bash
+./scripts/sphinx/setup.sh            # Create/refresh venv + install deps
+./scripts/sphinx/dynamics.sh         # Generate dynamic content
+./scripts/sphinx/build.sh            # Build + deploy docs (requires venv)
+./scripts/sphinx/clean.sh            # Remove build/public
+./scripts/sphinx/clean.sh --venv     # Remove build/public + venv
+./scripts/sphinx/all.sh              # Quick rebuild (setup + dynamics + build)
+./scripts/sphinx/all.sh --clean      # Clean rebuild (clean + setup + dynamics + build)
+./scripts/sphinx/all.sh --fresh      # Full reset (clean --venv + setup + dynamics + build)
+./scripts/sphinx/all.sh --no-dynamics # Rebuild without refreshing dynamic content
+```
+
+### Release Build
+```bash
+./scripts/build/only-build.sh        # Release build (no wipe; builds backend only)
+./scripts/build/all.sh               # Full release build + deploy (systemd, certs, Sphinx; uses sudo)
+./scripts/build/all.sh --local       # Local build + deploy (keeps .host, local certs; uses sudo)
+./scripts/build/all.sh --delete-build # Wipe build/ before configure
+./scripts/build/all.sh --reset-db    # Wipe data/ before start
+./scripts/build/install.sh           # Install binaries to /usr/local/bin (SELinux; uses sudo)
+```
+
+## Build Workflow (IMPORTANT)
+
+**ALWAYS ask before building to save tokens.** Build processes consume significant tokens and should only be run when explicitly requested by the user or when absolutely necessary.
+
+- ✗ Don't automatically run `meson compile`, `npm run build:*`, or other build commands after making changes
+- ✓ Do make code changes and wait for user to request build
+- ✓ Do ask "Should I build this?" when uncertain
+- Exception: Only build without asking if the user explicitly requests it (e.g., "build and test this")
+
+## Architecture
+
+### Directory Structure
+```
+src/neonsignal/          # C++ implementations (event_loop, http2_listener, router, etc.)
+include/neonsignal/      # C++ headers (mirror src/ structure)
+www/                     # Frontend sources
+  ├── book/              # Sphinx documentation source
+  ├── neonsignaljsx/     # neonsignal JSX app
+  ├── nutsloopjsx/       # nutsloop JSX app
+  ├── simonedelpopolo/   # simonedelpopolo site
+  └── _default/          # default vhost site
+neonjsx/                 # Shared JSX runtime (h(), Fragment, render())
+build/                   # All build artifacts (C++, transpiled JS, Sphinx HTML)
+public/                  # Deployed web assets (served by server)
+benchmark/               # Benchmark reports (source)
+plans/                   # AI collaboration plans
+certs/                   # TLS certificates (self-signed)
+systemd/                 # systemd service units
+scripts/                 # Build and deployment scripts
+  ├── global_variables.sh    # Centralized paths
+  ├── build/                 # Release/deploy scripts
+  ├── sphinx/                # Sphinx pipeline scripts
+  ├── vhost/                 # Virtual host helpers
+  └── lib/logging.sh         # Shared logging functions
+```
+
+### Build Pipelines
+
+**C++ Backend**: `meson compile` → `build/src/neonsignal`
+
+**Frontend**: TSX → Babel transpile → `build/*/` → esbuild bundle → `public/*/app.js`
+
+**Sphinx Docs**: `www/book/source/` → `build/www/book/` → `public/neonsignal.nutsloop.net/book/`
+
+### Two Executables
+- `neonsignal` - Main HTTP/2 server (port 9443)
+- `neonsignal_redirect` - HTTP→HTTPS redirector
+
+## Code Style
+
+### C++
+- C++23 standard; prefer `std::format` for logging/string assembly.
+- 2-space indentation, RAII, and standard library utilities.
+- Prefer `std::unique_ptr`/`std::shared_ptr` as appropriate.
+- Keep headers in `include/neonsignal/` paired with `src/neonsignal/` implementations.
+- Favor self-documenting names (`event_loop`, `http2_listener`, `router`).
+- Files: lowercase `snake_case.c++`/`.h++`.
+- Private members must be suffixed with `_`.
+- Method implementations live in a file named after the method, under a directory named after the class.
+- Constructors are implemented in the `.c++` file named after the class.
+- Keep comments minimal and purposeful; run formatters if added, otherwise match existing style.
+
+### TypeScript/JSX
+- Custom JSX factory: `h`/`Fragment` (not React).
+- Keep components in PascalCase files under `neonsignaljsx/` or `nutsloopjsx/`.
+- ESLint with the TypeScript parser.
+- Keep comments minimal and purposeful; match existing style.
+
+## Key Configuration
+
+- Server config: `include/neonsignal/neonsignal.h++` (ServerConfig struct)
+- Routes: `include/neonsignal/routes.h++`
+- Babel JSX: `.babelrc`
+- TypeScript: `tsconfig.json`
+- C++ format: `.clang-format`
+- Global paths: `scripts/global_variables.sh`
+
+## Commit Guidelines
+
+- Always wait to commit until explicitly requested.
+- Use concise, descriptive commits with conventional prefixes: `feat:`, `fix:`, `chore:`.
+- Follow the subject with a blank line and a short body explaining what/why.
+- Keep commits scoped; avoid committing build artifacts unless required.
+- Use detailed descriptions for every commit.
+- Group logically related files in the same commit.
+- PRs should summarize changes, mention affected modules, list verification steps, and include screenshots/GIFs for UI updates.
+
+## License
+
+Apache License 2.0. See `LICENSE`.
 
 ## Security & Configuration Tips
 - Certificates are self-signed in `certs/`; rotate/regenerate for production and guard private keys.
 - The server defaults to HTTP/2 over TLS; ensure ALPN `h2` is negotiated by clients. Avoid running with weak ciphers or without TLS in production.
+
+## Testing
+
+No formal test suite. Manual testing approaches:
+```bash
+curl -k --http2 https://localhost:9443/      # HTTP/2 check
+h2load -n 1000 -c 10 https://localhost:9443/ # Load testing
+```
