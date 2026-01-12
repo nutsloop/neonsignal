@@ -244,8 +244,8 @@ By default, the server:
 | `NEONSIGNAL_PORT`      | `9443`               | HTTPS listen port                     |
 | `NEONSIGNAL_THREADS`   | `3`                  | Worker thread count (match CPU cores) |
 | `NEONSIGNAL_DB_PATH`   | `data/neonsignal.mdb`| LIBMDBX database file path            |
-| `NEONSIGNAL_RP_ID`     | *(none)*             | WebAuthn Relying Party ID (required)  |
-| `NEONSIGNAL_ORIGIN`    | *(none)*             | WebAuthn origin URL (required)        |
+| `NEONSIGNAL_WEBAUTHN_DOMAIN` | *(none)*       | WebAuthn Relying Party ID (required)  |
+| `NEONSIGNAL_WEBAUTHN_ORIGIN` | *(none)*       | WebAuthn origin URL (required)        |
 
 **Example (with firewall redirect configured):**
 
@@ -338,8 +338,8 @@ WorkingDirectory=/home/core/code/neonsignal  # ← Change to your path
 Environment=NEONSIGNAL_THREADS=3       # ← Match your CPU count
 Environment=NEONSIGNAL_HOST=10.0.0.10  # ← Change to your IP
 Environment=NEONSIGNAL_PORT=9443       # ← Adjust if needed
-Environment=NEONSIGNAL_RP_ID=neonsignal.nutsloop.host     # ← Your domain
-Environment=NEONSIGNAL_ORIGIN=https://neonsignal.nutsloop.host  # ← Your origin
+Environment=NEONSIGNAL_WEBAUTHN_DOMAIN=neonsignal.nutsloop.host     # ← Your domain
+Environment=NEONSIGNAL_WEBAUTHN_ORIGIN=https://neonsignal.nutsloop.host  # ← Your origin
 ExecStart=/usr/local/bin/neonsignal
 ```
 

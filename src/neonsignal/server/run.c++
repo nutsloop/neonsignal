@@ -24,10 +24,10 @@ void Server::run() {
 
   configure_credentials();
 
-  if (const char *rp = std::getenv("NEONSIGNAL_RP_ID")) {
+  if (const char *rp = std::getenv("NEONSIGNAL_WEBAUTHN_DOMAIN")) {
     config_.rp_id = rp;
   }
-  if (const char *origin = std::getenv("NEONSIGNAL_ORIGIN")) {
+  if (const char *origin = std::getenv("NEONSIGNAL_WEBAUTHN_ORIGIN")) {
     config_.origin = origin;
   }
   if (const char *db_path = std::getenv("NEONSIGNAL_DB_PATH")) {

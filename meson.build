@@ -1,5 +1,5 @@
 project('neonsignal', 'cpp',
-  version : '0.1.0',
+  version : '0.2.0',  # Project version (matches neonsignal binary version)
   default_options : [
     'cpp_std=c++23',
     'warning_level=3',
@@ -8,6 +8,10 @@ project('neonsignal', 'cpp',
     'optimization=2'
   ]
 )
+
+# Binary versions
+neonsignal_version = '0.2.0'
+neonsignal_redirect_version = '0.1.0'
 
 neonsignal_inc = include_directories('include')
 
@@ -34,6 +38,11 @@ endif
 ansi_dep = dependency('ansi', required : false, static : true)
 if not ansi_dep.found()
   ansi_dep = dependency('ansi', fallback : ['ansi', 'ansi_dep'], static : true)
+endif
+
+args_dep = dependency('args', required : false)
+if not args_dep.found()
+  args_dep = dependency('args', fallback : ['args', 'args_dep'])
 endif
 
 subdir('src')
