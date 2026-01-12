@@ -89,6 +89,7 @@ std::unordered_set<std::string> redirect_skip_digits() { return {"host", "acme-w
 
 server_voltage::server_voltage(int argc, char *argv[]) {
 
+  voltage_argv::help::set_server_mode();
   validate_dash_format_(argc, argv);
 
   skip_digit_check_t skip{server_skip_digits()};
@@ -171,6 +172,7 @@ server_voltage::server_voltage(int argc, char *argv[]) {
 
 redirect_voltage::redirect_voltage(int argc, char *argv[]) {
 
+  voltage_argv::help::set_redirect_mode();
   validate_dash_format_(argc, argv);
 
   skip_digit_check_t skip{redirect_skip_digits()};

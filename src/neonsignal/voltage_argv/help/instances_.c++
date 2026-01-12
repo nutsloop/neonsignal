@@ -17,7 +17,7 @@ std::string help::instances_() const {
       "{}\n"
       "  {}\n\n"
       "{}\n"
-      "  1\n\n"
+      "  2\n\n"
       "{}\n"
       "  {} spin --instances=3\n"
       "  {} spin --instances=8\n",

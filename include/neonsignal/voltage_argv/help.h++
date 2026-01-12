@@ -8,7 +8,10 @@
 namespace neonsignal::voltage_argv {
 
 class help {
+public:
+  enum class Mode { server, redirect };
 
+private:
   enum class Topic_ {
     // Main help
     help,
@@ -38,10 +41,16 @@ class help {
 public:
   explicit help(std::string look_up_option, nutsloop::args::version_t version);
 
+  static void set_server_mode();
+  static void set_redirect_mode();
+
   [[nodiscard]] int print();
   [[nodiscard]] std::string to_string();
 
 private:
+  static Mode mode_;
+  static void set_mode(Mode mode);
+  [[nodiscard]] static Mode mode();
   std::string look_up_option_;
   nutsloop::args::version_t version_info_;
 

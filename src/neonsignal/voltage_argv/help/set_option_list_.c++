@@ -5,17 +5,24 @@ namespace neonsignal::voltage_argv {
 void help::set_option_list_() {
   option_list_ = {{"help", Topic_::help},
                   {"version", Topic_::version},
-                  {"threads", Topic_::threads},
-                  {"host", Topic_::host},
-                  {"port", Topic_::port},
-                  {"webauthn-domain", Topic_::webauthn_domain},
-                  {"webauthn-origin", Topic_::webauthn_origin},
-                  {"db-path", Topic_::db_path},
                   {"systemd", Topic_::systemd},
-                  {"instances", Topic_::instances},
-                  {"target-port", Topic_::target_port},
-                  {"acme-webroot", Topic_::acme_webroot},
                   {"spin", Topic_::spin}};
+
+  if (mode() == Mode::server) {
+    option_list_.insert({{"threads", Topic_::threads},
+                         {"host", Topic_::host},
+                         {"port", Topic_::port},
+                         {"webauthn-domain", Topic_::webauthn_domain},
+                         {"webauthn-origin", Topic_::webauthn_origin},
+                         {"db-path", Topic_::db_path}});
+    return;
+  }
+
+  option_list_.insert({{"instances", Topic_::instances},
+                       {"host", Topic_::host},
+                       {"port", Topic_::port},
+                       {"target-port", Topic_::target_port},
+                       {"acme-webroot", Topic_::acme_webroot}});
 }
 
 } // namespace neonsignal::voltage_argv

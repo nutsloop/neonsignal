@@ -82,7 +82,11 @@ srcs = [
   'neonsignal/voltage_argv/check/acme_webroot.c++',
   # help
   'neonsignal/voltage_argv/help/help.c++',
+  'neonsignal/voltage_argv/help/mode.c++',
+  'neonsignal/voltage_argv/help/set_mode.c++',
   'neonsignal/voltage_argv/help/print.c++',
+  'neonsignal/voltage_argv/help/set_redirect_mode.c++',
+  'neonsignal/voltage_argv/help/set_server_mode.c++',
   'neonsignal/voltage_argv/help/to_string.c++',
   'neonsignal/voltage_argv/help/set_option_list_.c++',
   'neonsignal/voltage_argv/help/remove_leading_hyphens_.c++',
@@ -184,7 +188,11 @@ redirect_srcs = [
   'neonsignal/voltage_argv/check/acme_webroot.c++',
   # help
   'neonsignal/voltage_argv/help/help.c++',
+  'neonsignal/voltage_argv/help/mode.c++',
+  'neonsignal/voltage_argv/help/set_mode.c++',
   'neonsignal/voltage_argv/help/print.c++',
+  'neonsignal/voltage_argv/help/set_redirect_mode.c++',
+  'neonsignal/voltage_argv/help/set_server_mode.c++',
   'neonsignal/voltage_argv/help/to_string.c++',
   'neonsignal/voltage_argv/help/set_option_list_.c++',
   'neonsignal/voltage_argv/help/remove_leading_hyphens_.c++',
