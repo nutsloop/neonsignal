@@ -16,6 +16,7 @@
 *.wraplock
 /subprojects/libmdbx/
 /subprojects/ansi/
+/subprojects/args/
 /www/book/.venv/
 /www/book/source/ai-conversations/*
 !/www/book/source/ai-conversations/index.md
