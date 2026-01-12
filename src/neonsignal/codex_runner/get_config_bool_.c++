@@ -10,7 +10,7 @@ bool CodexRunner::get_config_bool_(std::string_view key, bool fallback) const {
     return fallback;
   }
   auto text = *value;
-  for (auto& ch : text) {
+  for (auto &ch : text) {
     ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
   }
   if (text == "1" || text == "true" || text == "yes") {

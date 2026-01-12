@@ -34,9 +34,9 @@ std::string query_param(std::string_view path, std::string_view key) {
 
 } // namespace
 
-bool ApiHandler::codex_run_start(const std::shared_ptr<Http2Connection>& conn,
-                                 std::uint32_t stream_id, const std::string& path,
-                                 const std::string& method) {
+bool ApiHandler::codex_run_start(const std::shared_ptr<Http2Connection> &conn,
+                                 std::uint32_t stream_id, const std::string &path,
+                                 const std::string &method) {
   if (method != "POST") {
     std::string body = "{\"error\":\"method-not-allowed\"}";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "neonsignal/neonsignal.h++"
 #include "neonsignal/database.h++"
 #include "neonsignal/hpack_decoder.h++"
+#include "neonsignal/neonsignal.h++"
 #include "neonsignal/vhost.h++"
 #include "neonsignal/webauthn.h++"
 
@@ -11,12 +11,12 @@
 
 #include <atomic>
 #include <chrono>
+#include <fstream>
 #include <memory>
 #include <mutex>
 #include <string>
-#include <fstream>
-#include <unordered_map>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 
 struct ssl_ctx_st;
@@ -67,7 +67,7 @@ struct Http2Connection {
   std::chrono::steady_clock::time_point created_at{std::chrono::steady_clock::now()};
   std::chrono::steady_clock::time_point last_activity{std::chrono::steady_clock::now()};
   bool has_write_backpressure{false};
-  bool tls_handshake_offloaded{false};  // TLS handshake in thread pool
+  bool tls_handshake_offloaded{false}; // TLS handshake in thread pool
 
   // Session caching
   std::string cached_session_token;
@@ -105,9 +105,9 @@ struct Http2Connection {
 // New performance components (header-only) - included after Http2Connection definition
 // Must be outside namespace to avoid polluting system header includes
 #include "neonsignal/connection_manager.h++"
-#include "neonsignal/static_cache.h++"
 #include "neonsignal/session_cache.h++"
 #include "neonsignal/sse_broadcaster.h++"
+#include "neonsignal/static_cache.h++"
 
 namespace neonsignal {
 
@@ -124,11 +124,9 @@ struct SSEResetPolicy {
 
 class Http2Listener {
 public:
-  Http2Listener(EventLoop& loop, ThreadPool& pool, SSL_CTX* ssl_ctx,
-                ServerConfig config, const Router& router,
-                std::atomic<std::uint64_t>& served_files,
-                std::atomic<std::uint64_t>& page_views,
-                std::atomic<std::uint64_t>& event_clients);
+  Http2Listener(EventLoop &loop, ThreadPool &pool, SSL_CTX *ssl_ctx, ServerConfig config,
+                const Router &router, std::atomic<std::uint64_t> &served_files,
+                std::atomic<std::uint64_t> &page_views, std::atomic<std::uint64_t> &event_clients);
   ~Http2Listener();
 
   void start();
@@ -139,8 +137,7 @@ private:
   void handle_accept_();
   void handle_connection_(int client_fd);
   void register_connection_(std::shared_ptr<Http2Connection> conn);
-  void handle_io_(const std::shared_ptr<Http2Connection>& conn,
-                  std::uint32_t events);
+  void handle_io_(const std::shared_ptr<Http2Connection> &conn, std::uint32_t events);
   void close_connection_(int fd);
   void start_redirect_monitor_();
   void stop_redirect_monitor_();
@@ -156,14 +153,14 @@ private:
   void complete_tls_handshake_(std::shared_ptr<Http2Connection> conn, bool success);
 
   int listen_fd_{-1};
-  EventLoop& loop_;
-  ThreadPool& pool_;
-  SSL_CTX* ssl_ctx_;
+  EventLoop &loop_;
+  ThreadPool &pool_;
+  SSL_CTX *ssl_ctx_;
   ServerConfig config_;
-  const Router& router_;
-  std::atomic<std::uint64_t>& served_files_;
-  std::atomic<std::uint64_t>& page_views_;
-  std::atomic<std::uint64_t>& event_clients_;
+  const Router &router_;
+  std::atomic<std::uint64_t> &served_files_;
+  std::atomic<std::uint64_t> &page_views_;
+  std::atomic<std::uint64_t> &event_clients_;
 
   // New: Advanced resource management
   std::unique_ptr<ConnectionManager> conn_manager_;

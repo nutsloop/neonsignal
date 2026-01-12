@@ -36,14 +36,13 @@ std::string query_param(std::string_view path, std::string_view key) {
 
 } // namespace
 
-bool ApiHandler::codex_image(const std::shared_ptr<Http2Connection>& conn,
-                             std::uint32_t stream_id, const std::string& path) {
+bool ApiHandler::codex_image(const std::shared_ptr<Http2Connection> &conn, std::uint32_t stream_id,
+                             const std::string &path) {
   auto id = query_param(path, "id");
   if (id.empty()) {
     std::string body = "missing id";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
-    build_response_frames(conn->write_buf, stream_id, 400, "text/plain; charset=utf-8",
-                          body_bytes);
+    build_response_frames(conn->write_buf, stream_id, 400, "text/plain; charset=utf-8", body_bytes);
     conn->events |= EPOLLOUT;
     loop_.update_fd(conn->fd, conn->events);
     return true;
@@ -52,8 +51,7 @@ bool ApiHandler::codex_image(const std::shared_ptr<Http2Connection>& conn,
   if (!record || record->image_size == 0) {
     std::string body = "not found";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
-    build_response_frames(conn->write_buf, stream_id, 404, "text/plain; charset=utf-8",
-                          body_bytes);
+    build_response_frames(conn->write_buf, stream_id, 404, "text/plain; charset=utf-8", body_bytes);
     conn->events |= EPOLLOUT;
     loop_.update_fd(conn->fd, conn->events);
     return true;
@@ -62,15 +60,13 @@ bool ApiHandler::codex_image(const std::shared_ptr<Http2Connection>& conn,
   if (!bytes) {
     std::string body = "not found";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
-    build_response_frames(conn->write_buf, stream_id, 404, "text/plain; charset=utf-8",
-                          body_bytes);
+    build_response_frames(conn->write_buf, stream_id, 404, "text/plain; charset=utf-8", body_bytes);
     conn->events |= EPOLLOUT;
     loop_.update_fd(conn->fd, conn->events);
     return true;
   }
-  std::string content_type = record->image_type.empty()
-                                 ? "application/octet-stream"
-                                 : record->image_type;
+  std::string content_type =
+      record->image_type.empty() ? "application/octet-stream" : record->image_type;
   build_response_frames(conn->write_buf, stream_id, 200, content_type, *bytes);
   conn->events |= EPOLLOUT;
   loop_.update_fd(conn->fd, conn->events);

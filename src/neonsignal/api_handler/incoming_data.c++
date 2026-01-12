@@ -52,9 +52,8 @@ std::filesystem::path make_unique_path_local(const std::filesystem::path &dir,
 } // namespace
 
 bool ApiHandler::incoming_data(const std::shared_ptr<Http2Connection> &conn,
-                                         std::uint32_t stream_id, const std::string &method,
-                                         const std::string &upload_header_name,
-                                          const std::string &path) {
+                               std::uint32_t stream_id, const std::string &method,
+                               const std::string &upload_header_name, const std::string &path) {
   if (method != "POST") {
     std::string body = "Method Not Allowed";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());

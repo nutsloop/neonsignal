@@ -13,8 +13,7 @@ void EventLoop::run() {
   std::array<epoll_event, 64> events{};
 
   while (running_.load()) {
-    int n = epoll_wait(epoll_fd_, events.data(),
-                       static_cast<int>(events.size()), 500);
+    int n = epoll_wait(epoll_fd_, events.data(), static_cast<int>(events.size()), 500);
     if (n == -1) {
       if (errno == EINTR) {
         continue;

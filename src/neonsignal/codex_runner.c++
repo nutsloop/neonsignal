@@ -2,7 +2,6 @@
 
 namespace neonsignal {
 
-CodexRunner::CodexRunner(Database& db)
-    : db_(db) {}
+CodexRunner::CodexRunner(Database &db) : db_(db) {}
 
 } // namespace neonsignal

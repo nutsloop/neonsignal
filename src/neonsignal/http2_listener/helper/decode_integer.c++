@@ -4,8 +4,8 @@
 
 namespace neonsignal {
 
-bool decode_integer(const std::vector<std::uint8_t>& buf, std::size_t& off,
-                    std::uint8_t prefix_bits, std::uint32_t& out_val) {
+bool decode_integer(const std::vector<std::uint8_t> &buf, std::size_t &off,
+                    std::uint8_t prefix_bits, std::uint32_t &out_val) {
   const std::uint32_t max_prefix = (1u << prefix_bits) - 1u;
   if (off >= buf.size()) {
     return false;

@@ -14,23 +14,23 @@ std::string json_escape(std::string_view value) {
   out.reserve(value.size());
   for (char c : value) {
     switch (c) {
-      case '\\':
-      case '"':
-        out.push_back('\\');
-        out.push_back(c);
-        break;
-      case '\n':
-        out += "\\n";
-        break;
-      case '\r':
-        out += "\\r";
-        break;
-      case '\t':
-        out += "\\t";
-        break;
-      default:
-        out.push_back(c);
-        break;
+    case '\\':
+    case '"':
+      out.push_back('\\');
+      out.push_back(c);
+      break;
+    case '\n':
+      out += "\\n";
+      break;
+    case '\r':
+      out += "\\r";
+      break;
+    case '\t':
+      out += "\\t";
+      break;
+    default:
+      out.push_back(c);
+      break;
     }
   }
   return out;
@@ -63,8 +63,8 @@ std::string query_param(std::string_view path, std::string_view key) {
 
 } // namespace
 
-bool ApiHandler::codex_run_status(const std::shared_ptr<Http2Connection>& conn,
-                                  std::uint32_t stream_id, const std::string& path) {
+bool ApiHandler::codex_run_status(const std::shared_ptr<Http2Connection> &conn,
+                                  std::uint32_t stream_id, const std::string &path) {
   auto id = query_param(path, "id");
   if (id.empty()) {
     std::string body = "{\"error\":\"missing-id\"}";

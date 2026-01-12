@@ -46,12 +46,12 @@ std::string extract_param(std::string_view line, std::string_view key) {
 }
 
 bool parse_multipart(std::span<const std::uint8_t> payload, std::string_view boundary,
-                     CodexParsed& out) {
+                     CodexParsed &out) {
   if (boundary.empty()) {
     return false;
   }
   std::string marker = "--" + std::string(boundary);
-  std::string_view body(reinterpret_cast<const char*>(payload.data()), payload.size());
+  std::string_view body(reinterpret_cast<const char *>(payload.data()), payload.size());
   std::size_t pos = body.find(marker);
   while (pos != std::string_view::npos) {
     pos += marker.size();
@@ -131,7 +131,7 @@ bool parse_multipart(std::span<const std::uint8_t> payload, std::string_view bou
 std::string sha256_hex(std::span<const std::uint8_t> data) {
   std::array<std::uint8_t, 32> digest{};
   unsigned int len = 0;
-  EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+  EVP_MD_CTX *ctx = EVP_MD_CTX_new();
   if (!ctx) {
     return {};
   }
@@ -144,7 +144,7 @@ std::string sha256_hex(std::span<const std::uint8_t> data) {
   }
   EVP_DigestFinal_ex(ctx, digest.data(), &len);
   EVP_MD_CTX_free(ctx);
-  static const char* kHex = "0123456789abcdef";
+  static const char *kHex = "0123456789abcdef";
   std::string out;
   out.reserve(len * 2);
   for (unsigned int i = 0; i < len; ++i) {
@@ -171,10 +171,10 @@ std::string extract_boundary(std::string_view content_type) {
 
 } // namespace
 
-bool ApiHandler::codex_brief_headers(
-    const std::shared_ptr<Http2Connection>& conn, std::uint32_t stream_id,
-    const std::unordered_map<std::string, std::string>& headers,
-    const std::string& path, const std::string& method) {
+bool ApiHandler::codex_brief_headers(const std::shared_ptr<Http2Connection> &conn,
+                                     std::uint32_t stream_id,
+                                     const std::unordered_map<std::string, std::string> &headers,
+                                     const std::string &path, const std::string &method) {
   if (method != "POST") {
     std::string body = "{\"error\":\"method not allowed\"}";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
@@ -197,8 +197,8 @@ bool ApiHandler::codex_brief_headers(
   return true;
 }
 
-ApiHandler::ApiResponse ApiHandler::codex_brief_finish(
-    std::string_view content_type, std::span<const std::uint8_t> payload) {
+ApiHandler::ApiResponse ApiHandler::codex_brief_finish(std::string_view content_type,
+                                                       std::span<const std::uint8_t> payload) {
   ApiResponse response;
   CodexParsed parsed{};
   if (content_type.find("multipart/form-data") != std::string_view::npos) {

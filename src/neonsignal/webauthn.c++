@@ -258,14 +258,13 @@ private:
 
 } // namespace
 
-WebAuthnManager::WebAuthnManager(std::string rp_id, std::string origin, Database& db)
-    : rp_id_(std::move(rp_id)), origin_(std::move(origin)), db_(db) {
-}
+WebAuthnManager::WebAuthnManager(std::string rp_id, std::string origin, Database &db)
+    : rp_id_(std::move(rp_id)), origin_(std::move(origin)), db_(db) {}
 
 bool WebAuthnManager::load_credentials() {
   credentials_.clear();
   auto users = db_.list_users();
-  for (const auto& user : users) {
+  for (const auto &user : users) {
     // Skip users without credentials (pending enrollment)
     if (!user.has_credential()) {
       continue;
@@ -321,8 +320,7 @@ WebAuthnManager::find_credential(const std::vector<std::uint8_t> &credential_id)
 std::string WebAuthnManager::issue_session(std::uint64_t user_id, std::string_view user,
                                            std::string_view state) {
   // TTL based on state: pre_webauthn = 5 minutes, auth = 5 days
-  auto ttl = (state == "pre_webauthn") ? std::chrono::minutes(5)
-                                       : std::chrono::hours(24 * 5);
+  auto ttl = (state == "pre_webauthn") ? std::chrono::minutes(5) : std::chrono::hours(24 * 5);
   return db_.create_session(user_id, user, state, ttl);
 }
 
@@ -468,9 +466,9 @@ WebAuthnRegisterOptions WebAuthnManager::make_register_options(std::string_view 
   return {};
 }
 
-WebAuthnRegisterOptions WebAuthnManager::make_register_options_for_user(std::uint64_t user_id,
-                                                                        std::string_view email,
-                                                                        std::string_view display_name) {
+WebAuthnRegisterOptions
+WebAuthnManager::make_register_options_for_user(std::uint64_t user_id, std::string_view email,
+                                                std::string_view display_name) {
   WebAuthnRegisterOptions out;
 
   // Verify user exists and is verified
@@ -502,8 +500,8 @@ WebAuthnRegisterOptions WebAuthnManager::make_register_options_for_user(std::uin
   std::ostringstream opts;
   opts << "{\"challenge\":\"" << out.challenge << "\",";
   opts << "\"rp\":{\"name\":\"neonsignal\",\"id\":\"" << rp_id_ << "\"},";
-  opts << "\"user\":{\"name\":\"" << email << "\",\"displayName\":\"" << display_name << "\",\"id\":\""
-       << user_id_b64 << "\"},";
+  opts << "\"user\":{\"name\":\"" << email << "\",\"displayName\":\"" << display_name
+       << "\",\"id\":\"" << user_id_b64 << "\"},";
   opts << "\"pubKeyCredParams\":[{\"type\":\"public-key\",\"alg\":-7}],";
   opts << "\"authenticatorSelection\":{\"userVerification\":\"preferred\"},";
   opts << "\"timeout\":60000}";
@@ -629,7 +627,7 @@ WebAuthnRegisterResult WebAuthnManager::finish_register(std::string_view /*body*
 }
 
 WebAuthnRegisterResult WebAuthnManager::finish_register_for_user(std::string_view body,
-                                                                  std::uint64_t user_id) {
+                                                                 std::uint64_t user_id) {
   WebAuthnRegisterResult res;
 
   // Verify user exists and is verified

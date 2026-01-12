@@ -336,12 +336,13 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
             if (method == "GET") {
               handled_api = api_handler_->user_enroll(conn, stream_id, header_map);
             } else {
-              handled_api = api_handler_->user_enroll_headers(conn, stream_id, header_map, path, method);
+              handled_api =
+                  api_handler_->user_enroll_headers(conn, stream_id, header_map, path, method);
             }
             break;
           case ApiRoute::CodexBrief:
-            handled_api = api_handler_->codex_brief_headers(conn, stream_id, header_map, path,
-                                                            method);
+            handled_api =
+                api_handler_->codex_brief_headers(conn, stream_id, header_map, path, method);
             break;
           case ApiRoute::CodexList:
             handled_api = api_handler_->codex_list(conn, stream_id);
@@ -636,8 +637,8 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
                     std::string session_id = resp_str.substr(pos, end - pos);
                     std::string cookie = "ns_session=" + session_id +
                                          "; Path=/; Max-Age=300; HttpOnly; Secure; SameSite=Lax";
-                    std::string dbg_cookie = "ns_debug=" + session_id +
-                                             "; Path=/; Max-Age=300; Secure; SameSite=Lax";
+                    std::string dbg_cookie =
+                        "ns_debug=" + session_id + "; Path=/; Max-Age=300; Secure; SameSite=Lax";
                     build_response_frames_with_headers(
                         conn->write_buf, stream_id, status, content_type,
                         {{"set-cookie", cookie}, {"set-cookie", dbg_cookie}}, body_bytes);
@@ -665,8 +666,8 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
                     std::string session_id = resp_str.substr(pos, end - pos);
                     std::string cookie = "ns_session=" + session_id +
                                          "; Path=/; Max-Age=432000; HttpOnly; Secure; SameSite=Lax";
-                    std::string dbg_cookie = "ns_debug=" + session_id +
-                                             "; Path=/; Max-Age=432000; Secure; SameSite=Lax";
+                    std::string dbg_cookie =
+                        "ns_debug=" + session_id + "; Path=/; Max-Age=432000; Secure; SameSite=Lax";
                     build_response_frames_with_headers(
                         conn->write_buf, stream_id, status, content_type,
                         {{"set-cookie", cookie}, {"set-cookie", dbg_cookie}}, body_bytes);

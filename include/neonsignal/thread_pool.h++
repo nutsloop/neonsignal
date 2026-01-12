@@ -17,7 +17,7 @@ public:
     int port;
   };
 
-  explicit ThreadPool(std::size_t thread_count, const ServerHostPort& server_config);
+  explicit ThreadPool(std::size_t thread_count, const ServerHostPort &server_config);
   ~ThreadPool();
 
   void enqueue(std::function<void()> task);

@@ -14,8 +14,7 @@ namespace neonsignal {
 
 void Http2Listener::handle_accept_() {
   for (;;) {
-    int client_fd = accept4(listen_fd_, nullptr, nullptr,
-                            SOCK_NONBLOCK | SOCK_CLOEXEC);
+    int client_fd = accept4(listen_fd_, nullptr, nullptr, SOCK_NONBLOCK | SOCK_CLOEXEC);
     if (client_fd == -1) {
       if (errno == EAGAIN || errno == EWOULDBLOCK) {
         break;

@@ -1,5 +1,5 @@
-#include "neonsignal/http2_listener.h++"
 #include "neonsignal/event_loop.h++"
+#include "neonsignal/http2_listener.h++"
 
 #include <openssl/ssl.h>
 #include <unistd.h>

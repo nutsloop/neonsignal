@@ -10,8 +10,8 @@
 #include <thread>
 #include <vector>
 
-#include <signal.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -20,7 +20,7 @@ namespace neonsignal {
 
 namespace {
 
-std::vector<std::uint8_t> read_file_bytes(const std::filesystem::path& path,
+std::vector<std::uint8_t> read_file_bytes(const std::filesystem::path &path,
                                           std::size_t max_bytes) {
   std::ifstream file(path, std::ios::binary);
   if (!file) {
@@ -32,20 +32,20 @@ std::vector<std::uint8_t> read_file_bytes(const std::filesystem::path& path,
   file.seekg(0, std::ios::beg);
   bytes.resize(std::min(size, max_bytes));
   if (!bytes.empty()) {
-    file.read(reinterpret_cast<char*>(bytes.data()), static_cast<std::streamsize>(bytes.size()));
+    file.read(reinterpret_cast<char *>(bytes.data()), static_cast<std::streamsize>(bytes.size()));
   }
   return bytes;
 }
 
-std::string read_file_text(const std::filesystem::path& path, std::size_t max_bytes) {
+std::string read_file_text(const std::filesystem::path &path, std::size_t max_bytes) {
   auto bytes = read_file_bytes(path, max_bytes);
   return std::string(bytes.begin(), bytes.end());
 }
 
-std::string join_args(const std::vector<std::string>& args) {
+std::string join_args(const std::vector<std::string> &args) {
   std::ostringstream out;
   bool first = true;
-  for (const auto& arg : args) {
+  for (const auto &arg : args) {
     if (!first) {
       out << ' ';
     }
@@ -136,7 +136,7 @@ void CodexRunner::run_async_(CodexRun run) {
     auto fname = sanitize_filename_(record->image_name.empty() ? "image.bin" : record->image_name);
     image_path = run_dir / fname;
     std::ofstream out(*image_path, std::ios::binary);
-    out.write(reinterpret_cast<const char*>(image_bytes->data()),
+    out.write(reinterpret_cast<const char *>(image_bytes->data()),
               static_cast<std::streamsize>(image_bytes->size()));
     args.push_back("--image");
     args.push_back(image_path->string());
@@ -186,10 +186,10 @@ void CodexRunner::run_async_(CodexRun run) {
     ::dup2(err_fd, STDERR_FILENO);
     ::close(out_fd);
     ::close(err_fd);
-    std::vector<char*> argv;
+    std::vector<char *> argv;
     argv.reserve(args.size() + 1);
-    for (auto& arg : args) {
-      argv.push_back(const_cast<char*>(arg.c_str()));
+    for (auto &arg : args) {
+      argv.push_back(const_cast<char *>(arg.c_str()));
     }
     argv.push_back(nullptr);
     ::execvp(argv[0], argv.data());
@@ -247,7 +247,7 @@ void CodexRunner::run_async_(CodexRun run) {
   std::ostringstream artifacts;
   artifacts << "[";
   std::size_t count = 0;
-  for (const auto& entry : std::filesystem::directory_iterator(run_dir)) {
+  for (const auto &entry : std::filesystem::directory_iterator(run_dir)) {
     if (!entry.is_regular_file()) {
       continue;
     }

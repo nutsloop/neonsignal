@@ -28,7 +28,7 @@ std::vector<std::uint8_t> base64url_decode(std::string_view input) {
   if (!s.empty() && s[s.size() - 1] == '=') ++pad;
   if (s.size() > 1 && s[s.size() - 2] == '=') ++pad;
   std::vector<unsigned char> buf((s.size() / 4) * 3 + 1);
-  int len = EVP_DecodeBlock(buf.data(), reinterpret_cast<const unsigned char*>(s.data()),
+  int len = EVP_DecodeBlock(buf.data(), reinterpret_cast<const unsigned char *>(s.data()),
                             static_cast<int>(s.size()));
   if (len < 0) {
     return {};
@@ -61,10 +61,9 @@ std::string extract_json_string(std::string_view json, std::string_view key) {
 
 } // namespace
 
-bool ApiHandler::user_verify_headers(const std::shared_ptr<Http2Connection>& conn,
-                                     std::uint32_t stream_id,
-                                     const std::string& path,
-                                     const std::string& method) {
+bool ApiHandler::user_verify_headers(const std::shared_ptr<Http2Connection> &conn,
+                                     std::uint32_t stream_id, const std::string &path,
+                                     const std::string &method) {
   if (method != "POST") {
     std::string body = "{\"error\":\"method not allowed\"}";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
@@ -93,9 +92,8 @@ ApiHandler::ApiResponse ApiHandler::user_verify_finish(std::span<const std::uint
   std::string email = extract_json_string(body_str, "email");
 
   if (email.empty()) {
-    res.body = std::vector<std::uint8_t>(
-        "{\"error\":\"email required\"}"sv.begin(),
-        "{\"error\":\"email required\"}"sv.end());
+    res.body = std::vector<std::uint8_t>("{\"error\":\"email required\"}"sv.begin(),
+                                         "{\"error\":\"email required\"}"sv.end());
     return res;
   }
 
@@ -103,16 +101,14 @@ ApiHandler::ApiResponse ApiHandler::user_verify_finish(std::span<const std::uint
   if (token_b64.empty()) {
     auto user = db_.find_user_by_email(email);
     if (!user) {
-      res.body = std::vector<std::uint8_t>(
-          "{\"error\":\"user not found\"}"sv.begin(),
-          "{\"error\":\"user not found\"}"sv.end());
+      res.body = std::vector<std::uint8_t>("{\"error\":\"user not found\"}"sv.begin(),
+                                           "{\"error\":\"user not found\"}"sv.end());
       return res;
     }
 
     if (!user->verified) {
-      res.body = std::vector<std::uint8_t>(
-          "{\"error\":\"account not verified\"}"sv.begin(),
-          "{\"error\":\"account not verified\"}"sv.end());
+      res.body = std::vector<std::uint8_t>("{\"error\":\"account not verified\"}"sv.begin(),
+                                           "{\"error\":\"account not verified\"}"sv.end());
       return res;
     }
 
@@ -120,9 +116,8 @@ ApiHandler::ApiResponse ApiHandler::user_verify_finish(std::span<const std::uint
     std::string session_id = auth_.issue_session(user->id, user->email, "pre_webauthn");
     if (session_id.empty()) {
       res.status = 500;
-      res.body = std::vector<std::uint8_t>(
-          "{\"error\":\"failed to create session\"}"sv.begin(),
-          "{\"error\":\"failed to create session\"}"sv.end());
+      res.body = std::vector<std::uint8_t>("{\"error\":\"failed to create session\"}"sv.begin(),
+                                           "{\"error\":\"failed to create session\"}"sv.end());
       return res;
     }
 
@@ -141,9 +136,8 @@ ApiHandler::ApiResponse ApiHandler::user_verify_finish(std::span<const std::uint
   // Decode token
   auto token = base64url_decode(token_b64);
   if (token.size() != 32) {
-    res.body = std::vector<std::uint8_t>(
-        "{\"error\":\"invalid token format\"}"sv.begin(),
-        "{\"error\":\"invalid token format\"}"sv.end());
+    res.body = std::vector<std::uint8_t>("{\"error\":\"invalid token format\"}"sv.begin(),
+                                         "{\"error\":\"invalid token format\"}"sv.end());
     return res;
   }
 
@@ -154,51 +148,46 @@ ApiHandler::ApiResponse ApiHandler::user_verify_finish(std::span<const std::uint
   // Find verification record
   auto verification = db_.find_verification(token_hash);
   if (!verification) {
-    res.body = std::vector<std::uint8_t>(
-        "{\"error\":\"invalid or expired token\"}"sv.begin(),
-        "{\"error\":\"invalid or expired token\"}"sv.end());
+    res.body = std::vector<std::uint8_t>("{\"error\":\"invalid or expired token\"}"sv.begin(),
+                                         "{\"error\":\"invalid or expired token\"}"sv.end());
     return res;
   }
 
   // Check if already used
   if (verification->used_at != 0) {
-    res.body = std::vector<std::uint8_t>(
-        "{\"error\":\"token already used\"}"sv.begin(),
-        "{\"error\":\"token already used\"}"sv.end());
+    res.body = std::vector<std::uint8_t>("{\"error\":\"token already used\"}"sv.begin(),
+                                         "{\"error\":\"token already used\"}"sv.end());
     return res;
   }
 
   // Find user and verify email matches
   auto user = db_.find_user_by_id(verification->user_id);
   if (!user) {
-    res.body = std::vector<std::uint8_t>(
-        "{\"error\":\"user not found\"}"sv.begin(),
-        "{\"error\":\"user not found\"}"sv.end());
+    res.body = std::vector<std::uint8_t>("{\"error\":\"user not found\"}"sv.begin(),
+                                         "{\"error\":\"user not found\"}"sv.end());
     return res;
   }
 
   if (user->email != email) {
-    res.body = std::vector<std::uint8_t>(
-        "{\"error\":\"email mismatch\"}"sv.begin(),
-        "{\"error\":\"email mismatch\"}"sv.end());
+    res.body = std::vector<std::uint8_t>("{\"error\":\"email mismatch\"}"sv.begin(),
+                                         "{\"error\":\"email mismatch\"}"sv.end());
     return res;
   }
 
   // Mark verification as used
   if (!db_.mark_verification_used(token_hash)) {
     res.status = 500;
-    res.body = std::vector<std::uint8_t>(
-        "{\"error\":\"failed to mark verification used\"}"sv.begin(),
-        "{\"error\":\"failed to mark verification used\"}"sv.end());
+    res.body =
+        std::vector<std::uint8_t>("{\"error\":\"failed to mark verification used\"}"sv.begin(),
+                                  "{\"error\":\"failed to mark verification used\"}"sv.end());
     return res;
   }
 
   // Mark user as verified
   if (!db_.set_user_verified(user->id)) {
     res.status = 500;
-    res.body = std::vector<std::uint8_t>(
-        "{\"error\":\"failed to verify user\"}"sv.begin(),
-        "{\"error\":\"failed to verify user\"}"sv.end());
+    res.body = std::vector<std::uint8_t>("{\"error\":\"failed to verify user\"}"sv.begin(),
+                                         "{\"error\":\"failed to verify user\"}"sv.end());
     return res;
   }
 
@@ -206,9 +195,8 @@ ApiHandler::ApiResponse ApiHandler::user_verify_finish(std::span<const std::uint
   std::string session_id = auth_.issue_session(user->id, user->email, "pre_webauthn");
   if (session_id.empty()) {
     res.status = 500;
-    res.body = std::vector<std::uint8_t>(
-        "{\"error\":\"failed to create session\"}"sv.begin(),
-        "{\"error\":\"failed to create session\"}"sv.end());
+    res.body = std::vector<std::uint8_t>("{\"error\":\"failed to create session\"}"sv.begin(),
+                                         "{\"error\":\"failed to create session\"}"sv.end());
     return res;
   }
 

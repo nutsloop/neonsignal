@@ -14,8 +14,7 @@ public:
   EventLoop();
   ~EventLoop();
 
-  void add_fd(int fd, std::uint32_t events,
-              std::function<void(std::uint32_t)> callback);
+  void add_fd(int fd, std::uint32_t events, std::function<void(std::uint32_t)> callback);
   void update_fd(int fd, std::uint32_t events);
   void remove_fd(int fd);
 
@@ -26,13 +25,10 @@ public:
   void shutdown_graceful(std::chrono::seconds timeout = std::chrono::seconds{30});
 
   // Register a periodic timer callback
-  void add_timer(std::chrono::milliseconds interval,
-                 std::function<void()> callback);
+  void add_timer(std::chrono::milliseconds interval, std::function<void()> callback);
 
   // Check if running
-  [[nodiscard]] bool is_running() const {
-    return running_.load(std::memory_order_relaxed);
-  }
+  [[nodiscard]] bool is_running() const { return running_.load(std::memory_order_relaxed); }
 
   // Get active FD count
   [[nodiscard]] std::size_t active_fd_count() const {
@@ -44,7 +40,7 @@ private:
   int epoll_fd_;
   std::atomic<bool> running_{false};
   std::atomic<bool> shutdown_requested_{false};
-  mutable std::mutex callbacks_mutex_;  // mutable to allow locking in const methods
+  mutable std::mutex callbacks_mutex_; // mutable to allow locking in const methods
   std::unordered_map<int, std::function<void(std::uint32_t)>> callbacks_;
   int timer_fd_{-1};
   std::function<void()> timer_callback_;

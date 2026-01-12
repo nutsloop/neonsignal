@@ -5,12 +5,11 @@
 
 namespace neonsignal {
 
-bool ApiHandler::codex_list(const std::shared_ptr<Http2Connection>& conn,
-                            std::uint32_t stream_id) {
+bool ApiHandler::codex_list(const std::shared_ptr<Http2Connection> &conn, std::uint32_t stream_id) {
   auto items = db_.list_codex(25);
   std::string body = "{\"items\":[";
   for (std::size_t i = 0; i < items.size(); ++i) {
-    const auto& item = items[i];
+    const auto &item = items[i];
     body += "{";
     body += "\"id\":\"" + item.id + "\",";
     body += "\"title\":\"" + item.title + "\",";

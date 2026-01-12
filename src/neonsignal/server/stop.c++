@@ -1,5 +1,5 @@
-#include "neonsignal/neonsignal.h++"
 #include "neonsignal/event_loop.h++"
+#include "neonsignal/neonsignal.h++"
 
 namespace neonsignal {
 

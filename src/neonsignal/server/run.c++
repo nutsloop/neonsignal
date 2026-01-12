@@ -7,7 +7,6 @@
 
 #include <csignal>
 #include <cstdlib>
-#include <iostream>
 #include <stdexcept>
 #include <thread>
 

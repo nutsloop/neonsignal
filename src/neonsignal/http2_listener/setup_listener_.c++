@@ -4,8 +4,6 @@
 
 namespace neonsignal {
 
-void Http2Listener::setup_listener_() {
-  listen_fd_ = make_listen_socket(config_);
-}
+void Http2Listener::setup_listener_() { listen_fd_ = make_listen_socket(config_); }
 
 } // namespace neonsignal

@@ -24,10 +24,10 @@ public:
   ~HpackDecoder();
 
   // Returns std::nullopt on decode failure.
-  std::optional<ParsedHeaders> decode(const std::vector<std::uint8_t>& block) const;
+  std::optional<ParsedHeaders> decode(const std::vector<std::uint8_t> &block) const;
 
 private:
-  nghttp2_hd_inflater* inflater_{nullptr};
+  nghttp2_hd_inflater *inflater_{nullptr};
 };
 
 } // namespace neonsignal

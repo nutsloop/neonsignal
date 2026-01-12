@@ -13,7 +13,7 @@ using namespace std::string_view_literals;
 
 namespace {
 
-std::string extract_cookie(const std::string& cookie_header, std::string_view name) {
+std::string extract_cookie(const std::string &cookie_header, std::string_view name) {
   std::string target = std::string(name) + "=";
   auto pos = cookie_header.find(target);
   if (pos == std::string::npos) {
@@ -29,9 +29,8 @@ std::string extract_cookie(const std::string& cookie_header, std::string_view na
 
 } // namespace
 
-bool ApiHandler::user_enroll(const std::shared_ptr<Http2Connection>& conn,
-                             std::uint32_t stream_id,
-                             const std::unordered_map<std::string, std::string>& headers) {
+bool ApiHandler::user_enroll(const std::shared_ptr<Http2Connection> &conn, std::uint32_t stream_id,
+                             const std::unordered_map<std::string, std::string> &headers) {
   // GET request - return WebAuthn options for enrollment
   auto cookie_it = headers.find("cookie");
   std::string session_id;
@@ -97,11 +96,10 @@ bool ApiHandler::user_enroll(const std::shared_ptr<Http2Connection>& conn,
   return true;
 }
 
-bool ApiHandler::user_enroll_headers(const std::shared_ptr<Http2Connection>& conn,
+bool ApiHandler::user_enroll_headers(const std::shared_ptr<Http2Connection> &conn,
                                      std::uint32_t stream_id,
-                                     const std::unordered_map<std::string, std::string>& headers,
-                                     const std::string& path,
-                                     const std::string& method) {
+                                     const std::unordered_map<std::string, std::string> &headers,
+                                     const std::string &path, const std::string &method) {
   // POST request - finish enrollment with WebAuthn attestation
   auto cookie_it = headers.find("cookie");
   std::string session_id;
@@ -171,9 +169,8 @@ ApiHandler::ApiResponse ApiHandler::user_enroll_finish(std::uint64_t user_id,
   auto user = db_.find_user_by_id(user_id);
   if (!user) {
     res.status = 500;
-    res.body = std::vector<std::uint8_t>(
-        "{\"error\":\"user not found\"}"sv.begin(),
-        "{\"error\":\"user not found\"}"sv.end());
+    res.body = std::vector<std::uint8_t>("{\"error\":\"user not found\"}"sv.begin(),
+                                         "{\"error\":\"user not found\"}"sv.end());
     return res;
   }
 
@@ -181,9 +178,8 @@ ApiHandler::ApiResponse ApiHandler::user_enroll_finish(std::uint64_t user_id,
   std::string session_id = auth_.issue_session(user_id, user->email, "auth");
   if (session_id.empty()) {
     res.status = 500;
-    res.body = std::vector<std::uint8_t>(
-        "{\"error\":\"failed to create session\"}"sv.begin(),
-        "{\"error\":\"failed to create session\"}"sv.end());
+    res.body = std::vector<std::uint8_t>("{\"error\":\"failed to create session\"}"sv.begin(),
+                                         "{\"error\":\"failed to create session\"}"sv.end());
     return res;
   }
 

@@ -1,5 +1,5 @@
-#include "neonsignal/http2_listener.h++"
 #include "neonsignal/event_loop.h++"
+#include "neonsignal/http2_listener.h++"
 
 #include "neonsignal/http2_listener_helpers.h++"
 
@@ -19,7 +19,7 @@ void Http2Listener::start() {
   // Log virtual hosts
   if (vhost_resolver_.enabled()) {
     std::cerr << "neonsignal->Virtual hosts discovered:\n";
-    for (const auto& vhost : vhost_resolver_.list_vhosts()) {
+    for (const auto &vhost : vhost_resolver_.list_vhosts()) {
       std::cerr << "  " << vhost << '\n';
     }
   } else {

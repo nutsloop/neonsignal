@@ -36,8 +36,8 @@ std::string query_param(std::string_view path, std::string_view key) {
 
 } // namespace
 
-bool ApiHandler::codex_item(const std::shared_ptr<Http2Connection>& conn,
-                            std::uint32_t stream_id, const std::string& path) {
+bool ApiHandler::codex_item(const std::shared_ptr<Http2Connection> &conn, std::uint32_t stream_id,
+                            const std::string &path) {
   auto id = query_param(path, "id");
   if (id.empty()) {
     std::string body = "{\"error\":\"missing id\"}";

@@ -3,42 +3,42 @@
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 
+#include <algorithm>
 #include <array>
 #include <chrono>
-#include <algorithm>
 #include <filesystem>
 
 namespace neonsignal {
 
 namespace db {
-std::string user_to_json(const User& user);
+std::string user_to_json(const User &user);
 std::optional<User> user_from_json(std::string_view json);
-std::string session_to_json(const Session& session);
+std::string session_to_json(const Session &session);
 std::optional<Session> session_from_json(std::string_view json);
-std::string verification_to_json(const Verification& v);
+std::string verification_to_json(const Verification &v);
 std::optional<Verification> verification_from_json(std::string_view json);
-std::string codex_to_json(const CodexRecord& record);
+std::string codex_to_json(const CodexRecord &record);
 std::optional<CodexRecord> codex_from_json(std::string_view json);
-std::string codex_run_to_json(const CodexRun& run);
+std::string codex_run_to_json(const CodexRun &run);
 std::optional<CodexRun> codex_run_from_json(std::string_view json);
 } // namespace db
 
 namespace {
 
-std::vector<std::uint8_t> slice_to_bytes(const mdbx::slice& slice) {
-  auto data = static_cast<const std::uint8_t*>(slice.data());
+std::vector<std::uint8_t> slice_to_bytes(const mdbx::slice &slice) {
+  auto data = static_cast<const std::uint8_t *>(slice.data());
   return std::vector<std::uint8_t>(data, data + slice.size());
 }
 
-std::string_view slice_to_view(const mdbx::slice& slice) {
-  auto data = static_cast<const char*>(slice.data());
+std::string_view slice_to_view(const mdbx::slice &slice) {
+  auto data = static_cast<const char *>(slice.data());
   return std::string_view(data, slice.size());
 }
 
 std::string sha256_hex(std::span<const std::uint8_t> data) {
   std::array<std::uint8_t, 32> digest{};
   unsigned int len = 0;
-  EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+  EVP_MD_CTX *ctx = EVP_MD_CTX_new();
   if (!ctx) {
     return {};
   }
@@ -51,7 +51,7 @@ std::string sha256_hex(std::span<const std::uint8_t> data) {
   }
   EVP_DigestFinal_ex(ctx, digest.data(), &len);
   EVP_MD_CTX_free(ctx);
-  static const char* kHex = "0123456789abcdef";
+  static const char *kHex = "0123456789abcdef";
   std::string out;
   out.reserve(len * 2);
   for (unsigned int i = 0; i < len; ++i) {
@@ -63,8 +63,7 @@ std::string sha256_hex(std::span<const std::uint8_t> data) {
 
 } // namespace
 
-Database::Database(std::string_view path)
-    : env_() {
+Database::Database(std::string_view path) : env_() {
   auto db_path = std::filesystem::path(std::string(path));
   if (db_path.has_parent_path()) {
     std::filesystem::create_directories(db_path.parent_path());
@@ -102,14 +101,14 @@ void Database::open_maps_() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 std::optional<User> Database::create_user_pending(std::string_view email,
-                                                   std::string_view display_name) {
+                                                  std::string_view display_name) {
   auto txn = env_.start_write();
 
   // Check if email already exists
-  auto existing = txn.get(emails_map_, mdbx::slice(email.data(), email.size()),
-                          mdbx::slice::invalid());
+  auto existing =
+      txn.get(emails_map_, mdbx::slice(email.data(), email.size()), mdbx::slice::invalid());
   if (existing.is_valid()) {
-    return std::nullopt;  // Email already registered
+    return std::nullopt; // Email already registered
   }
 
   // Get next user ID
@@ -140,8 +139,8 @@ std::optional<User> Database::create_user_pending(std::string_view email,
   // Store user by ID
   auto id_key = std::to_string(next_id);
   auto json = db::user_to_json(user);
-  txn.put(users_map_, mdbx::slice(id_key.data(), id_key.size()),
-          mdbx::slice(json), mdbx::put_mode::insert_unique);
+  txn.put(users_map_, mdbx::slice(id_key.data(), id_key.size()), mdbx::slice(json),
+          mdbx::put_mode::insert_unique);
 
   // Store email → user_id index
   txn.put(emails_map_, mdbx::slice(email.data(), email.size()),
@@ -153,14 +152,14 @@ std::optional<User> Database::create_user_pending(std::string_view email,
 
 std::optional<User> Database::find_user_by_email(std::string_view email) {
   auto txn = env_.start_read();
-  auto id_slice = txn.get(emails_map_, mdbx::slice(email.data(), email.size()),
-                          mdbx::slice::invalid());
+  auto id_slice =
+      txn.get(emails_map_, mdbx::slice(email.data(), email.size()), mdbx::slice::invalid());
   if (!id_slice.is_valid()) {
     return std::nullopt;
   }
   auto id_str = slice_to_view(id_slice);
-  auto user_data = txn.get(users_map_, mdbx::slice(id_str.data(), id_str.size()),
-                           mdbx::slice::invalid());
+  auto user_data =
+      txn.get(users_map_, mdbx::slice(id_str.data(), id_str.size()), mdbx::slice::invalid());
   if (!user_data.is_valid()) {
     return std::nullopt;
   }
@@ -170,8 +169,8 @@ std::optional<User> Database::find_user_by_email(std::string_view email) {
 std::optional<User> Database::find_user_by_id(std::uint64_t user_id) {
   auto txn = env_.start_read();
   auto id_key = std::to_string(user_id);
-  auto user_data = txn.get(users_map_, mdbx::slice(id_key.data(), id_key.size()),
-                           mdbx::slice::invalid());
+  auto user_data =
+      txn.get(users_map_, mdbx::slice(id_key.data(), id_key.size()), mdbx::slice::invalid());
   if (!user_data.is_valid()) {
     return std::nullopt;
   }
@@ -181,8 +180,8 @@ std::optional<User> Database::find_user_by_id(std::uint64_t user_id) {
 bool Database::set_user_verified(std::uint64_t user_id) {
   auto txn = env_.start_write();
   auto id_key = std::to_string(user_id);
-  auto user_data = txn.get(users_map_, mdbx::slice(id_key.data(), id_key.size()),
-                           mdbx::slice::invalid());
+  auto user_data =
+      txn.get(users_map_, mdbx::slice(id_key.data(), id_key.size()), mdbx::slice::invalid());
   if (!user_data.is_valid()) {
     return false;
   }
@@ -192,8 +191,8 @@ bool Database::set_user_verified(std::uint64_t user_id) {
   }
   user->verified = true;
   auto json = db::user_to_json(*user);
-  txn.put(users_map_, mdbx::slice(id_key.data(), id_key.size()),
-          mdbx::slice(json), mdbx::put_mode::update);
+  txn.put(users_map_, mdbx::slice(id_key.data(), id_key.size()), mdbx::slice(json),
+          mdbx::put_mode::update);
   txn.commit();
   return true;
 }
@@ -203,8 +202,8 @@ bool Database::set_user_credential(std::uint64_t user_id,
                                    std::span<const std::uint8_t> public_key) {
   auto txn = env_.start_write();
   auto id_key = std::to_string(user_id);
-  auto user_data = txn.get(users_map_, mdbx::slice(id_key.data(), id_key.size()),
-                           mdbx::slice::invalid());
+  auto user_data =
+      txn.get(users_map_, mdbx::slice(id_key.data(), id_key.size()), mdbx::slice::invalid());
   if (!user_data.is_valid()) {
     return false;
   }
@@ -217,8 +216,8 @@ bool Database::set_user_credential(std::uint64_t user_id,
   user->public_key.assign(public_key.begin(), public_key.end());
 
   auto json = db::user_to_json(*user);
-  txn.put(users_map_, mdbx::slice(id_key.data(), id_key.size()),
-          mdbx::slice(json), mdbx::put_mode::update);
+  txn.put(users_map_, mdbx::slice(id_key.data(), id_key.size()), mdbx::slice(json),
+          mdbx::put_mode::update);
 
   // Add credential_id → user_id index for WebAuthn login
   txn.put(credentials_map_, mdbx::slice(credential_id.data(), credential_id.size()),
@@ -268,9 +267,9 @@ std::optional<User> Database::create_user(std::string_view username,
   txn.put(config_map_, mdbx::slice("next_user_id"), mdbx::slice(next_str), mdbx::put_mode::upsert);
   User user;
   user.id = next_id;
-  user.email = std::string(username);  // Legacy: username stored as email
+  user.email = std::string(username); // Legacy: username stored as email
   user.display_name = std::string(username);
-  user.verified = true;  // Legacy users are considered verified
+  user.verified = true; // Legacy users are considered verified
   user.credential_id.assign(credential_id.begin(), credential_id.end());
   user.public_key.assign(public_key.begin(), public_key.end());
   user.sign_count = 0;
@@ -287,12 +286,10 @@ std::optional<User> Database::create_user(std::string_view username,
   return user;
 }
 
-std::optional<User> Database::find_user_by_credential(
-    std::span<const std::uint8_t> credential_id) {
+std::optional<User> Database::find_user_by_credential(std::span<const std::uint8_t> credential_id) {
   auto txn = env_.start_read();
-  auto value =
-      txn.get(users_map_, mdbx::slice(credential_id.data(), credential_id.size()),
-              mdbx::slice::invalid());
+  auto value = txn.get(users_map_, mdbx::slice(credential_id.data(), credential_id.size()),
+                       mdbx::slice::invalid());
   if (!value.is_valid()) {
     return std::nullopt;
   }
@@ -339,9 +336,9 @@ bool Database::update_sign_count(std::span<const std::uint8_t> credential_id,
   std::string user_id_str;
   {
     auto txn = env_.start_read();
-    auto id_slice = txn.get(credentials_map_,
-                            mdbx::slice(credential_id.data(), credential_id.size()),
-                            mdbx::slice::invalid());
+    auto id_slice =
+        txn.get(credentials_map_, mdbx::slice(credential_id.data(), credential_id.size()),
+                mdbx::slice::invalid());
     if (id_slice.is_valid()) {
       user_id_str = std::string(slice_to_view(id_slice));
     }
@@ -362,8 +359,8 @@ bool Database::update_sign_count(std::span<const std::uint8_t> credential_id,
     user->sign_count = sign_count;
     user->last_login = std::time(nullptr);
     auto json = db::user_to_json(*user);
-    txn.put(users_map_, mdbx::slice(credential_id.data(), credential_id.size()),
-            mdbx::slice(json), mdbx::put_mode::update);
+    txn.put(users_map_, mdbx::slice(credential_id.data(), credential_id.size()), mdbx::slice(json),
+            mdbx::put_mode::update);
     txn.commit();
     return true;
   }
@@ -382,8 +379,8 @@ bool Database::update_sign_count(std::span<const std::uint8_t> credential_id,
   user->sign_count = sign_count;
   user->last_login = std::time(nullptr);
   auto json = db::user_to_json(*user);
-  txn.put(users_map_, mdbx::slice(user_id_str.data(), user_id_str.size()),
-          mdbx::slice(json), mdbx::put_mode::update);
+  txn.put(users_map_, mdbx::slice(user_id_str.data(), user_id_str.size()), mdbx::slice(json),
+          mdbx::put_mode::update);
   txn.commit();
   return true;
 }
@@ -392,8 +389,7 @@ bool Database::update_sign_count(std::span<const std::uint8_t> credential_id,
 // Verification tokens
 // ─────────────────────────────────────────────────────────────────────────────
 
-bool Database::store_verification(std::span<const std::uint8_t> token_hash,
-                                  std::uint64_t user_id,
+bool Database::store_verification(std::span<const std::uint8_t> token_hash, std::uint64_t user_id,
                                   std::chrono::seconds ttl) {
   Verification v;
   v.user_id = user_id;
@@ -402,16 +398,15 @@ bool Database::store_verification(std::span<const std::uint8_t> token_hash,
 
   auto json = db::verification_to_json(v);
   auto txn = env_.start_write();
-  txn.put(verifications_map_, mdbx::slice(token_hash.data(), token_hash.size()),
-          mdbx::slice(json), mdbx::put_mode::upsert);
+  txn.put(verifications_map_, mdbx::slice(token_hash.data(), token_hash.size()), mdbx::slice(json),
+          mdbx::put_mode::upsert);
   txn.commit();
   return true;
 }
 
 std::optional<Verification> Database::find_verification(std::span<const std::uint8_t> token_hash) {
   auto txn = env_.start_read();
-  auto value = txn.get(verifications_map_,
-                       mdbx::slice(token_hash.data(), token_hash.size()),
+  auto value = txn.get(verifications_map_, mdbx::slice(token_hash.data(), token_hash.size()),
                        mdbx::slice::invalid());
   if (!value.is_valid()) {
     return std::nullopt;
@@ -421,8 +416,7 @@ std::optional<Verification> Database::find_verification(std::span<const std::uin
 
 bool Database::mark_verification_used(std::span<const std::uint8_t> token_hash) {
   auto txn = env_.start_write();
-  auto value = txn.get(verifications_map_,
-                       mdbx::slice(token_hash.data(), token_hash.size()),
+  auto value = txn.get(verifications_map_, mdbx::slice(token_hash.data(), token_hash.size()),
                        mdbx::slice::invalid());
   if (!value.is_valid()) {
     return false;
@@ -433,8 +427,8 @@ bool Database::mark_verification_used(std::span<const std::uint8_t> token_hash) 
   }
   v->used_at = std::time(nullptr);
   auto json = db::verification_to_json(*v);
-  txn.put(verifications_map_, mdbx::slice(token_hash.data(), token_hash.size()),
-          mdbx::slice(json), mdbx::put_mode::update);
+  txn.put(verifications_map_, mdbx::slice(token_hash.data(), token_hash.size()), mdbx::slice(json),
+          mdbx::put_mode::update);
   txn.commit();
   return true;
 }
@@ -475,8 +469,8 @@ std::string Database::create_session(std::uint64_t user_id, std::string_view use
   session.expires_at = session.created_at + ttl.count();
   auto json = db::session_to_json(session);
   auto txn = env_.start_write();
-  txn.put(sessions_map_, mdbx::slice(session_id.data(), session_id.size()),
-          mdbx::slice(json), mdbx::put_mode::upsert);
+  txn.put(sessions_map_, mdbx::slice(session_id.data(), session_id.size()), mdbx::slice(json),
+          mdbx::put_mode::upsert);
   txn.commit();
   return session_id;
 }
@@ -519,14 +513,13 @@ bool Database::update_session_expiry(std::string_view session_id, std::chrono::s
   session->id = std::string(session_id);
   session->expires_at = std::time(nullptr) + ttl.count();
   auto json = db::session_to_json(*session);
-  txn.put(sessions_map_, mdbx::slice(session_id.data(), session_id.size()),
-          mdbx::slice(json), mdbx::put_mode::upsert);
+  txn.put(sessions_map_, mdbx::slice(session_id.data(), session_id.size()), mdbx::slice(json),
+          mdbx::put_mode::upsert);
   txn.commit();
   return true;
 }
 
-bool Database::upgrade_session_state(std::string_view session_id,
-                                     std::string_view new_state,
+bool Database::upgrade_session_state(std::string_view session_id, std::string_view new_state,
                                      std::chrono::seconds new_ttl) {
   auto txn = env_.start_write();
   auto value = txn.get(sessions_map_, mdbx::slice(session_id.data(), session_id.size()),
@@ -542,8 +535,8 @@ bool Database::upgrade_session_state(std::string_view session_id,
   session->state = std::string(new_state);
   session->expires_at = std::time(nullptr) + new_ttl.count();
   auto json = db::session_to_json(*session);
-  txn.put(sessions_map_, mdbx::slice(session_id.data(), session_id.size()),
-          mdbx::slice(json), mdbx::put_mode::upsert);
+  txn.put(sessions_map_, mdbx::slice(session_id.data(), session_id.size()), mdbx::slice(json),
+          mdbx::put_mode::upsert);
   txn.commit();
   return true;
 }
@@ -574,12 +567,11 @@ std::size_t Database::cleanup_expired_sessions() {
   return removed;
 }
 
-std::optional<CodexRecord> Database::store_codex_entry(
-    const CodexBrief& brief, std::string_view content_type,
-    std::span<const std::uint8_t> payload) {
+std::optional<CodexRecord> Database::store_codex_entry(const CodexBrief &brief,
+                                                       std::string_view content_type,
+                                                       std::span<const std::uint8_t> payload) {
   auto txn = env_.start_write();
-  auto next_val = txn.get(config_map_, mdbx::slice("next_codex_id"),
-                          mdbx::slice::invalid());
+  auto next_val = txn.get(config_map_, mdbx::slice("next_codex_id"), mdbx::slice::invalid());
   std::uint64_t next_id = 1;
   if (next_val.is_valid()) {
     try {
@@ -591,8 +583,7 @@ std::optional<CodexRecord> Database::store_codex_entry(
     }
   }
   auto next_str = std::to_string(next_id + 1);
-  txn.put(config_map_, mdbx::slice("next_codex_id"), mdbx::slice(next_str),
-          mdbx::put_mode::upsert);
+  txn.put(config_map_, mdbx::slice("next_codex_id"), mdbx::slice(next_str), mdbx::put_mode::upsert);
 
   CodexRecord record;
   record.id = std::to_string(next_id);
@@ -611,8 +602,8 @@ std::optional<CodexRecord> Database::store_codex_entry(
   record.image_size = brief.image_bytes.size();
 
   auto meta_json = db::codex_to_json(record);
-  txn.put(codex_meta_map_, mdbx::slice(record.id.data(), record.id.size()),
-          mdbx::slice(meta_json), mdbx::put_mode::upsert);
+  txn.put(codex_meta_map_, mdbx::slice(record.id.data(), record.id.size()), mdbx::slice(meta_json),
+          mdbx::put_mode::upsert);
   if (!payload.empty()) {
     txn.put(codex_payloads_map_, mdbx::slice(record.id.data(), record.id.size()),
             mdbx::slice(payload.data(), payload.size()), mdbx::put_mode::upsert);
@@ -632,8 +623,7 @@ std::optional<CodexRecord> Database::store_codex_entry(
 
 std::optional<CodexRecord> Database::fetch_codex_record(std::string_view id) {
   auto txn = env_.start_read();
-  auto value = txn.get(codex_meta_map_, mdbx::slice(id.data(), id.size()),
-                       mdbx::slice::invalid());
+  auto value = txn.get(codex_meta_map_, mdbx::slice(id.data(), id.size()), mdbx::slice::invalid());
   if (!value.is_valid()) {
     return std::nullopt;
   }
@@ -647,8 +637,8 @@ std::optional<CodexRecord> Database::fetch_codex_record(std::string_view id) {
 
 std::optional<std::vector<std::uint8_t>> Database::fetch_codex_payload(std::string_view id) {
   auto txn = env_.start_read();
-  auto value = txn.get(codex_payloads_map_, mdbx::slice(id.data(), id.size()),
-                       mdbx::slice::invalid());
+  auto value =
+      txn.get(codex_payloads_map_, mdbx::slice(id.data(), id.size()), mdbx::slice::invalid());
   if (!value.is_valid()) {
     return std::nullopt;
   }
@@ -657,8 +647,8 @@ std::optional<std::vector<std::uint8_t>> Database::fetch_codex_payload(std::stri
 
 std::optional<std::vector<std::uint8_t>> Database::fetch_codex_image(std::string_view id) {
   auto txn = env_.start_read();
-  auto value = txn.get(codex_images_map_, mdbx::slice(id.data(), id.size()),
-                       mdbx::slice::invalid());
+  auto value =
+      txn.get(codex_images_map_, mdbx::slice(id.data(), id.size()), mdbx::slice::invalid());
   if (!value.is_valid()) {
     return std::nullopt;
   }
@@ -678,9 +668,7 @@ std::vector<CodexRecord> Database::list_codex(std::size_t limit) {
     out.push_back(std::move(*record));
   }
   std::sort(out.begin(), out.end(),
-            [](const CodexRecord& a, const CodexRecord& b) {
-              return a.created_at > b.created_at;
-            });
+            [](const CodexRecord &a, const CodexRecord &b) { return a.created_at > b.created_at; });
   if (out.size() > limit) {
     out.resize(limit);
   }
@@ -690,8 +678,7 @@ std::vector<CodexRecord> Database::list_codex(std::size_t limit) {
 std::optional<CodexRun> Database::create_codex_run(std::string_view brief_id,
                                                    std::string_view cmdline) {
   auto txn = env_.start_write();
-  auto next_val = txn.get(config_map_, mdbx::slice("next_codex_run_id"),
-                          mdbx::slice::invalid());
+  auto next_val = txn.get(config_map_, mdbx::slice("next_codex_run_id"), mdbx::slice::invalid());
   std::uint64_t next_id = 1;
   if (next_val.is_valid()) {
     try {
@@ -723,25 +710,25 @@ std::optional<CodexRun> Database::create_codex_run(std::string_view brief_id,
   run.artifact_count = 0;
 
   auto json = db::codex_run_to_json(run);
-  txn.put(codex_runs_map_, mdbx::slice(run.id.data(), run.id.size()),
-          mdbx::slice(json), mdbx::put_mode::insert_unique);
+  txn.put(codex_runs_map_, mdbx::slice(run.id.data(), run.id.size()), mdbx::slice(json),
+          mdbx::put_mode::insert_unique);
   txn.commit();
   return run;
 }
 
-bool Database::update_codex_run(const CodexRun& run) {
+bool Database::update_codex_run(const CodexRun &run) {
   auto json = db::codex_run_to_json(run);
   auto txn = env_.start_write();
-  txn.put(codex_runs_map_, mdbx::slice(run.id.data(), run.id.size()),
-          mdbx::slice(json), mdbx::put_mode::upsert);
+  txn.put(codex_runs_map_, mdbx::slice(run.id.data(), run.id.size()), mdbx::slice(json),
+          mdbx::put_mode::upsert);
   txn.commit();
   return true;
 }
 
 std::optional<CodexRun> Database::fetch_codex_run(std::string_view run_id) {
   auto txn = env_.start_read();
-  auto value = txn.get(codex_runs_map_, mdbx::slice(run_id.data(), run_id.size()),
-                       mdbx::slice::invalid());
+  auto value =
+      txn.get(codex_runs_map_, mdbx::slice(run_id.data(), run_id.size()), mdbx::slice::invalid());
   if (!value.is_valid()) {
     return std::nullopt;
   }
@@ -754,15 +741,13 @@ bool Database::store_codex_run_streams(std::string_view run_id,
   auto txn = env_.start_write();
   if (!stdout_bytes.empty()) {
     txn.put(codex_run_stdout_map_, mdbx::slice(run_id.data(), run_id.size()),
-            mdbx::slice(stdout_bytes.data(), stdout_bytes.size()),
-            mdbx::put_mode::upsert);
+            mdbx::slice(stdout_bytes.data(), stdout_bytes.size()), mdbx::put_mode::upsert);
   } else {
     txn.erase(codex_run_stdout_map_, mdbx::slice(run_id.data(), run_id.size()));
   }
   if (!stderr_bytes.empty()) {
     txn.put(codex_run_stderr_map_, mdbx::slice(run_id.data(), run_id.size()),
-            mdbx::slice(stderr_bytes.data(), stderr_bytes.size()),
-            mdbx::put_mode::upsert);
+            mdbx::slice(stderr_bytes.data(), stderr_bytes.size()), mdbx::put_mode::upsert);
   } else {
     txn.erase(codex_run_stderr_map_, mdbx::slice(run_id.data(), run_id.size()));
   }
@@ -770,8 +755,7 @@ bool Database::store_codex_run_streams(std::string_view run_id,
   return true;
 }
 
-std::optional<std::vector<std::uint8_t>> Database::fetch_codex_run_stdout(
-    std::string_view run_id) {
+std::optional<std::vector<std::uint8_t>> Database::fetch_codex_run_stdout(std::string_view run_id) {
   auto txn = env_.start_read();
   auto value = txn.get(codex_run_stdout_map_, mdbx::slice(run_id.data(), run_id.size()),
                        mdbx::slice::invalid());
@@ -781,8 +765,7 @@ std::optional<std::vector<std::uint8_t>> Database::fetch_codex_run_stdout(
   return slice_to_bytes(value);
 }
 
-std::optional<std::vector<std::uint8_t>> Database::fetch_codex_run_stderr(
-    std::string_view run_id) {
+std::optional<std::vector<std::uint8_t>> Database::fetch_codex_run_stderr(std::string_view run_id) {
   auto txn = env_.start_read();
   auto value = txn.get(codex_run_stderr_map_, mdbx::slice(run_id.data(), run_id.size()),
                        mdbx::slice::invalid());
@@ -792,13 +775,11 @@ std::optional<std::vector<std::uint8_t>> Database::fetch_codex_run_stderr(
   return slice_to_bytes(value);
 }
 
-bool Database::store_codex_run_artifacts(std::string_view run_id,
-                                         std::string_view artifacts_json) {
+bool Database::store_codex_run_artifacts(std::string_view run_id, std::string_view artifacts_json) {
   auto txn = env_.start_write();
   if (!artifacts_json.empty()) {
     txn.put(codex_run_artifacts_map_, mdbx::slice(run_id.data(), run_id.size()),
-            mdbx::slice(artifacts_json.data(), artifacts_json.size()),
-            mdbx::put_mode::upsert);
+            mdbx::slice(artifacts_json.data(), artifacts_json.size()), mdbx::put_mode::upsert);
   } else {
     txn.erase(codex_run_artifacts_map_, mdbx::slice(run_id.data(), run_id.size()));
   }
@@ -808,9 +789,8 @@ bool Database::store_codex_run_artifacts(std::string_view run_id,
 
 std::optional<std::string> Database::fetch_codex_run_artifacts(std::string_view run_id) {
   auto txn = env_.start_read();
-  auto value =
-      txn.get(codex_run_artifacts_map_, mdbx::slice(run_id.data(), run_id.size()),
-              mdbx::slice::invalid());
+  auto value = txn.get(codex_run_artifacts_map_, mdbx::slice(run_id.data(), run_id.size()),
+                       mdbx::slice::invalid());
   if (!value.is_valid()) {
     return std::nullopt;
   }
@@ -820,8 +800,7 @@ std::optional<std::string> Database::fetch_codex_run_artifacts(std::string_view 
 
 std::optional<std::string> Database::get_config(std::string_view key) {
   auto txn = env_.start_read();
-  auto value = txn.get(config_map_, mdbx::slice(key.data(), key.size()),
-                       mdbx::slice::invalid());
+  auto value = txn.get(config_map_, mdbx::slice(key.data(), key.size()), mdbx::slice::invalid());
   if (!value.is_valid()) {
     return std::nullopt;
   }
@@ -831,8 +810,8 @@ std::optional<std::string> Database::get_config(std::string_view key) {
 
 bool Database::set_config(std::string_view key, std::string_view value) {
   auto txn = env_.start_write();
-  txn.put(config_map_, mdbx::slice(key.data(), key.size()),
-          mdbx::slice(value.data(), value.size()), mdbx::put_mode::upsert);
+  txn.put(config_map_, mdbx::slice(key.data(), key.size()), mdbx::slice(value.data(), value.size()),
+          mdbx::put_mode::upsert);
   txn.commit();
   return true;
 }
@@ -847,7 +826,7 @@ bool Database::delete_config(std::string_view key) {
 std::string Database::generate_session_id_() {
   std::array<std::uint8_t, 32> bytes{};
   RAND_bytes(bytes.data(), static_cast<int>(bytes.size()));
-  static const char* kTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  static const char *kTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
   std::string out;
   out.reserve(44);
   std::size_t i = 0;

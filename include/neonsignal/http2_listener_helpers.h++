@@ -12,8 +12,7 @@
 
 namespace neonsignal {
 
-inline constexpr std::string_view kClientPreface =
-    "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n";
+inline constexpr std::string_view kClientPreface = "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n";
 inline constexpr std::size_t kMaxHeaderLog = 256;
 
 struct StaticResult {
@@ -29,7 +28,7 @@ struct StaticResult {
  * @return Listening socket fd (caller responsible for close), or throws on
  *         failure.
  */
-int make_listen_socket(const ServerConfig& config);
+int make_listen_socket(const ServerConfig &config);
 /**
  * Read the current process RSS in kilobytes from /proc/self/status.
  *
@@ -45,15 +44,15 @@ std::uint64_t read_rss_kb();
  * @param prefix_bits Number of prefix bits allowed in the first byte (1-8).
  * @param first_byte_prefix High bits to OR into the first byte.
  */
-void encode_integer(std::vector<std::uint8_t>& out, std::uint32_t value,
-                    std::uint8_t prefix_bits, std::uint8_t first_byte_prefix);
+void encode_integer(std::vector<std::uint8_t> &out, std::uint32_t value, std::uint8_t prefix_bits,
+                    std::uint8_t first_byte_prefix);
 /**
  * HPACK string encoding helper (no Huffman, H=0).
  *
  * @param out Destination buffer to append to.
  * @param str UTF-8 string to encode with length prefix.
  */
-void encode_string(std::vector<std::uint8_t>& out, std::string_view str);
+void encode_string(std::vector<std::uint8_t> &out, std::string_view str);
 /**
  * Emit a literal header field without indexing.
  *
@@ -61,8 +60,7 @@ void encode_string(std::vector<std::uint8_t>& out, std::string_view str);
  * @param name_index HPACK static table index for the header name.
  * @param value Header value to encode (no Huffman).
  */
-void encode_literal_header_no_index(std::vector<std::uint8_t>& out,
-                                    std::uint32_t name_index,
+void encode_literal_header_no_index(std::vector<std::uint8_t> &out, std::uint32_t name_index,
                                     std::string_view value);
 /**
  * @brief Build a raw HTTP/2 frame.
@@ -79,7 +77,7 @@ void encode_literal_header_no_index(std::vector<std::uint8_t>& out,
  */
 std::vector<std::uint8_t> build_frame(std::uint8_t type, std::uint8_t flags,
                                       std::uint32_t stream_id,
-                                      const std::vector<std::uint8_t>& payload);
+                                      const std::vector<std::uint8_t> &payload);
 /**
  * HPACK integer decoding helper.
  *
@@ -89,15 +87,15 @@ std::vector<std::uint8_t> build_frame(std::uint8_t type, std::uint8_t flags,
  * @param out_val Decoded integer on success.
  * @return true on success, false if buffer is too short or malformed.
  */
-bool decode_integer(const std::vector<std::uint8_t>& buf, std::size_t& off,
-                    std::uint8_t prefix_bits, std::uint32_t& out_val);
+bool decode_integer(const std::vector<std::uint8_t> &buf, std::size_t &off,
+                    std::uint8_t prefix_bits, std::uint32_t &out_val);
 /**
  * Guess MIME type from file extension.
  *
  * @param p Path to inspect.
  * @return MIME string (defaults to application/octet-stream).
  */
-std::string guess_content_type(const std::filesystem::path& p);
+std::string guess_content_type(const std::filesystem::path &p);
 /**
  * Build server SETTINGS frame payload for startup (max streams + window).
  *
@@ -119,10 +117,8 @@ std::vector<std::uint8_t> build_settings_ack();
  * @param content_type Content-Type header value.
  * @param body Response body payload.
  */
-void build_response_frames(std::vector<std::uint8_t>& out,
-                           std::uint32_t stream_id, int status,
-                           std::string_view content_type,
-                           const std::vector<std::uint8_t>& body);
+void build_response_frames(std::vector<std::uint8_t> &out, std::uint32_t stream_id, int status,
+                           std::string_view content_type, const std::vector<std::uint8_t> &body);
 /**
  * Encode HEADERS/DATA frames for a response with extra headers (e.g., cookies).
  *
@@ -134,10 +130,10 @@ void build_response_frames(std::vector<std::uint8_t>& out,
  * @param body Response body payload.
  */
 void build_response_frames_with_headers(
-    std::vector<std::uint8_t>& out, std::uint32_t stream_id, int status,
+    std::vector<std::uint8_t> &out, std::uint32_t stream_id, int status,
     std::string_view content_type,
-    const std::vector<std::pair<std::string, std::string>>& extra_headers,
-    const std::vector<std::uint8_t>& body);
+    const std::vector<std::pair<std::string, std::string>> &extra_headers,
+    const std::vector<std::uint8_t> &body);
 /**
  * Build a WINDOW_UPDATE frame.
  *
@@ -145,8 +141,7 @@ void build_response_frames_with_headers(
  * @param increment Window increment value.
  * @return Encoded WINDOW_UPDATE frame.
  */
-std::vector<std::uint8_t> build_window_update(std::uint32_t stream_id,
-                                              std::uint32_t increment);
+std::vector<std::uint8_t> build_window_update(std::uint32_t stream_id, std::uint32_t increment);
 // Forward declaration for cache
 class StaticFileCache;
 
@@ -159,8 +154,8 @@ class StaticFileCache;
  * @param cache Optional cache for in-memory file serving (nullptr = no cache).
  * @return StaticResult with status/content-type/body.
  */
-StaticResult load_static(std::string_view path, const Router& router,
-                         StaticFileCache* cache = nullptr);
+StaticResult load_static(std::string_view path, const Router &router,
+                         StaticFileCache *cache = nullptr);
 
 /**
  * Resolve and load a static asset from a custom document root (for vhosting).
@@ -171,8 +166,7 @@ StaticResult load_static(std::string_view path, const Router& router,
  * @param router Router abstraction (uses its resolve(path, doc_root) overload).
  * @return StaticResult with status/content-type/body.
  */
-StaticResult load_static_vhost(std::string_view path,
-                               const std::filesystem::path& document_root,
-                               const Router& router);
+StaticResult load_static_vhost(std::string_view path, const std::filesystem::path &document_root,
+                               const Router &router);
 
 } // namespace neonsignal

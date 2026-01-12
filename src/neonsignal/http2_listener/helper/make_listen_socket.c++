@@ -13,9 +13,8 @@
 
 namespace neonsignal {
 
-int make_listen_socket(const ServerConfig& config) {
-  int fd =
-      ::socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
+int make_listen_socket(const ServerConfig &config) {
+  int fd = ::socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
   if (fd == -1) {
     throw std::runtime_error("failed to create socket");
   }
@@ -34,7 +33,7 @@ int make_listen_socket(const ServerConfig& config) {
     throw std::runtime_error("invalid listen address: " + config.host);
   }
 
-  if (bind(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1) {
+  if (bind(fd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) == -1) {
     close(fd);
     throw std::runtime_error("bind failed: " + std::string(strerror(errno)));
   }

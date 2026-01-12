@@ -2,9 +2,9 @@
 
 namespace neonsignal {
 
-bool ApiHandler::auth_login_finish_headers(
-    const std::shared_ptr<Http2Connection>& conn, std::uint32_t stream_id,
-    const std::string& path, const std::string& method) {
+bool ApiHandler::auth_login_finish_headers(const std::shared_ptr<Http2Connection> &conn,
+                                           std::uint32_t stream_id, const std::string &path,
+                                           const std::string &method) {
   Http2Connection::StreamState st{};
   st.path = path;
   st.method = method;

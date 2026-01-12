@@ -7,8 +7,7 @@
 
 namespace neonsignal {
 
-void EventLoop::add_fd(int fd, std::uint32_t events,
-                       std::function<void(std::uint32_t)> callback) {
+void EventLoop::add_fd(int fd, std::uint32_t events, std::function<void(std::uint32_t)> callback) {
   epoll_event ev{};
   ev.events = events;
   ev.data.fd = fd;

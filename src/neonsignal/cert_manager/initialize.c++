@@ -11,14 +11,13 @@
 namespace {
 
 // Select HTTP/2 via ALPN callback
-int select_h2_alpn(SSL *, const unsigned char **out, unsigned char *outlen,
-                   const unsigned char *in, unsigned int inlen, void *) {
+int select_h2_alpn(SSL *, const unsigned char **out, unsigned char *outlen, const unsigned char *in,
+                   unsigned int inlen, void *) {
   static const unsigned char alpn_h2[] = {0x02, 'h', '2'};
 
   unsigned char *selected = nullptr;
   unsigned char selected_len = 0;
-  int rc = SSL_select_next_proto(&selected, &selected_len, alpn_h2,
-                                 sizeof(alpn_h2), in, inlen);
+  int rc = SSL_select_next_proto(&selected, &selected_len, alpn_h2, sizeof(alpn_h2), in, inlen);
   if (rc == OPENSSL_NPN_NEGOTIATED) {
     *out = selected;
     *outlen = selected_len;
@@ -38,8 +37,7 @@ bool CertManager::initialize() {
   default_cert_ = nullptr;
 
   if (!std::filesystem::is_directory(certs_root_)) {
-    std::cerr << "neonsignal->CertManager: certs directory not found: "
-              << certs_root_ << '\n';
+    std::cerr << "neonsignal->CertManager: certs directory not found: " << certs_root_ << '\n';
     return false;
   }
 
@@ -57,8 +55,7 @@ bool CertManager::initialize() {
     auto bundle = load_certificate(entry.path(), name);
 
     if (!bundle) {
-      std::cerr << "neonsignal->CertManager: failed to load cert for " << name
-                << '\n';
+      std::cerr << "neonsignal->CertManager: failed to load cert for " << name << '\n';
       continue;
     }
 
@@ -76,15 +73,13 @@ bool CertManager::initialize() {
   }
 
   if (!default_cert_) {
-    std::cerr
-        << "neonsignal->CertManager: WARNING - no _default certificate found\n";
+    std::cerr << "neonsignal->CertManager: WARNING - no _default certificate found\n";
     // Use first available cert as fallback
     if (!exact_certs_.empty()) {
       for (auto &[name, bundle] : exact_certs_) {
         if (name != "_default") {
           default_cert_ = bundle.get();
-          std::cerr << "neonsignal->CertManager: using " << name
-                    << " as fallback default\n";
+          std::cerr << "neonsignal->CertManager: using " << name << " as fallback default\n";
           break;
         }
       }
@@ -100,8 +95,7 @@ bool CertManager::is_cert_directory(const std::filesystem::path &path) {
 }
 
 std::unique_ptr<CertificateBundle>
-CertManager::load_certificate(const std::filesystem::path &cert_dir,
-                              const std::string &domain) {
+CertManager::load_certificate(const std::filesystem::path &cert_dir, const std::string &domain) {
   auto bundle = std::make_unique<CertificateBundle>();
   bundle->domain = domain;
   bundle->cert_path = cert_dir / "fullchain.pem";
@@ -130,29 +124,26 @@ bool CertManager::configure_ssl_ctx(CertificateBundle &bundle) {
 
   // Modern TLS settings
   SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION);
-  SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1 |
-                               SSL_OP_NO_TLSv1_1);
+  SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1);
 
   // Prefer ECDHE cipher suites
   if (SSL_CTX_set_cipher_list(ctx, "ECDHE:!aNULL") != 1) {
-    std::cerr << "neonsignal->CertManager: failed to configure cipher list for "
-              << bundle.domain << '\n';
+    std::cerr << "neonsignal->CertManager: failed to configure cipher list for " << bundle.domain
+              << '\n';
     return false;
   }
 
   // Load certificate chain
   if (SSL_CTX_use_certificate_chain_file(ctx, bundle.cert_path.c_str()) != 1) {
-    std::cerr << "neonsignal->CertManager: failed to load certificate: "
-              << bundle.cert_path << '\n';
+    std::cerr << "neonsignal->CertManager: failed to load certificate: " << bundle.cert_path
+              << '\n';
     ERR_print_errors_fp(stderr);
     return false;
   }
 
   // Load private key
-  if (SSL_CTX_use_PrivateKey_file(ctx, bundle.key_path.c_str(),
-                                  SSL_FILETYPE_PEM) != 1) {
-    std::cerr << "neonsignal->CertManager: failed to load private key: "
-              << bundle.key_path << '\n';
+  if (SSL_CTX_use_PrivateKey_file(ctx, bundle.key_path.c_str(), SSL_FILETYPE_PEM) != 1) {
+    std::cerr << "neonsignal->CertManager: failed to load private key: " << bundle.key_path << '\n';
     ERR_print_errors_fp(stderr);
     return false;
   }
@@ -168,8 +159,7 @@ bool CertManager::configure_ssl_ctx(CertificateBundle &bundle) {
   // Configure ALPN for HTTP/2
   SSL_CTX_set_alpn_select_cb(ctx, select_h2_alpn, nullptr);
 
-  std::cerr << "neonsignal->CertManager: loaded certificate for "
-            << bundle.domain << '\n';
+  std::cerr << "neonsignal->CertManager: loaded certificate for " << bundle.domain << '\n';
   return true;
 }
 
@@ -213,15 +203,15 @@ bool CertManager::extract_cert_info(CertificateBundle &bundle) {
   }
 
   // Extract SANs
-  GENERAL_NAMES *san_names = static_cast<GENERAL_NAMES *>(
-      X509_get_ext_d2i(cert, NID_subject_alt_name, nullptr, nullptr));
+  GENERAL_NAMES *san_names =
+      static_cast<GENERAL_NAMES *>(X509_get_ext_d2i(cert, NID_subject_alt_name, nullptr, nullptr));
   if (san_names) {
     int san_count = sk_GENERAL_NAME_num(san_names);
     for (int i = 0; i < san_count; ++i) {
       GENERAL_NAME *entry = sk_GENERAL_NAME_value(san_names, i);
       if (entry->type == GEN_DNS) {
-        const char *dns_name = reinterpret_cast<const char *>(
-            ASN1_STRING_get0_data(entry->d.dNSName));
+        const char *dns_name =
+            reinterpret_cast<const char *>(ASN1_STRING_get0_data(entry->d.dNSName));
         if (dns_name) {
           bundle.san_names.emplace_back(dns_name);
         }
@@ -230,8 +220,8 @@ bool CertManager::extract_cert_info(CertificateBundle &bundle) {
         ASN1_OCTET_STRING *ip = entry->d.iPAddress;
         if (ip && ip->length == 4) {
           char ip_str[16];
-          snprintf(ip_str, sizeof(ip_str), "%d.%d.%d.%d", ip->data[0],
-                   ip->data[1], ip->data[2], ip->data[3]);
+          snprintf(ip_str, sizeof(ip_str), "%d.%d.%d.%d", ip->data[0], ip->data[1], ip->data[2],
+                   ip->data[3]);
           bundle.san_names.emplace_back(ip_str);
         }
       }
@@ -264,8 +254,7 @@ std::vector<std::string> CertManager::list_certificates() const {
   }
 
   for (const auto &bundle : wildcard_certs_) {
-    std::string entry =
-        "*." + bundle->domain + " -> " + bundle->cert_path.string();
+    std::string entry = "*." + bundle->domain + " -> " + bundle->cert_path.string();
     if (!bundle->common_name.empty()) {
       entry += " (CN=" + bundle->common_name + ")";
     }
@@ -284,10 +273,8 @@ std::vector<std::string> CertManager::expiring_soon(int days) const {
 
   auto check_bundle = [&](const CertificateBundle &bundle) {
     if (bundle.not_after > 0 && bundle.not_after < threshold) {
-      int days_left =
-          static_cast<int>((bundle.not_after - now) / (24 * 60 * 60));
-      result.push_back(bundle.domain + " expires in " +
-                       std::to_string(days_left) + " days");
+      int days_left = static_cast<int>((bundle.not_after - now) / (24 * 60 * 60));
+      result.push_back(bundle.domain + " expires in " + std::to_string(days_left) + " days");
     }
   };
 
