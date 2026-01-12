@@ -5,3 +5,7 @@ depth = 1
 
 [provide]
 libmdbx = mdbx_dep
+
+[cmake]
+CMAKE_POLICY_DEFAULT_CMP0156 = NEW
+CMAKE_MESSAGE_LOG_LEVEL = WARNING
