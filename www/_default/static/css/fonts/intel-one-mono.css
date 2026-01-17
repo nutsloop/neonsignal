@@ -1,0 +1,6 @@
+/* Intel One Mono - clean monospace for terminals/code */
+@import url('https://fonts.googleapis.com/css2?family=Intel+One+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-intel: 'Intel One Mono', monospace; /* clean monospace - terminals/code */
+}

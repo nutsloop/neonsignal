@@ -1,0 +1,6 @@
+/* Monoton - neon sign outlines */
+@import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
+
+:root {
+  --font-monoton: 'Monoton', cursive; /* neon sign outlines - headers/logos */
+}

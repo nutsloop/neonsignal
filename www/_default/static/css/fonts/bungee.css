@@ -1,0 +1,6 @@
+/* Bungee - bold signage */
+@import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
+
+:root {
+  --font-bungee: 'Bungee', cursive; /* bold signage - impact headers */
+}

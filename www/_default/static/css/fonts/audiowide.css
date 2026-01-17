@@ -1,0 +1,6 @@
+/* Audiowide - 80s arcade/racing */
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+
+:root {
+  --font-audiowide: 'Audiowide', cursive; /* 80s arcade - titles/UI */
+}

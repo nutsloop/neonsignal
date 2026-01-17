@@ -1,0 +1,96 @@
+/* Font Showcase */
+.font-showcase {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+.font-showcase-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.font-showcase-page .font-showcase {
+  flex: 1;
+}
+
+.font-showcase .title {
+  font-family: var(--font-orbitron);
+  font-size: 2rem;
+  color: var(--neon-cyan);
+  text-align: center;
+  margin-bottom: 3rem;
+  text-shadow: 0 0 20px var(--neon-cyan);
+}
+
+.font-sample {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-left: 3px solid var(--neon-pink);
+  background: var(--terminal-bg);
+}
+
+.font-sample .label {
+  font-family: var(--font-share-tech);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.font-sample .preview {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+/* Individual font styles */
+.font-sample.orbitron .preview {
+  font-family: var(--font-orbitron);
+  color: var(--neon-cyan);
+}
+
+.font-sample.share-tech .preview {
+  font-family: var(--font-share-tech);
+  color: var(--neon-green);
+}
+
+.font-sample.intel .preview {
+  font-family: var(--font-intel);
+  color: var(--neon-purple);
+}
+
+.font-sample.monoton .preview {
+  font-family: var(--font-monoton);
+  font-size: 3rem;
+  color: var(--neon-pink);
+  text-shadow: 0 0 30px var(--neon-pink);
+}
+
+.font-sample.audiowide .preview {
+  font-family: var(--font-audiowide);
+  color: var(--neon-orange);
+}
+
+.font-sample.syncopate .preview {
+  font-family: var(--font-syncopate);
+  font-weight: 700;
+  color: var(--neon-cyan);
+  letter-spacing: 0.05em;
+}
+
+.font-sample.press-start .preview {
+  font-family: var(--font-press-start);
+  font-size: 1rem;
+  color: var(--neon-red);
+}
+
+.font-sample.bungee .preview {
+  font-family: var(--font-bungee);
+  font-size: 2rem;
+  color: var(--neon-orange);
+  text-shadow: 0 0 15px var(--neon-orange);
+}
