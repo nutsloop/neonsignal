@@ -1,5 +1,5 @@
-#include "neonsignal/cert_manager.h++"
 #include "neonsignal/neonsignal.h++"
+#include "neonsignal/cert_manager.h++"
 
 #include <openssl/ssl.h>
 
@@ -51,7 +51,8 @@ void Server::initialize_tls() {
   // Initialize the CertManager and load all certificates
   cert_manager_ = std::make_unique<CertManager>(config_.certs_root);
   if (!cert_manager_->initialize()) {
-    throw std::runtime_error("failed to initialize certificate manager from " + config_.certs_root);
+    throw std::runtime_error(
+        "failed to initialize certificate manager from " + config_.certs_root);
   }
 
   // Get the default context from CertManager

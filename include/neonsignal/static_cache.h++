@@ -22,7 +22,7 @@ public:
   struct CachedFile {
     std::vector<std::uint8_t> content;
     std::string mime_type;
-    std::string etag; // For cache validation
+    std::string etag;  // For cache validation
     std::chrono::system_clock::time_point last_modified;
     std::size_t access_count{0};
   };
@@ -31,12 +31,16 @@ public:
       : max_cache_size_bytes_(max_cache_size_bytes) {}
 
   // Pre-load critical files at startup
-  void preload(const std::filesystem::path &public_root) {
+  void preload(const std::filesystem::path& public_root) {
     // Critical files that should ALWAYS be in memory
-    const std::vector<std::string> critical_files = {"index.html", "app.js", "app.css",
-                                                     "favicon.ico"};
+    const std::vector<std::string> critical_files = {
+        "index.html",
+        "app.js",
+        "app.css",
+        "favicon.ico"
+    };
 
-    for (const auto &file : critical_files) {
+    for (const auto& file : critical_files) {
       auto path = public_root / file;
       if (std::filesystem::exists(path)) {
         load_file(path, "/" + file);
@@ -44,15 +48,15 @@ public:
     }
 
     // Scan and pre-load small files (< 100KB)
-    for (const auto &entry : std::filesystem::recursive_directory_iterator(public_root)) {
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(public_root)) {
       if (entry.is_regular_file() && entry.file_size() < 100 * 1024) {
         auto rel_path = std::filesystem::relative(entry.path(), public_root);
         load_file(entry.path(), "/" + rel_path.string());
       }
     }
 
-    std::cerr << std::format("📦 Static cache: {} files loaded, {} bytes\n", cache_.size(),
-                             current_size_bytes_);
+    std::cerr << std::format("📦 Static cache: {} files loaded, {} bytes\n",
+                             cache_.size(), current_size_bytes_);
   }
 
   // Get file from cache
@@ -67,11 +71,13 @@ public:
   }
 
   // Manually add file to cache
-  void put(std::string_view path, std::vector<std::uint8_t> content, std::string_view mime_type) {
+  void put(std::string_view path, std::vector<std::uint8_t> content,
+           std::string_view mime_type) {
     std::lock_guard lock(mutex_);
 
     // Evict if over size limit
-    while (current_size_bytes_ + content.size() > max_cache_size_bytes_ && !cache_.empty()) {
+    while (current_size_bytes_ + content.size() > max_cache_size_bytes_ &&
+           !cache_.empty()) {
       evict_lru_();
     }
 
@@ -105,10 +111,13 @@ public:
     return cache_.size();
   }
 
-  [[nodiscard]] std::size_t bytes() const { return current_size_bytes_; }
+  [[nodiscard]] std::size_t bytes() const {
+    return current_size_bytes_;
+  }
 
 private:
-  void load_file(const std::filesystem::path &file_path, const std::string &cache_key) {
+  void load_file(const std::filesystem::path& file_path,
+                 const std::string& cache_key) {
     try {
       std::ifstream file(file_path, std::ios::binary);
       if (!file) return;
@@ -119,14 +128,14 @@ private:
       file.seekg(0, std::ios::beg);
 
       std::vector<std::uint8_t> content(size);
-      file.read(reinterpret_cast<char *>(content.data()), size);
+      file.read(reinterpret_cast<char*>(content.data()), size);
 
       // Determine MIME type from extension
       auto mime = mime_type_from_extension_(file_path.extension().string());
 
       put(cache_key, std::move(content), mime);
 
-    } catch (const std::exception &e) {
+    } catch (const std::exception& e) {
       std::cerr << std::format("Failed to load {}: {}\n", file_path.string(), e.what());
     }
   }
@@ -146,10 +155,10 @@ private:
     }
   }
 
-  [[nodiscard]] std::string generate_etag_(const std::vector<std::uint8_t> &content) const {
+  [[nodiscard]] std::string generate_etag_(const std::vector<std::uint8_t>& content) const {
     // Simple hash-based ETag (could use MD5/SHA for production)
     std::size_t hash = std::hash<std::string_view>{}(
-        std::string_view(reinterpret_cast<const char *>(content.data()), content.size()));
+        std::string_view(reinterpret_cast<const char*>(content.data()), content.size()));
     return std::format("\"{:016x}\"", hash);
   }
 

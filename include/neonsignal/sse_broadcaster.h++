@@ -22,14 +22,14 @@ struct Http2Connection;
 class SSEBroadcaster {
 public:
   enum class Channel {
-    Events,     // General application events
-    CPUMetrics, // CPU usage stats
-    MemMetrics, // Memory usage stats
-    Redirect    // Redirect service status
+    Events,       // General application events
+    CPUMetrics,   // CPU usage stats
+    MemMetrics,   // Memory usage stats
+    Redirect      // Redirect service status
   };
 
   // Batch interval - accumulate events for this duration
-  static constexpr std::chrono::milliseconds BATCH_INTERVAL{16}; // ~60fps
+  static constexpr std::chrono::milliseconds BATCH_INTERVAL{16};  // ~60fps
 
   SSEBroadcaster() = default;
 
@@ -44,15 +44,19 @@ public:
   // Unsubscribe connection from channel
   void unsubscribe(Channel channel, int fd) {
     std::lock_guard lock(mutex_);
-    auto &subs = subscriptions_[channel];
-    std::erase_if(subs, [fd](const Subscription &sub) { return sub.fd == fd; });
+    auto& subs = subscriptions_[channel];
+    std::erase_if(subs, [fd](const Subscription& sub) {
+      return sub.fd == fd;
+    });
   }
 
   // Unsubscribe from all channels
   void unsubscribe_all(int fd) {
     std::lock_guard lock(mutex_);
-    for (auto &[_, subs] : subscriptions_) {
-      std::erase_if(subs, [fd](const Subscription &sub) { return sub.fd == fd; });
+    for (auto& [_, subs] : subscriptions_) {
+      std::erase_if(subs, [fd](const Subscription& sub) {
+        return sub.fd == fd;
+      });
     }
   }
 
@@ -64,16 +68,15 @@ public:
 
   // Immediate broadcast (bypasses batching)
   void broadcast_immediate(Channel channel, std::string_view event_data,
-                           std::function<void(const std::shared_ptr<Http2Connection> &,
-                                              std::uint32_t, const std::vector<std::uint8_t> &)>
-                               send_frame) {
+                          std::function<void(const std::shared_ptr<Http2Connection>&,
+                                             std::uint32_t, const std::vector<std::uint8_t>&)> send_frame) {
     auto frame = encode_sse_data_frame_(event_data);
 
     std::lock_guard lock(mutex_);
     auto it = subscriptions_.find(channel);
     if (it == subscriptions_.end()) return;
 
-    for (const auto &sub : it->second) {
+    for (const auto& sub : it->second) {
       if (auto conn = sub.conn.lock()) {
         send_frame(conn, sub.stream_id, frame);
       }
@@ -81,9 +84,8 @@ public:
   }
 
   // Flush batched events (call periodically, e.g., every 16ms)
-  void flush_batched(std::function<void(const std::shared_ptr<Http2Connection> &, std::uint32_t,
-                                        const std::vector<std::uint8_t> &)>
-                         send_frame) {
+  void flush_batched(std::function<void(const std::shared_ptr<Http2Connection>&,
+                                        std::uint32_t, const std::vector<std::uint8_t>&)> send_frame) {
     std::unordered_map<Channel, std::vector<std::string>> events_snapshot;
 
     {
@@ -93,14 +95,14 @@ public:
     }
 
     // Process each channel
-    for (const auto &[channel, events] : events_snapshot) {
+    for (const auto& [channel, events] : events_snapshot) {
       if (events.empty()) continue;
 
       // Combine multiple events into a single frame (if small enough)
       std::string combined;
-      for (const auto &event : events) {
+      for (const auto& event : events) {
         combined += event;
-        combined += "\n\n"; // SSE event separator
+        combined += "\n\n";  // SSE event separator
       }
 
       // Pre-encode once for all subscribers
@@ -111,7 +113,7 @@ public:
       auto it = subscriptions_.find(channel);
       if (it == subscriptions_.end()) continue;
 
-      for (const auto &sub : it->second) {
+      for (const auto& sub : it->second) {
         if (auto conn = sub.conn.lock()) {
           send_frame(conn, sub.stream_id, frame);
         }
@@ -130,20 +132,21 @@ public:
   [[nodiscard]] std::size_t total_subscribers() const {
     std::lock_guard lock(mutex_);
     std::size_t total = 0;
-    for (const auto &[_, subs] : subscriptions_) {
+    for (const auto& [_, subs] : subscriptions_) {
       total += subs.size();
     }
     return total;
   }
 
   // Simple iteration over subscribers (for custom frame building)
-  template <typename Callback> void for_each_subscriber(Channel channel, Callback &&callback) {
+  template<typename Callback>
+  void for_each_subscriber(Channel channel, Callback&& callback) {
     std::lock_guard lock(mutex_);
     auto it = subscriptions_.find(channel);
     if (it == subscriptions_.end()) return;
 
     // Iterate and call callback for each active subscriber
-    for (const auto &sub : it->second) {
+    for (const auto& sub : it->second) {
       if (auto conn = sub.conn.lock()) {
         callback(conn, sub.stream_id);
       }
@@ -156,13 +159,13 @@ private:
     std::weak_ptr<Http2Connection> conn;
     std::uint32_t stream_id;
 
-    bool operator==(const Subscription &other) const {
+    bool operator==(const Subscription& other) const {
       return fd == other.fd && stream_id == other.stream_id;
     }
   };
 
   struct SubscriptionHash {
-    std::size_t operator()(const Subscription &sub) const {
+    std::size_t operator()(const Subscription& sub) const {
       return std::hash<int>{}(sub.fd) ^ (std::hash<std::uint32_t>{}(sub.stream_id) << 1);
     }
   };

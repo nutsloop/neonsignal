@@ -1,6 +1,7 @@
 #include "neonsignal/api_handler.h++"
 
 #include "neonsignal/event_loop.h++"
+#include "neonsignal/event_mask.h++"
 #include "neonsignal/http2_listener_helpers.h++"
 
 #include <filesystem>
@@ -52,13 +53,14 @@ std::filesystem::path make_unique_path_local(const std::filesystem::path &dir,
 } // namespace
 
 bool ApiHandler::incoming_data(const std::shared_ptr<Http2Connection> &conn,
-                               std::uint32_t stream_id, const std::string &method,
-                               const std::string &upload_header_name, const std::string &path) {
+                                         std::uint32_t stream_id, const std::string &method,
+                                         const std::string &upload_header_name,
+                                          const std::string &path) {
   if (method != "POST") {
     std::string body = "Method Not Allowed";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
     build_response_frames(conn->write_buf, stream_id, 405, "text/plain; charset=utf-8", body_bytes);
-    conn->events |= EPOLLOUT;
+    conn->events |= EventMask::Write;
     loop_.update_fd(conn->fd, conn->events);
     return true; // handled (405)
   }
@@ -82,7 +84,7 @@ bool ApiHandler::incoming_data(const std::shared_ptr<Http2Connection> &conn,
     std::string body = "{\"error\":\"cannot open upload path\"}";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
     build_response_frames(conn->write_buf, stream_id, 500, "application/json", body_bytes);
-    conn->events |= EPOLLOUT;
+    conn->events |= EventMask::Write;
     loop_.update_fd(conn->fd, conn->events);
     std::cerr << "UPLOAD init failed (open) fd=" << conn->fd << " stream=" << stream_id
               << " path=" << fullpath << '\n';
@@ -94,7 +96,7 @@ bool ApiHandler::incoming_data(const std::shared_ptr<Http2Connection> &conn,
   auto wu_conn = build_window_update(0, stream_window_boost);
   conn->write_buf.insert(conn->write_buf.end(), wu_stream.begin(), wu_stream.end());
   conn->write_buf.insert(conn->write_buf.end(), wu_conn.begin(), wu_conn.end());
-  conn->events |= EPOLLOUT;
+  conn->events |= EventMask::Write;
   loop_.update_fd(conn->fd, conn->events);
   conn->streams[stream_id] = std::move(st);
   std::cerr << "UPLOAD init fd=" << conn->fd << " stream=" << stream_id << " method=" << method

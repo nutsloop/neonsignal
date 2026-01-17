@@ -4,7 +4,8 @@
 
 namespace neonsignal {
 
-std::vector<std::uint8_t> build_window_update(std::uint32_t stream_id, std::uint32_t increment) {
+std::vector<std::uint8_t> build_window_update(std::uint32_t stream_id,
+                                              std::uint32_t increment) {
   std::vector<std::uint8_t> payload;
   payload.push_back(static_cast<std::uint8_t>((increment >> 24) & 0x7F));
   payload.push_back(static_cast<std::uint8_t>((increment >> 16) & 0xFF));

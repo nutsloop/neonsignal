@@ -1,6 +1,7 @@
 #include "neonsignal/api_handler.h++"
 
 #include "neonsignal/event_loop.h++"
+#include "neonsignal/event_mask.h++"
 #include "neonsignal/http2_listener_helpers.h++"
 
 namespace neonsignal {
@@ -34,14 +35,14 @@ std::string query_param(std::string_view path, std::string_view key) {
 
 } // namespace
 
-bool ApiHandler::codex_run_start(const std::shared_ptr<Http2Connection> &conn,
-                                 std::uint32_t stream_id, const std::string &path,
-                                 const std::string &method) {
+bool ApiHandler::codex_run_start(const std::shared_ptr<Http2Connection>& conn,
+                                 std::uint32_t stream_id, const std::string& path,
+                                 const std::string& method) {
   if (method != "POST") {
     std::string body = "{\"error\":\"method-not-allowed\"}";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
     build_response_frames(conn->write_buf, stream_id, 405, "application/json", body_bytes);
-    conn->events |= EPOLLOUT;
+    conn->events |= EventMask::Write;
     loop_.update_fd(conn->fd, conn->events);
     return true;
   }
@@ -51,7 +52,7 @@ bool ApiHandler::codex_run_start(const std::shared_ptr<Http2Connection> &conn,
     std::string body = "{\"error\":\"missing-id\"}";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
     build_response_frames(conn->write_buf, stream_id, 400, "application/json", body_bytes);
-    conn->events |= EPOLLOUT;
+    conn->events |= EventMask::Write;
     loop_.update_fd(conn->fd, conn->events);
     return true;
   }
@@ -61,7 +62,7 @@ bool ApiHandler::codex_run_start(const std::shared_ptr<Http2Connection> &conn,
     std::string body = "{\"error\":\"run-start-failed\"}";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
     build_response_frames(conn->write_buf, stream_id, 500, "application/json", body_bytes);
-    conn->events |= EPOLLOUT;
+    conn->events |= EventMask::Write;
     loop_.update_fd(conn->fd, conn->events);
     return true;
   }
@@ -70,7 +71,7 @@ bool ApiHandler::codex_run_start(const std::shared_ptr<Http2Connection> &conn,
                      "\",\"brief_id\":\"" + run->brief_id + "\"}";
   std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
   build_response_frames(conn->write_buf, stream_id, 200, "application/json", body_bytes);
-  conn->events |= EPOLLOUT;
+  conn->events |= EventMask::Write;
   loop_.update_fd(conn->fd, conn->events);
   return true;
 }

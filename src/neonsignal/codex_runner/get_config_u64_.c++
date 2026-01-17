@@ -4,7 +4,8 @@
 
 namespace neonsignal {
 
-std::uint64_t CodexRunner::get_config_u64_(std::string_view key, std::uint64_t fallback) const {
+std::uint64_t CodexRunner::get_config_u64_(std::string_view key,
+                                           std::uint64_t fallback) const {
   auto value = db_.get_config(key);
   if (!value || value->empty()) {
     return fallback;

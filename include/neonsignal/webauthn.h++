@@ -1,8 +1,8 @@
 #pragma once
 
-#include <chrono>
 #include <cstdint>
 #include <optional>
+#include <chrono>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -45,7 +45,7 @@ struct WebAuthnLoginResult {
 
 class WebAuthnManager {
 public:
-  WebAuthnManager(std::string rp_id, std::string origin, Database &db);
+  WebAuthnManager(std::string rp_id, std::string origin, Database& db);
 
   bool load_credentials();
 
@@ -56,19 +56,23 @@ public:
   WebAuthnRegisterOptions make_register_options_for_user(std::uint64_t user_id,
                                                          std::string_view email,
                                                          std::string_view display_name);
-  WebAuthnRegisterResult finish_register_for_user(std::string_view body, std::uint64_t user_id);
+  WebAuthnRegisterResult finish_register_for_user(std::string_view body,
+                                                  std::uint64_t user_id);
 
   // Legacy (deprecated)
-  WebAuthnRegisterOptions make_register_options(std::string_view user, std::string_view secret);
-  WebAuthnRegisterResult finish_register(std::string_view body, std::string_view secret);
+  WebAuthnRegisterOptions make_register_options(std::string_view user,
+                                                std::string_view secret);
+  WebAuthnRegisterResult finish_register(std::string_view body,
+                                         std::string_view secret);
 
   bool user_exists(std::string_view user);
 
   bool is_protected_path(std::string_view path) const;
 
-  bool validate_session(std::string_view session_id, std::string &user_out);
+  bool validate_session(std::string_view session_id, std::string& user_out);
 
-  std::string issue_session(std::uint64_t user_id, std::string_view user, std::string_view state);
+  std::string issue_session(std::uint64_t user_id, std::string_view user,
+                            std::string_view state);
 
 private:
   struct Challenge {
@@ -77,11 +81,11 @@ private:
   };
 
   std::optional<WebAuthnCredential>
-  find_credential(const std::vector<std::uint8_t> &credential_id) const;
+  find_credential(const std::vector<std::uint8_t>& credential_id) const;
 
   std::string rp_id_;
   std::string origin_;
-  Database &db_;
+  Database& db_;
   std::vector<WebAuthnCredential> credentials_;
   std::unordered_map<std::string, Challenge> challenges_;
 };

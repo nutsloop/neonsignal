@@ -1,10 +1,11 @@
 #include "neonsignal/redirect_service.h++"
 
+#include "neonsignal/event_mask.h++"
+
 #include <algorithm>
 #include <cctype>
 #include <iostream>
 #include <netinet/in.h>
-#include <sys/epoll.h>
 #include <sys/socket.h>
 
 namespace neonsignal {
@@ -106,7 +107,7 @@ void RedirectService::process_buffer_(const int fd, Connection &conn) {
       std::cerr << "redirect: ACME served fd=" << fd << " path=" << path << '\n';
     }
     conn.responded = true;
-    loop_.update_fd(fd, EPOLLOUT | EPOLLET);
+    loop_.update_fd(fd, EventMask::Write | EventMask::Edge);
     return;
   }
 
@@ -115,7 +116,7 @@ void RedirectService::process_buffer_(const int fd, Connection &conn) {
   send_redirect_(conn, host, path);
   std::cerr << "redirect: queued 308 fd=" << fd << " host=" << host << " port=" << host_port
             << " method=" << method << " path=" << path << " client_port=" << client_port << '\n';
-  loop_.update_fd(fd, EPOLLOUT | EPOLLET);
+  loop_.update_fd(fd, EventMask::Write | EventMask::Edge);
 }
 
 } // namespace neonsignal

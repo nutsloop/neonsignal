@@ -8,7 +8,8 @@
 
 namespace neonsignal {
 
-StaticResult load_static(std::string_view path, const Router &router, StaticFileCache *cache) {
+StaticResult load_static(std::string_view path, const Router& router,
+                         StaticFileCache* cache) {
   StaticResult res;
 
   // Check cache first if available
@@ -42,7 +43,7 @@ StaticResult load_static(std::string_view path, const Router &router, StaticFile
 
   res.body.resize(static_cast<std::size_t>(size));
   std::ifstream in(full, std::ios::binary);
-  if (!in.read(reinterpret_cast<char *>(res.body.data()),
+  if (!in.read(reinterpret_cast<char*>(res.body.data()),
                static_cast<std::streamsize>(res.body.size()))) {
     res.status = 500;
     res.body.assign({'E', 'r', 'r', 'o', 'r'});
@@ -54,8 +55,9 @@ StaticResult load_static(std::string_view path, const Router &router, StaticFile
   return res;
 }
 
-StaticResult load_static_vhost(std::string_view path, const std::filesystem::path &document_root,
-                               const Router &router) {
+StaticResult load_static_vhost(std::string_view path,
+                               const std::filesystem::path& document_root,
+                               const Router& router) {
   StaticResult res;
 
   // Resolve using custom document root
@@ -78,7 +80,7 @@ StaticResult load_static_vhost(std::string_view path, const std::filesystem::pat
 
   res.body.resize(static_cast<std::size_t>(size));
   std::ifstream in(full, std::ios::binary);
-  if (!in.read(reinterpret_cast<char *>(res.body.data()),
+  if (!in.read(reinterpret_cast<char*>(res.body.data()),
                static_cast<std::streamsize>(res.body.size()))) {
     res.status = 500;
     res.body.assign({'E', 'r', 'r', 'o', 'r'});

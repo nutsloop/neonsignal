@@ -31,7 +31,8 @@ public:
 
   // Resolve domain to document root
   // Returns nullopt if no vhost found (use legacy behavior)
-  [[nodiscard]] std::optional<std::filesystem::path> resolve(std::string_view authority) const;
+  [[nodiscard]] std::optional<std::filesystem::path>
+  resolve(std::string_view authority) const;
 
   // Rescan public directory for vhost directories
   void refresh();
@@ -43,7 +44,8 @@ public:
   [[nodiscard]] bool is_neonjsx(std::string_view authority) const;
 
   // Check if path is a known NeonJSX route for this domain
-  [[nodiscard]] bool is_neonjsx_route(std::string_view authority, std::string_view path) const;
+  [[nodiscard]] bool is_neonjsx_route(std::string_view authority,
+                                      std::string_view path) const;
 
   // Get list of discovered vhosts for logging
   [[nodiscard]] std::vector<std::string> list_vhosts() const;

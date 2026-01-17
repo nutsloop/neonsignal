@@ -12,7 +12,7 @@ namespace neonsignal::db {
 namespace {
 
 std::string base64url_encode(std::span<const std::uint8_t> data) {
-  static const char *kTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  static const char* kTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
   std::string out;
   out.reserve(((data.size() + 2) / 3) * 4);
   std::size_t i = 0;
@@ -48,7 +48,7 @@ std::vector<std::uint8_t> base64url_decode(std::string_view input) {
   if (!s.empty() && s[s.size() - 1] == '=') ++pad;
   if (s.size() > 1 && s[s.size() - 2] == '=') ++pad;
   std::vector<unsigned char> buf((s.size() / 4) * 3 + 1);
-  int len = EVP_DecodeBlock(buf.data(), reinterpret_cast<const unsigned char *>(s.data()),
+  int len = EVP_DecodeBlock(buf.data(), reinterpret_cast<const unsigned char*>(s.data()),
                             static_cast<int>(s.size()));
   if (len < 0) {
     return {};
@@ -64,23 +64,23 @@ std::string json_escape(std::string_view value) {
   out.reserve(value.size());
   for (char c : value) {
     switch (c) {
-    case '\\':
-    case '"':
-      out.push_back('\\');
-      out.push_back(c);
-      break;
-    case '\n':
-      out += "\\n";
-      break;
-    case '\r':
-      out += "\\r";
-      break;
-    case '\t':
-      out += "\\t";
-      break;
-    default:
-      out.push_back(c);
-      break;
+      case '\\':
+      case '"':
+        out.push_back('\\');
+        out.push_back(c);
+        break;
+      case '\n':
+        out += "\\n";
+        break;
+      case '\r':
+        out += "\\r";
+        break;
+      case '\t':
+        out += "\\t";
+        break;
+      default:
+        out.push_back(c);
+        break;
     }
   }
   return out;
@@ -157,7 +157,7 @@ std::optional<bool> extract_json_bool(std::string_view json, std::string_view ke
 
 } // namespace
 
-std::string user_to_json(const User &user) {
+std::string user_to_json(const User& user) {
   std::ostringstream out;
   out << "{";
   out << "\"id\":" << user.id << ",";
@@ -207,7 +207,7 @@ std::optional<User> user_from_json(std::string_view json) {
   return user;
 }
 
-std::string session_to_json(const Session &session) {
+std::string session_to_json(const Session& session) {
   std::ostringstream out;
   out << "{";
   out << "\"user_id\":" << session.user_id << ",";
@@ -231,13 +231,13 @@ std::optional<Session> session_from_json(std::string_view json) {
   }
   session.user_id = *user_id;
   session.user = std::move(user);
-  session.state = state.empty() ? "auth" : std::move(state); // default to auth for legacy
+  session.state = state.empty() ? "auth" : std::move(state);  // default to auth for legacy
   session.created_at = static_cast<std::time_t>(*created);
   session.expires_at = static_cast<std::time_t>(*expires);
   return session;
 }
 
-std::string verification_to_json(const Verification &v) {
+std::string verification_to_json(const Verification& v) {
   std::ostringstream out;
   out << "{";
   out << "\"user_id\":" << v.user_id << ",";
@@ -261,7 +261,7 @@ std::optional<Verification> verification_from_json(std::string_view json) {
   return v;
 }
 
-std::string codex_to_json(const CodexRecord &record) {
+std::string codex_to_json(const CodexRecord& record) {
   std::ostringstream out;
   out << "{";
   out << "\"id\":\"" << json_escape(record.id) << "\",";
@@ -310,7 +310,7 @@ std::optional<CodexRecord> codex_from_json(std::string_view json) {
   return record;
 }
 
-std::string codex_run_to_json(const CodexRun &run) {
+std::string codex_run_to_json(const CodexRun& run) {
   std::ostringstream out;
   out << "{";
   out << "\"id\":\"" << json_escape(run.id) << "\",";

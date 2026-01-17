@@ -1,9 +1,9 @@
 #pragma once
 
-#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <atomic>
 
 #include <openssl/ssl.h>
 
@@ -37,7 +37,7 @@ public:
 
 private:
   struct SSLContextDeleter {
-    void operator()(SSL_CTX *ctx) const;
+    void operator()(SSL_CTX* ctx) const;
   };
 
   ServerConfig config_;
@@ -50,7 +50,6 @@ private:
   std::atomic<std::uint64_t> served_files_{0};
   std::atomic<std::uint64_t> page_views_{0};
   std::atomic<std::uint64_t> event_clients_{0};
-  int shutdown_fd_{-1};
 };
 
 } // namespace neonsignal

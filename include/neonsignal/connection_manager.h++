@@ -22,12 +22,12 @@ public:
   // Resource limits - tuned for production
   static constexpr std::size_t MAX_CONNECTIONS = 10'000;
   static constexpr std::size_t MAX_STREAMS_PER_CONNECTION = 100;
-  static constexpr std::size_t MAX_WRITE_BUFFER_BYTES = 256 * 1024;       // 256KB
-  static constexpr std::size_t MAX_READ_BUFFER_BYTES = 1024 * 1024;       // 1MB
-  static constexpr std::size_t MAX_UPLOAD_SIZE_BYTES = 100 * 1024 * 1024; // 100MB
+  static constexpr std::size_t MAX_WRITE_BUFFER_BYTES = 256 * 1024;  // 256KB
+  static constexpr std::size_t MAX_READ_BUFFER_BYTES = 1024 * 1024;  // 1MB
+  static constexpr std::size_t MAX_UPLOAD_SIZE_BYTES = 100 * 1024 * 1024;  // 100MB
   static constexpr std::chrono::seconds CONNECTION_TIMEOUT{60};
   static constexpr std::chrono::seconds HANDSHAKE_TIMEOUT{10};
-  static constexpr std::chrono::seconds IDLE_TIMEOUT{300}; // 5 minutes
+  static constexpr std::chrono::seconds IDLE_TIMEOUT{300};  // 5 minutes
 
   ConnectionManager() = default;
 
@@ -63,7 +63,7 @@ public:
     std::lock_guard lock(mutex_);
     std::vector<std::shared_ptr<Http2Connection>> result;
     result.reserve(connections_.size());
-    for (const auto &[_, conn] : connections_) {
+    for (const auto& [_, conn] : connections_) {
       result.push_back(conn);
     }
     return result;
@@ -75,11 +75,12 @@ public:
     auto now = std::chrono::steady_clock::now();
 
     std::lock_guard lock(mutex_);
-    for (const auto &[fd, conn] : connections_) {
+    for (const auto& [fd, conn] : connections_) {
       auto idle_time = now - conn->last_activity;
 
       // Check handshake timeout
-      if (!conn->handshake_complete && now > conn->handshake_deadline) {
+      if (!conn->handshake_complete &&
+          now > conn->handshake_deadline) {
         timed_out.push_back(fd);
         continue;
       }
@@ -101,14 +102,14 @@ public:
   [[nodiscard]] std::size_t total_write_buffer_bytes() const {
     std::size_t total = 0;
     std::lock_guard lock(mutex_);
-    for (const auto &[_, conn] : connections_) {
+    for (const auto& [_, conn] : connections_) {
       total += conn->write_buf.size();
     }
     return total;
   }
 
   // Check write buffer backpressure
-  [[nodiscard]] bool has_write_backpressure(const std::shared_ptr<Http2Connection> &conn) const {
+  [[nodiscard]] bool has_write_backpressure(const std::shared_ptr<Http2Connection>& conn) const {
     return conn->write_buf.size() > MAX_WRITE_BUFFER_BYTES;
   }
 
@@ -117,16 +118,17 @@ public:
     std::lock_guard lock(mutex_);
     std::vector<int> fds;
     fds.reserve(connections_.size());
-    for (const auto &[fd, _] : connections_) {
+    for (const auto& [fd, _] : connections_) {
       fds.push_back(fd);
     }
     return fds;
   }
 
   // Iterate through all connections with callback
-  template <typename Func> void for_each_connection(Func callback) {
+  template<typename Func>
+  void for_each_connection(Func callback) {
     std::lock_guard lock(mutex_);
-    for (auto &[fd, conn] : connections_) {
+    for (auto& [fd, conn] : connections_) {
       callback(fd, conn);
     }
   }

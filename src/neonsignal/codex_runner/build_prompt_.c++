@@ -4,7 +4,7 @@
 
 namespace neonsignal {
 
-std::string CodexRunner::build_prompt_(const CodexRecord &record) const {
+std::string CodexRunner::build_prompt_(const CodexRecord& record) const {
   std::ostringstream out;
   out << "Title: " << record.title << "\n";
   out << "Meta tags: " << record.meta_tags << "\n";

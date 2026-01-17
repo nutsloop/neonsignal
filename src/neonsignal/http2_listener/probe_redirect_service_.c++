@@ -1,7 +1,7 @@
 #include "neonsignal/http2_listener.h++"
+#include "neonsignal/socket_utils.h++"
 
 #include <arpa/inet.h>
-#include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/time.h>
@@ -13,13 +13,10 @@
 namespace neonsignal {
 
 bool Http2Listener::probe_redirect_service_() {
-  int fd = ::socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
+  int fd = socket_utils::socket_nonblocking(AF_INET, SOCK_STREAM, 0);
   if (fd == -1) {
     return false;
   }
-
-  int flags = fcntl(fd, F_GETFL, 0);
-  fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 
   sockaddr_in addr{};
   addr.sin_family = AF_INET;

@@ -1,6 +1,7 @@
 #include "neonsignal/api_handler.h++"
 
 #include "neonsignal/event_loop.h++"
+#include "neonsignal/event_mask.h++"
 #include "neonsignal/http2_listener_helpers.h++"
 
 namespace neonsignal {
@@ -34,14 +35,14 @@ std::string query_param(std::string_view path, std::string_view key) {
 
 } // namespace
 
-bool ApiHandler::codex_run_artifacts(const std::shared_ptr<Http2Connection> &conn,
-                                     std::uint32_t stream_id, const std::string &path) {
+bool ApiHandler::codex_run_artifacts(const std::shared_ptr<Http2Connection>& conn,
+                                     std::uint32_t stream_id, const std::string& path) {
   auto id = query_param(path, "id");
   if (id.empty()) {
     std::string body = "{\"error\":\"missing-id\"}";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
     build_response_frames(conn->write_buf, stream_id, 400, "application/json", body_bytes);
-    conn->events |= EPOLLOUT;
+    conn->events |= EventMask::Write;
     loop_.update_fd(conn->fd, conn->events);
     return true;
   }
@@ -50,13 +51,13 @@ bool ApiHandler::codex_run_artifacts(const std::shared_ptr<Http2Connection> &con
     std::string body = "{\"error\":\"not-found\"}";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
     build_response_frames(conn->write_buf, stream_id, 404, "application/json", body_bytes);
-    conn->events |= EPOLLOUT;
+    conn->events |= EventMask::Write;
     loop_.update_fd(conn->fd, conn->events);
     return true;
   }
   std::vector<std::uint8_t> body_bytes(artifacts->begin(), artifacts->end());
   build_response_frames(conn->write_buf, stream_id, 200, "application/json", body_bytes);
-  conn->events |= EPOLLOUT;
+  conn->events |= EventMask::Write;
   loop_.update_fd(conn->fd, conn->events);
   return true;
 }

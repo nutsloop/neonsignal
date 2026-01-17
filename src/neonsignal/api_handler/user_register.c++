@@ -1,6 +1,7 @@
 #include "neonsignal/api_handler.h++"
 
 #include "neonsignal/event_loop.h++"
+#include "neonsignal/event_mask.h++"
 #include "neonsignal/http2_listener_helpers.h++"
 
 #include <openssl/rand.h>
@@ -16,8 +17,8 @@ using namespace std::string_view_literals;
 
 namespace {
 
-std::string base64url_encode(const std::vector<std::uint8_t> &data) {
-  static const char *kTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+std::string base64url_encode(const std::vector<std::uint8_t>& data) {
+  static const char* kTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
   std::string out;
   out.reserve(((data.size() + 2) / 3) * 4);
   std::size_t i = 0;
@@ -67,23 +68,23 @@ std::string json_escape(std::string_view value) {
   out.reserve(value.size());
   for (char c : value) {
     switch (c) {
-    case '\\':
-    case '"':
-      out.push_back('\\');
-      out.push_back(c);
-      break;
-    case '\n':
-      out += "\\n";
-      break;
-    case '\r':
-      out += "\\r";
-      break;
-    case '\t':
-      out += "\\t";
-      break;
-    default:
-      out.push_back(c);
-      break;
+      case '\\':
+      case '"':
+        out.push_back('\\');
+        out.push_back(c);
+        break;
+      case '\n':
+        out += "\\n";
+        break;
+      case '\r':
+        out += "\\r";
+        break;
+      case '\t':
+        out += "\\t";
+        break;
+      default:
+        out.push_back(c);
+        break;
     }
   }
   return out;
@@ -91,14 +92,15 @@ std::string json_escape(std::string_view value) {
 
 } // namespace
 
-bool ApiHandler::user_register_headers(const std::shared_ptr<Http2Connection> &conn,
-                                       std::uint32_t stream_id, const std::string &path,
-                                       const std::string &method) {
+bool ApiHandler::user_register_headers(const std::shared_ptr<Http2Connection>& conn,
+                                       std::uint32_t stream_id,
+                                       const std::string& path,
+                                       const std::string& method) {
   if (method != "POST") {
     std::string body = "{\"error\":\"method not allowed\"}";
     std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
     build_response_frames(conn->write_buf, stream_id, 405, "application/json", body_bytes);
-    conn->events |= EPOLLOUT;
+    conn->events |= EventMask::Write;
     loop_.update_fd(conn->fd, conn->events);
     return true;
   }
@@ -122,8 +124,9 @@ ApiHandler::ApiResponse ApiHandler::user_register_finish(std::span<const std::ui
   std::string display_name = extract_json_string(body_str, "display_name");
 
   if (email.empty()) {
-    res.body = std::vector<std::uint8_t>("{\"error\":\"email required\"}"sv.begin(),
-                                         "{\"error\":\"email required\"}"sv.end());
+    res.body = std::vector<std::uint8_t>(
+        "{\"error\":\"email required\"}"sv.begin(),
+        "{\"error\":\"email required\"}"sv.end());
     return res;
   }
 
@@ -144,8 +147,9 @@ ApiHandler::ApiResponse ApiHandler::user_register_finish(std::span<const std::ui
   // Check if user already exists
   auto existing = db_.find_user_by_email(email);
   if (existing) {
-    res.body = std::vector<std::uint8_t>("{\"error\":\"user already exists\"}"sv.begin(),
-                                         "{\"error\":\"user already exists\"}"sv.end());
+    res.body = std::vector<std::uint8_t>(
+        "{\"error\":\"user already exists\"}"sv.begin(),
+        "{\"error\":\"user already exists\"}"sv.end());
     return res;
   }
 
@@ -153,8 +157,9 @@ ApiHandler::ApiResponse ApiHandler::user_register_finish(std::span<const std::ui
   auto user = db_.create_user_pending(email, display_name);
   if (!user) {
     res.status = 500;
-    res.body = std::vector<std::uint8_t>("{\"error\":\"failed to create user\"}"sv.begin(),
-                                         "{\"error\":\"failed to create user\"}"sv.end());
+    res.body = std::vector<std::uint8_t>(
+        "{\"error\":\"failed to create user\"}"sv.begin(),
+        "{\"error\":\"failed to create user\"}"sv.end());
     return res;
   }
 
@@ -162,8 +167,9 @@ ApiHandler::ApiResponse ApiHandler::user_register_finish(std::span<const std::ui
   std::vector<std::uint8_t> token(32);
   if (RAND_bytes(token.data(), 32) != 1) {
     res.status = 500;
-    res.body = std::vector<std::uint8_t>("{\"error\":\"token generation failed\"}"sv.begin(),
-                                         "{\"error\":\"token generation failed\"}"sv.end());
+    res.body = std::vector<std::uint8_t>(
+        "{\"error\":\"token generation failed\"}"sv.begin(),
+        "{\"error\":\"token generation failed\"}"sv.end());
     return res;
   }
 
@@ -174,8 +180,9 @@ ApiHandler::ApiResponse ApiHandler::user_register_finish(std::span<const std::ui
   // Store verification with 24h TTL
   if (!db_.store_verification(token_hash, user->id, std::chrono::hours(24))) {
     res.status = 500;
-    res.body = std::vector<std::uint8_t>("{\"error\":\"failed to store verification\"}"sv.begin(),
-                                         "{\"error\":\"failed to store verification\"}"sv.end());
+    res.body = std::vector<std::uint8_t>(
+        "{\"error\":\"failed to store verification\"}"sv.begin(),
+        "{\"error\":\"failed to store verification\"}"sv.end());
     return res;
   }
 

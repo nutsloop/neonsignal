@@ -41,12 +41,14 @@ private:
   std::filesystem::path certs_root_;
   mutable std::shared_mutex mutex_;
 
-  std::unordered_map<std::string, std::unique_ptr<CertificateBundle>> exact_certs_;
+  std::unordered_map<std::string, std::unique_ptr<CertificateBundle>>
+      exact_certs_;
   std::vector<std::unique_ptr<CertificateBundle>> wildcard_certs_;
   CertificateBundle *default_cert_{nullptr};
 
-  std::unique_ptr<CertificateBundle> load_certificate(const std::filesystem::path &cert_dir,
-                                                      const std::string &domain);
+  std::unique_ptr<CertificateBundle>
+  load_certificate(const std::filesystem::path &cert_dir,
+                   const std::string &domain);
 
   bool configure_ssl_ctx(CertificateBundle &bundle);
   bool extract_cert_info(CertificateBundle &bundle);

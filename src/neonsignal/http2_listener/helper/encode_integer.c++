@@ -4,8 +4,8 @@
 
 namespace neonsignal {
 
-void encode_integer(std::vector<std::uint8_t> &out, std::uint32_t value, std::uint8_t prefix_bits,
-                    std::uint8_t first_byte_prefix) {
+void encode_integer(std::vector<std::uint8_t>& out, std::uint32_t value,
+                    std::uint8_t prefix_bits, std::uint8_t first_byte_prefix) {
   const std::uint32_t max_prefix = (1u << prefix_bits) - 1u;
   if (value < max_prefix) {
     out.push_back(first_byte_prefix | static_cast<std::uint8_t>(value));

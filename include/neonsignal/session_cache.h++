@@ -46,7 +46,7 @@ public:
 
     // Check if needs refresh
     if (now - it->second.cached_at > CACHE_TTL) {
-      return std::nullopt; // Force revalidation
+      return std::nullopt;  // Force revalidation
     }
 
     return it->second;

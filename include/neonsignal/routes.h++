@@ -73,7 +73,8 @@ constexpr bool is_html_page(std::string_view path) {
 inline bool is_protected(std::string_view path) {
   auto query = path.find('?');
   std::string_view clean = (query == std::string_view::npos) ? path : path.substr(0, query);
-  return std::find(kProtectedPaths.begin(), kProtectedPaths.end(), clean) != kProtectedPaths.end();
+  return std::find(kProtectedPaths.begin(), kProtectedPaths.end(), clean) !=
+         kProtectedPaths.end();
 }
 
 constexpr bool needs_spa_shell(std::string_view path) {

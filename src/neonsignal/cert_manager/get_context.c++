@@ -34,7 +34,8 @@ SSL_CTX *CertManager::get_context(std::string_view hostname) const {
   for (const auto &wc : wildcard_certs_) {
     if (normalized.size() > wc->domain.size() + 1) {
       auto suffix_start = normalized.size() - wc->domain.size();
-      if (normalized[suffix_start - 1] == '.' && normalized.substr(suffix_start) == wc->domain) {
+      if (normalized[suffix_start - 1] == '.' &&
+          normalized.substr(suffix_start) == wc->domain) {
         return wc->ssl_ctx.get();
       }
     }
