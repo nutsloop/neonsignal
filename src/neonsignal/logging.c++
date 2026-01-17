@@ -1,4 +1,5 @@
 #include "neonsignal/logging.h++"
+#include "neonsignal/platform_utils.h++"
 
 #include <pthread.h>
 
@@ -99,7 +100,7 @@ void install_thread_logging_prefix() {
     std::cerr.unsetf(std::ios_base::unitbuf);
     char name[kThreadNameMax] = {};
     if (pthread_getname_np(pthread_self(), name, sizeof(name)) == 0 && name[0] == '\0') {
-      pthread_setname_np(pthread_self(), "main");
+      platform_utils::set_thread_name("main");
     }
     installed = true;
   }

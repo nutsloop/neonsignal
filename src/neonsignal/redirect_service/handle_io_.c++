@@ -1,6 +1,8 @@
 #include "neonsignal/redirect_service.h++"
 
-#include <sys/epoll.h>
+#include "neonsignal/event_mask.h++"
+#include "neonsignal/socket_utils.h++"
+
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -18,14 +20,14 @@ void RedirectService::handle_io_(const int fd, const std::uint32_t events) {
   }
   Connection &conn = it->second;
 
-  if (events & (EPOLLERR | EPOLLHUP)) {
+  if (events & (EventMask::Error | EventMask::HangUp)) {
     // Peer hung up or errored before we finished; drop the connection.
     std::cerr << "redirect: epoll err/hup fd=" << fd << '\n';
     close_connection_(fd);
     return;
   }
 
-  if (events & EPOLLIN) {
+  if (events & EventMask::Read) {
     char buf[2048];
     while (true) {
       // Read as much as available; the redirect response is tiny so we only
@@ -61,11 +63,12 @@ void RedirectService::handle_io_(const int fd, const std::uint32_t events) {
     process_buffer_(fd, conn);
   }
 
-  if ((events & EPOLLOUT) && conn.write_ready) {
+  if ((events & EventMask::Write) && conn.write_ready) {
     while (!conn.write_buffer.empty()) {
-      // Send until the buffer empties or the socket would block; MSG_NOSIGNAL
-      // avoids SIGPIPE if the peer vanished.
-      const ssize_t n = send(fd, conn.write_buffer.data(), conn.write_buffer.size(), MSG_NOSIGNAL);
+      // Send until the buffer empties or the socket would block; platform-specific
+      // flags avoid SIGPIPE if the peer vanished.
+      const ssize_t n =
+          send(fd, conn.write_buffer.data(), conn.write_buffer.size(), socket_utils::get_send_flags());
       if (n > 0) {
         conn.write_buffer.erase(0, static_cast<std::size_t>(n));
         continue;

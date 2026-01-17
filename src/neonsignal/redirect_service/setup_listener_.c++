@@ -1,8 +1,10 @@
 #include "neonsignal/redirect_service.h++"
+#include "neonsignal/socket_utils.h++"
+
+#include "neonsignal/event_mask.h++"
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <sys/epoll.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -11,7 +13,7 @@
 namespace neonsignal {
 
 void RedirectService::setup_listener_() {
-  listen_fd_ = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+  listen_fd_ = socket_utils::socket_nonblocking(AF_INET, SOCK_STREAM, 0);
   if (listen_fd_ == -1) {
     throw std::runtime_error("redirect: failed to create socket");
   }
@@ -47,7 +49,7 @@ void RedirectService::setup_listener_() {
     throw std::runtime_error("redirect: listen failed");
   }
 
-  loop_.add_fd(listen_fd_, EPOLLIN, [this](std::uint32_t /*events*/) { handle_accept_(); });
+  loop_.add_fd(listen_fd_, EventMask::Read, [this](std::uint32_t /*events*/) { handle_accept_(); });
 }
 
 } // namespace neonsignal

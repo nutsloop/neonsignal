@@ -1,4 +1,5 @@
 #include "neonsignal/logging.h++"
+#include "neonsignal/platform_utils.h++"
 #include "neonsignal/redirect_service.h++"
 #include "neonsignal/voltage_argv.h++"
 
@@ -8,7 +9,6 @@
 #include <exception>
 #include <iostream>
 #include <memory>
-#include <pthread.h>
 #include <string>
 #include <thread>
 #include <vector>
@@ -27,14 +27,6 @@ int read_int_env(const char *name, const int def) {
     }
   }
   return def;
-}
-
-void set_thread_name(const std::string &n) {
-  std::string name = n;
-  if (name.size() > 15) {
-    name.resize(15);
-  }
-  pthread_setname_np(pthread_self(), name.c_str());
 }
 
 } // namespace
@@ -91,7 +83,7 @@ int main(int argc, char *argv[]) {
     delete voltage_ptr;
 
     if (instances <= 1) {
-      set_thread_name("redir-main");
+      neonsignal::platform_utils::set_thread_name("redir-main");
       neonsignal::RedirectService service(listen_port, host, target_port, acme_root);
       service.start();
     } else {
@@ -107,7 +99,7 @@ int main(int argc, char *argv[]) {
         auto &svc = services[idx];
         threads.emplace_back([&svc, idx]() {
           std::string thread_name = std::format("neonredrec->({})", std::to_string(idx));
-          set_thread_name(thread_name);
+          neonsignal::platform_utils::set_thread_name(thread_name);
           svc->start();
         });
       }

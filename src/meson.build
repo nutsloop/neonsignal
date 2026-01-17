@@ -1,3 +1,20 @@
+# Platform-specific event loop backend
+if host_machine.system() == 'darwin'
+  event_loop_backend = 'neonsignal/event_loop/darwin/backend.c++'
+else
+  event_loop_backend = 'neonsignal/event_loop/linux/backend.c++'
+endif
+
+# Shared sources for event loop and utilities
+shared_srcs = [
+  # socket_utils
+  'neonsignal/socket_utils/socket_utils.c++',
+  # platform_utils
+  'neonsignal/platform_utils/platform_utils.c++',
+  # event_loop backend
+  event_loop_backend,
+]
+
 # neonsignal binary
 srcs = [
   'main.c++',
@@ -28,7 +45,9 @@ srcs = [
   # event_loop
   'neonsignal/event_loop.c++',
   'neonsignal/event_loop/add_fd.c++',
+  'neonsignal/event_loop/add_signal.c++',
   'neonsignal/event_loop/add_timer.c++',
+  'neonsignal/event_loop/cancel_timer.c++',
   'neonsignal/event_loop/remove_fd.c++',
   'neonsignal/event_loop/run.c++',
   'neonsignal/event_loop/shutdown_graceful.c++',
@@ -64,6 +83,7 @@ srcs = [
   'neonsignal/http2_listener/stop_redirect_monitor_.c++',
   # logging
   'neonsignal/logging.c++',
+  # voltage_argv
   'neonsignal/voltage_argv.c++',
   'neonsignal/voltage_argv/validate_dash_format_.c++',
   # check
@@ -157,12 +177,17 @@ srcs = [
   'neonsignal/webauthn.c++',
 ]
 
+# Add shared sources (platform utils, socket utils, backend)
+srcs += shared_srcs
+
 # redirector binary
 redirect_srcs = [
   # event_loop
   'neonsignal/event_loop.c++',
   'neonsignal/event_loop/add_fd.c++',
+  'neonsignal/event_loop/add_signal.c++',
   'neonsignal/event_loop/add_timer.c++',
+  'neonsignal/event_loop/cancel_timer.c++',
   'neonsignal/event_loop/remove_fd.c++',
   'neonsignal/event_loop/run.c++',
   'neonsignal/event_loop/shutdown_graceful.c++',
@@ -170,6 +195,7 @@ redirect_srcs = [
   'neonsignal/event_loop/update_fd.c++',
   # logging
   'neonsignal/logging.c++',
+  # voltage_argv
   'neonsignal/voltage_argv.c++',
   'neonsignal/voltage_argv/validate_dash_format_.c++',
   # check
@@ -238,6 +264,8 @@ redirect_srcs = [
   'neonsignal/redirect_service/stop.c++',
   'redirect_main.c++',
 ]
+
+redirect_srcs += shared_srcs
 
 executable('neonsignal',
   srcs,

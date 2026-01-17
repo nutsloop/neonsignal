@@ -11,8 +11,10 @@ namespace neonsignal {
 
 class RedirectService {
 public:
-  explicit RedirectService(int listen_port = 9090, std::string redirect_host = "0.0.0.0",
-                           int redirect_port = 443, std::string acme_root = "acme-challenge");
+  explicit RedirectService(int listen_port = 9090,
+                  std::string redirect_host = "0.0.0.0",
+                  int redirect_port = 443,
+                  std::string acme_root = "acme-challenge");
   ~RedirectService();
 
   void start();
@@ -32,7 +34,8 @@ private:
   void register_connection_(int client_fd);
   void handle_io_(int fd, std::uint32_t events);
   void process_buffer_(int fd, Connection &conn);
-  void send_redirect_(Connection &conn, const std::string &host, const std::string &path) const;
+  void send_redirect_(Connection &conn, const std::string &host,
+                      const std::string &path) const;
   bool serve_acme_challenge_(Connection &conn, const std::string &path) const;
   void close_connection_(int fd);
 

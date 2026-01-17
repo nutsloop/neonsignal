@@ -1,4 +1,5 @@
 #include "neonsignal/http2_listener.h++"
+#include "neonsignal/socket_utils.h++"
 #include "neonsignal/thread_pool.h++"
 
 #include "neonsignal/http2_listener_helpers.h++"
@@ -14,7 +15,7 @@ namespace neonsignal {
 
 void Http2Listener::handle_accept_() {
   for (;;) {
-    int client_fd = accept4(listen_fd_, nullptr, nullptr, SOCK_NONBLOCK | SOCK_CLOEXEC);
+    int client_fd = socket_utils::accept_nonblocking(listen_fd_, nullptr, nullptr);
     if (client_fd == -1) {
       if (errno == EAGAIN || errno == EWOULDBLOCK) {
         break;

@@ -1,13 +1,15 @@
 #include "neonsignal/api_handler.h++"
 #include "neonsignal/event_loop.h++"
+#include "neonsignal/event_mask.h++"
 #include "neonsignal/http2_listener.h++"
 #include "neonsignal/http2_listener_api.h++"
 #include "neonsignal/http2_listener_helpers.h++"
 #include "neonsignal/routes.h++"
 
+#if defined(__GLIBC__)
 #include <malloc.h>
+#endif
 #include <openssl/ssl.h>
-#include <sys/epoll.h>
 
 #include <atomic>
 #include <chrono>
@@ -54,8 +56,8 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
     return;
   }
 
-  if (events & (EPOLLERR | EPOLLHUP)) {
-    std::cerr << "Connection fd=" << conn->fd << " epoll err/hup\n";
+  if (events & (EventMask::Error | EventMask::HangUp)) {
+    std::cerr << "Connection fd=" << conn->fd << " event error/hangup\n";
     close_connection_(conn->fd);
     return;
   }
@@ -72,7 +74,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
     int ret = SSL_accept(conn->ssl.get());
     if (ret == 1) {
       conn->handshake_complete = true;
-      conn->events = EPOLLIN | EPOLLOUT;
+      conn->events = EventMask::Read | EventMask::Write;
       if (!conn->server_settings_sent) {
         auto settings = build_server_settings();
         conn->write_buf.insert(conn->write_buf.end(), settings.begin(), settings.end());
@@ -86,9 +88,9 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
     } else {
       int err = SSL_get_error(conn->ssl.get(), ret);
       if (err == SSL_ERROR_WANT_READ) {
-        conn->events = EPOLLIN;
+        conn->events = EventMask::Read;
       } else if (err == SSL_ERROR_WANT_WRITE) {
-        conn->events = EPOLLOUT;
+        conn->events = EventMask::Write;
       } else {
         std::cerr << "TLS handshake failed fd=" << conn->fd << " err=" << err << '\n';
         close_connection_(conn->fd);
@@ -99,7 +101,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
     }
   }
 
-  if (events & EPOLLIN) {
+  if (events & EventMask::Read) {
     bool ok = true;
     for (;;) {
       std::uint8_t buf[4096];
@@ -163,7 +165,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
           conn->client_settings_seen = true;
           auto ack = build_settings_ack();
           conn->write_buf.insert(conn->write_buf.end(), ack.begin(), ack.end());
-          conn->events |= EPOLLOUT;
+          conn->events |= EventMask::Write;
           loop_.update_fd(conn->fd, conn->events);
           std::cerr << "Client SETTINGS received fd=" << conn->fd << '\n';
         }
@@ -266,7 +268,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
                 build_response_frames_with_headers(conn->write_buf, stream_id, 302,
                                                    "application/json", hdrs, body_bytes);
               }
-              conn->events |= EPOLLOUT;
+              conn->events |= EventMask::Write;
               loop_.update_fd(conn->fd, conn->events);
               continue;
             }
@@ -309,7 +311,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
                 build_response_frames_with_headers(conn->write_buf, stream_id, 302,
                                                    "application/json", hdrs, body_bytes);
               }
-              conn->events |= EPOLLOUT;
+              conn->events |= EventMask::Write;
               loop_.update_fd(conn->fd, conn->events);
               continue;
             }
@@ -336,13 +338,12 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
             if (method == "GET") {
               handled_api = api_handler_->user_enroll(conn, stream_id, header_map);
             } else {
-              handled_api =
-                  api_handler_->user_enroll_headers(conn, stream_id, header_map, path, method);
+              handled_api = api_handler_->user_enroll_headers(conn, stream_id, header_map, path, method);
             }
             break;
           case ApiRoute::CodexBrief:
-            handled_api =
-                api_handler_->codex_brief_headers(conn, stream_id, header_map, path, method);
+            handled_api = api_handler_->codex_brief_headers(conn, stream_id, header_map, path,
+                                                            method);
             break;
           case ApiRoute::CodexList:
             handled_api = api_handler_->codex_list(conn, stream_id);
@@ -482,10 +483,10 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
                 }
                 auto data_frame = build_frame(0x0 /* DATA */, 0x0, stream_id, event_bytes);
                 c->write_buf.insert(c->write_buf.end(), data_frame.begin(), data_frame.end());
-                c->events |= EPOLLOUT;
+                c->events |= EventMask::Write;
                 loop_.update_fd(c->fd, c->events);
               });
-          conn->events |= EPOLLOUT;
+          conn->events |= EventMask::Write;
           loop_.update_fd(conn->fd, conn->events);
           if (path == routes::pages::kHome || path == routes::pages::kIndex) {
             std::cerr << "Serving index.html\n";
@@ -521,7 +522,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
               std::error_code ec;
               std::filesystem::remove(st.file_full_path, ec);
             }
-            conn->events |= EPOLLOUT;
+            conn->events |= EventMask::Write;
             loop_.update_fd(conn->fd, conn->events);
             st.responded = true;
             std::cerr << "UPLOAD too large fd=" << conn->fd << " stream=" << stream_id
@@ -542,7 +543,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
             std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
             build_response_frames(conn->write_buf, stream_id, 413, "text/plain; charset=utf-8",
                                   body_bytes);
-            conn->events |= EPOLLOUT;
+            conn->events |= EventMask::Write;
             loop_.update_fd(conn->fd, conn->events);
             st.responded = true;
             continue;
@@ -579,7 +580,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
                 std::string err = "{\"error\":\"" + auth_res.error + "\"}";
                 body_bytes.assign(err.begin(), err.end());
                 build_response_frames(conn->write_buf, stream_id, status, content_type, body_bytes);
-                conn->events |= EPOLLOUT;
+                conn->events |= EventMask::Write;
                 loop_.update_fd(conn->fd, conn->events);
                 st.responded = true;
                 conn->streams.erase(st_it);
@@ -600,7 +601,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
               build_response_frames_with_headers(
                   conn->write_buf, stream_id, 200, content_type,
                   {{"set-cookie", cookie}, {"set-cookie", dbg_cookie}}, body_bytes);
-              conn->events |= EPOLLOUT;
+              conn->events |= EventMask::Write;
               loop_.update_fd(conn->fd, conn->events);
               st.responded = true;
               conn->streams.erase(st_it);
@@ -637,12 +638,12 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
                     std::string session_id = resp_str.substr(pos, end - pos);
                     std::string cookie = "ns_session=" + session_id +
                                          "; Path=/; Max-Age=300; HttpOnly; Secure; SameSite=Lax";
-                    std::string dbg_cookie =
-                        "ns_debug=" + session_id + "; Path=/; Max-Age=300; Secure; SameSite=Lax";
+                    std::string dbg_cookie = "ns_debug=" + session_id +
+                                             "; Path=/; Max-Age=300; Secure; SameSite=Lax";
                     build_response_frames_with_headers(
                         conn->write_buf, stream_id, status, content_type,
                         {{"set-cookie", cookie}, {"set-cookie", dbg_cookie}}, body_bytes);
-                    conn->events |= EPOLLOUT;
+                    conn->events |= EventMask::Write;
                     loop_.update_fd(conn->fd, conn->events);
                     st.responded = true;
                     conn->streams.erase(st_it);
@@ -666,12 +667,12 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
                     std::string session_id = resp_str.substr(pos, end - pos);
                     std::string cookie = "ns_session=" + session_id +
                                          "; Path=/; Max-Age=432000; HttpOnly; Secure; SameSite=Lax";
-                    std::string dbg_cookie =
-                        "ns_debug=" + session_id + "; Path=/; Max-Age=432000; Secure; SameSite=Lax";
+                    std::string dbg_cookie = "ns_debug=" + session_id +
+                                             "; Path=/; Max-Age=432000; Secure; SameSite=Lax";
                     build_response_frames_with_headers(
                         conn->write_buf, stream_id, status, content_type,
                         {{"set-cookie", cookie}, {"set-cookie", dbg_cookie}}, body_bytes);
-                    conn->events |= EPOLLOUT;
+                    conn->events |= EventMask::Write;
                     loop_.update_fd(conn->fd, conn->events);
                     st.responded = true;
                     conn->streams.erase(st_it);
@@ -694,7 +695,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
 
           build_response_frames(conn->write_buf, stream_id, status, content_type, body_bytes);
           ++served_files_;
-          conn->events |= EPOLLOUT;
+          conn->events |= EventMask::Write;
           loop_.update_fd(conn->fd, conn->events);
           st.responded = true;
           std::cerr << "UPLOAD complete fd=" << conn->fd << " stream=" << stream_id << " bytes="
@@ -714,20 +715,22 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
           auto wu_conn = build_window_update(0, delta);
           conn->write_buf.insert(conn->write_buf.end(), wu_stream.begin(), wu_stream.end());
           conn->write_buf.insert(conn->write_buf.end(), wu_conn.begin(), wu_conn.end());
-          conn->events |= EPOLLOUT;
+          conn->events |= EventMask::Write;
           loop_.update_fd(conn->fd, conn->events);
         }
       }
     }
   }
 
-  if (events & EPOLLOUT) {
+  if (events & EventMask::Write) {
     auto now = std::chrono::steady_clock::now();
     static std::chrono::steady_clock::time_point last_trim{};
     if (last_trim.time_since_epoch().count() == 0 || (now - last_trim) >= std::chrono::minutes(5)) {
       // Best-effort memory trim to return free pages to OS.
       last_trim = now;
+#if defined(__GLIBC__)
       (void)malloc_trim(0);
+#endif
     }
     auto should_reset = [&](bool is_stream, std::uint64_t count,
                             std::chrono::steady_clock::time_point start) {
@@ -756,7 +759,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
       flag = false;
       count = 0;
       start = {};
-      conn->events |= EPOLLOUT;
+      conn->events |= EventMask::Write;
     };
 
     while (conn->write_offset < conn->write_buf.size()) {
@@ -778,7 +781,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
     if (conn->write_offset >= conn->write_buf.size()) {
       conn->write_buf.clear();
       conn->write_offset = 0;
-      conn->events = EPOLLIN;
+      conn->events = EventMask::Read;
       if (conn->is_event_stream) {
         if (conn->event_sse_start.time_since_epoch().count() == 0) {
           conn->event_sse_start = now;
@@ -800,7 +803,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
           std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
           auto data_frame = build_frame(0x0 /* DATA */, 0x0, conn->event_stream_id, body_bytes);
           conn->write_buf.insert(conn->write_buf.end(), data_frame.begin(), data_frame.end());
-          conn->events |= EPOLLOUT;
+          conn->events |= EventMask::Write;
           ++conn->event_sse_count;
         }
       }
@@ -842,7 +845,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
           std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
           auto data_frame = build_frame(0x0 /* DATA */, 0x0, conn->cpu_stream_id, body_bytes);
           conn->write_buf.insert(conn->write_buf.end(), data_frame.begin(), data_frame.end());
-          conn->events |= EPOLLOUT;
+          conn->events |= EventMask::Write;
           ++conn->cpu_sse_count;
         }
       }
@@ -867,7 +870,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
           std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
           auto data_frame = build_frame(0x0 /* DATA */, 0x0, conn->mem_stream_id, body_bytes);
           conn->write_buf.insert(conn->write_buf.end(), data_frame.begin(), data_frame.end());
-          conn->events |= EPOLLOUT;
+          conn->events |= EventMask::Write;
           conn->last_rss_kb = rss;
           ++conn->mem_sse_count;
         }
@@ -886,7 +889,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
       }
       loop_.update_fd(conn->fd, conn->events);
     } else {
-      conn->events = EPOLLIN | EPOLLOUT;
+      conn->events = EventMask::Read | EventMask::Write;
       loop_.update_fd(conn->fd, conn->events);
     }
   }

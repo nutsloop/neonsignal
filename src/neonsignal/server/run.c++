@@ -7,12 +7,9 @@
 
 #include <csignal>
 #include <cstdlib>
+#include <iostream>
 #include <stdexcept>
 #include <thread>
-
-#include <sys/epoll.h>
-#include <sys/signalfd.h>
-#include <unistd.h>
 
 namespace neonsignal {
 
@@ -66,26 +63,11 @@ void Server::run() {
                                               served_files_, page_views_, event_clients_);
   listener_->start();
 
-  // Graceful shutdown on SIGINT/SIGTERM using signalfd.
-  sigset_t mask;
-  sigemptyset(&mask);
-  sigaddset(&mask, SIGINT);
-  sigaddset(&mask, SIGTERM);
-  if (sigprocmask(SIG_BLOCK, &mask, nullptr) == -1) {
-    throw std::runtime_error("failed to block signals");
-  }
-  shutdown_fd_ = signalfd(-1, &mask, SFD_NONBLOCK | SFD_CLOEXEC);
-  if (shutdown_fd_ == -1) {
-    throw std::runtime_error("failed to create signalfd");
-  }
-  loop_->add_fd(shutdown_fd_, EPOLLIN, [this](std::uint32_t) { stop(); });
-  loop_->run();
+  // Graceful shutdown on SIGINT/SIGTERM using portable signal handling
+  loop_->add_signal(SIGINT, [this]() { stop(); });
+  loop_->add_signal(SIGTERM, [this]() { stop(); });
 
-  if (shutdown_fd_ != -1) {
-    loop_->remove_fd(shutdown_fd_);
-    close(shutdown_fd_);
-    shutdown_fd_ = -1;
-  }
+  loop_->run();
 }
 
 } // namespace neonsignal

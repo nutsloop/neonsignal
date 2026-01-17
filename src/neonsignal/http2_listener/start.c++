@@ -1,9 +1,8 @@
-#include "neonsignal/event_loop.h++"
 #include "neonsignal/http2_listener.h++"
+#include "neonsignal/event_loop.h++"
+#include "neonsignal/event_mask.h++"
 
 #include "neonsignal/http2_listener_helpers.h++"
-
-#include <sys/epoll.h>
 
 #include <iostream>
 
@@ -19,19 +18,19 @@ void Http2Listener::start() {
   // Log virtual hosts
   if (vhost_resolver_.enabled()) {
     std::cerr << "neonsignal->Virtual hosts discovered:\n";
-    for (const auto &vhost : vhost_resolver_.list_vhosts()) {
+    for (const auto& vhost : vhost_resolver_.list_vhosts()) {
       std::cerr << "  " << vhost << '\n';
     }
   } else {
     std::cerr << "neonsignal->No virtual hosts configured (single-root mode)\n";
   }
 
-  loop_.add_fd(listen_fd_, EPOLLIN, [this](std::uint32_t events) {
-    if (events & (EPOLLERR | EPOLLHUP)) {
+  loop_.add_fd(listen_fd_, EventMask::Read, [this](std::uint32_t events) {
+    if (events & (EventMask::Error | EventMask::HangUp)) {
       std::cerr << "Listener socket error/hup\n";
       return;
     }
-    if (events & EPOLLIN) {
+    if (events & EventMask::Read) {
       handle_accept_();
     }
   });
