@@ -1,4 +1,5 @@
-import { Fragment } from '../../../../neonjsx/runtime';
+import { Fragment } from '@nutsloop/neonjsx';
+
 import { CpuGraph } from './cpu_graph';
 import { HistoryPanel } from './history_panel';
 import { MemoryBlocks } from './memory_blocks';

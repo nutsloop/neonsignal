@@ -1,4 +1,5 @@
-import { render } from '../../neonjsx/runtime';
+import { render } from '@nutsloop/neonjsx';
+
 import { NotFound } from './components/notfound';
 import { LandingPage } from './landing';
 

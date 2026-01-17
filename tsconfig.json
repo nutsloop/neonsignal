@@ -1,18 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "ES2020",
     "module": "ESNext",
-    "jsx": "preserve",
-    "moduleResolution": "Node",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "allowJs": false,
-    "noEmit": true
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@nutsloop/neonjsx",
+    "strict": true
   },
   "include": [
-    "neonjsx",
     "www/neonsignaljsx",
     "www/nutsloopjsx"
   ]

@@ -1,4 +1,5 @@
-import { render } from '../../neonjsx/runtime';
+import { render } from '@nutsloop/neonjsx';
+
 import { AboutPage } from './about';
 import { AuthApp } from './components/auth/auth_app';
 // import { DataPage } from './components/auth/data';

@@ -142,14 +142,12 @@ print_substep "Installing npm dependencies"
 npm install
 
 print_substep "Cleaning old builds"
-npm run clean:neonjsx
 npm run clean:neonsignal
 npm run clean:nutsloop
 npm run clean:simonedelpopolo
 npm run clean:_default
 
 print_substep "Building all sites"
-npm run build:neonjsx
 npm run build:neonsignal
 npm run build:nutsloop
 npm run build:simonedelpopolo

@@ -1,4 +1,5 @@
-import { Fragment } from '../../../../neonjsx/runtime';
+import { Fragment } from '@nutsloop/neonjsx';
+
 import { isEnrolled } from '../../scripts/auth_state';
 import { sse_cpu } from '../../scripts/sse/cpu';
 import { sse_events } from '../../scripts/sse/events';

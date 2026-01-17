@@ -8,33 +8,32 @@ source "$NEONSIGNAL_LOGGING_LIB_SCRIPT"
 print_header "NeonSignalJSX Build"
 
 print_step "Creating directories"
-mkdir -p "$NEONSIGNAL_NEONSIGNALJSX_BUILD_DIR" "$NEONSIGNAL_NEONSIGNALJSX_PUBLIC_DIR" "$NEONSIGNAL_NEONJSX_BUILD_DIR"
-
-print_step "Transpiling NeonJSX runtime"
-"$NEONSIGNAL_NEONJSX_BUILD_SCRIPT"
-
-print_step "Transpiling NeonSignalJSX source"
-print_substep "Source: ${NEONSIGNAL_NEONSIGNALJSX_SOURCE_DIR}"
-print_substep "Output: ${NEONSIGNAL_NEONSIGNALJSX_BUILD_DIR}"
-npx babel "$NEONSIGNAL_NEONSIGNALJSX_SOURCE_DIR" --extensions .ts,.tsx --out-dir "$NEONSIGNAL_NEONSIGNALJSX_BUILD_DIR"
-print_success "Source transpiled"
+mkdir -p "$NEONSIGNAL_NEONSIGNALJSX_BUILD_DIR" "$NEONSIGNAL_NEONSIGNALJSX_PUBLIC_DIR"
 
 print_step "Bundling application"
-print_substep "Output: ${NEONSIGNAL_NEONSIGNALJSX_PUBLIC_DIR}/app.js"
-npx esbuild "$NEONSIGNAL_NEONSIGNALJSX_BUILD_DIR/main.js" \
+print_substep "Output: ${NEONSIGNAL_NEONSIGNALJSX_BUILD_DIR}/app.js"
+
+npx esbuild "$NEONSIGNAL_NEONSIGNALJSX_SOURCE_DIR/main.tsx" \
   --bundle \
-  --minify \
-  --sourcemap \
-  --format=iife \
-  --global-name=NeonApp \
-  --outfile="$NEONSIGNAL_NEONSIGNALJSX_PUBLIC_DIR/app.js"
+  --format=esm \
+  --platform=browser \
+  --jsx=transform \
+  --jsx-factory=h \
+  --jsx-fragment=Fragment \
+  --outfile="$NEONSIGNAL_NEONSIGNALJSX_BUILD_DIR/app.js"
 print_success "Bundle created"
 
 print_step "Copying static assets"
 if [[ -d "$NEONSIGNAL_NEONSIGNALJSX_SOURCE_DIR/static" ]]; then
-  cp -r "$NEONSIGNAL_NEONSIGNALJSX_SOURCE_DIR/static/." "$NEONSIGNAL_NEONSIGNALJSX_PUBLIC_DIR/"
+  cp -r "$NEONSIGNAL_NEONSIGNALJSX_SOURCE_DIR/static/." "$NEONSIGNAL_NEONSIGNALJSX_BUILD_DIR/"
   print_substep "Copied static directory"
 fi
-print_success "Static assets copied"
+print_success "Static assets copied in $NEONSIGNAL_NEONSIGNALJSX_BUILD_DIR."
+
+print_step "deploying into $NEONSIGNAL_NEONSIGNALJSX_PUBLIC_DIR"
+if [[ -d "$NEONSIGNAL_NEONSIGNALJSX_BUILD_DIR" ]]; then
+  cp -r "$NEONSIGNAL_NEONSIGNALJSX_BUILD_DIR/." "$NEONSIGNAL_NEONSIGNALJSX_PUBLIC_DIR/"
+  print_substep "deployed"
+fi
 
 print_success "NeonSignalJSX build complete -> ${NEONSIGNAL_NEONSIGNALJSX_PUBLIC_DIR}"

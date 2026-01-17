@@ -22,11 +22,10 @@
     "lint": "bash scripts/eslint/lint.sh",
     "lint-fix": "bash scripts/eslint/lint-fix.sh"
   },
+  "dependencies": {
+    "@nutsloop/neonjsx": "^1.2.2"
+  },
   "devDependencies": {
-    "@babel/cli": "^7.26.5",
-    "@babel/core": "^7.26.5",
-    "@babel/plugin-transform-react-jsx": "^7.26.5",
-    "@babel/preset-typescript": "^7.26.5",
     "@typescript-eslint/eslint-plugin": "^8.52.0",
     "@typescript-eslint/parser": "^8.52.0",
     "esbuild": "^0.27.2",
