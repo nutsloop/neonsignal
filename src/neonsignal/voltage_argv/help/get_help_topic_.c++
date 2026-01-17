@@ -1,0 +1,39 @@
+#include "neonsignal/voltage_argv/help.h++"
+
+namespace neonsignal::voltage_argv {
+
+std::string help::get_help_topic_(Topic_ topic) const {
+  switch (topic) {
+  case Topic_::help:
+    return help_();
+  case Topic_::version:
+    return version_();
+  case Topic_::threads:
+    return threads_();
+  case Topic_::host:
+    return host_();
+  case Topic_::port:
+    return port_();
+  case Topic_::webauthn_domain:
+    return webauthn_domain_();
+  case Topic_::webauthn_origin:
+    return webauthn_origin_();
+  case Topic_::db_path:
+    return db_path_();
+  case Topic_::systemd:
+    return systemd_();
+  case Topic_::instances:
+    return instances_();
+  case Topic_::target_port:
+    return target_port_();
+  case Topic_::acme_webroot:
+    return acme_webroot_();
+  case Topic_::spin:
+    return spin_();
+  case Topic_::unknown:
+    return unknown_();
+  }
+  return unknown_();
+}
+
+} // namespace neonsignal::voltage_argv

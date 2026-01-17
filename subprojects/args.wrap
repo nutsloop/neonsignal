@@ -1,0 +1,4 @@
+[wrap-git]
+directory=args
+url=https://github.com/nutsloop/args.git
+revision=main
