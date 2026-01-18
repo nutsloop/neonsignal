@@ -38,6 +38,79 @@ Complete guides covering:
 - Operations — Production deployment with systemd, Let's Encrypt, and monitoring
 - Benchmarks — Performance analysis and optimization techniques
 
+## neoncli
+
+NeonSignal ships two CLI binaries in `build/src/`:
+
+- `neonsignal` (HTTP/2 server)
+- `neonsignal_redirect` (HTTP to HTTPS redirector)
+
+Both binaries require the `spin` command unless `--systemd` is used. CLI flags are overridden by environment variables when set.
+
+### neonsignal
+
+Usage:
+
+```bash
+./build/src/neonsignal spin [options]
+./build/src/neonsignal --systemd [options]
+```
+
+Options:
+- `--threads=<n>`: Number of worker threads (default: 3)
+- `--host=<addr>`: Bind address (default: 0.0.0.0)
+- `--port=<n>`: HTTPS listen port (default: 9443)
+- `--webauthn-domain=<id>`: WebAuthn Relying Party ID
+- `--webauthn-origin=<url>`: WebAuthn origin URL
+- `--db-path=<path>`: LIBMDBX database file path (default: data/neonsignal.mdb)
+- `--www-root=<path>`: Static files root directory (default: public)
+- `--certs-root=<path>`: TLS certificates root directory (default: certs)
+- `--working-dir=<path>`: Working directory for resolving paths
+- `--systemd`: Run in systemd mode (bypasses `spin` requirement)
+- `--help`, `--help=<topic>`, `--version`, `-v`: Help and version output
+
+Environment variables:
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `NEONSIGNAL_THREADS` | `3` | Number of worker threads |
+| `NEONSIGNAL_HOST` | `0.0.0.0` | Bind address |
+| `NEONSIGNAL_PORT` | `9443` | HTTPS listen port |
+| `NEONSIGNAL_WEBAUTHN_DOMAIN` | *(none)* | WebAuthn Relying Party ID |
+| `NEONSIGNAL_WEBAUTHN_ORIGIN` | *(none)* | WebAuthn origin URL |
+| `NEONSIGNAL_DB_PATH` | `data/neonsignal.mdb` | LIBMDBX database file path |
+| `NEONSIGNAL_WWW_ROOT` | `public` | Static files root directory |
+| `NEONSIGNAL_CERTS_ROOT` | `certs` | TLS certificates root directory |
+| `NEONSIGNAL_WORKING_DIR` | *(none)* | Working directory for resolving paths |
+
+### neonsignal_redirect
+
+Usage:
+
+```bash
+./build/src/neonsignal_redirect spin [options]
+./build/src/neonsignal_redirect --systemd [options]
+```
+
+Options:
+- `--instances=<n>`: Number of redirect service instances (default: 2)
+- `--host=<addr>`: Bind address (default: 0.0.0.0)
+- `--port=<n>`: HTTP listen port (default: 9090)
+- `--target-port=<n>`: HTTPS target port (default: 443)
+- `--acme-webroot=<path>`: ACME webroot directory for challenges
+- `--systemd`: Run in systemd mode (bypasses `spin` requirement)
+- `--help`, `--help=<topic>`, `--version`, `-v`: Help and version output
+
+Environment variables:
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `REDIRECT_INSTANCES` | `2` | Number of redirect service instances |
+| `REDIRECT_HOST` | `0.0.0.0` | Bind address |
+| `REDIRECT_PORT` | `9090` | HTTP listen port |
+| `REDIRECT_TARGET_PORT` | `443` | HTTPS redirect target |
+| `ACME_WEBROOT` | *(none)* | ACME webroot directory for challenges |
+
 ## Contributing
 
 We welcome contributions to NeonSignal! Please follow these guidelines:
