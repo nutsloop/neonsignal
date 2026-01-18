@@ -22,3 +22,4 @@
 /www/book/source/benchmarks/*
 !/www/book/source/benchmarks/index.md
 __pycache__/
+.DS_Store
