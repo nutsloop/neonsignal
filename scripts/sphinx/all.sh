@@ -15,6 +15,7 @@ Options:
   --clean     Clean build/public before building (keeps venv)
   --fresh     Full reset: clean everything including venv
   --no-dynamics   Skip dynamic content generation
+  --deploy-to=<path>  Override public deployment directory
   --help      Show this help message
 
 Examples:
@@ -22,12 +23,14 @@ Examples:
   $(basename "$0") --clean      # Clean rebuild (clean + setup + dynamics + build)
   $(basename "$0") --fresh      # Full reset (clean --venv + setup + dynamics + build)
   $(basename "$0") --no-dynamics   # Rebuild without refreshing dynamic content
+  $(basename "$0") --deploy-to=/path/to/site/book
 EOF
 }
 
 DO_CLEAN=false
 DO_FRESH=false
 DO_DYNAMICS=true
+DEPLOY_TO=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -42,6 +45,19 @@ while [[ $# -gt 0 ]]; do
     --no-dynamics)
       DO_DYNAMICS=false
       shift
+      ;;
+    --deploy-to=*)
+      DEPLOY_TO="${1#*=}"
+      shift
+      ;;
+    --deploy-to)
+      if [[ $# -lt 2 ]]; then
+        print_error "Missing value for --deploy-to"
+        usage
+        exit 1
+      fi
+      DEPLOY_TO="$2"
+      shift 2
       ;;
     --help|-h)
       usage
@@ -62,11 +78,19 @@ START_TIME=$(date +%s)
 # Step 1: Clean (if requested)
 if [[ "$DO_FRESH" == true ]]; then
   print_step "Cleaning everything (fresh start)"
-  "$NEONSIGNAL_SPHINX_CLEAN_SCRIPT" --venv
+  if [[ -n "$DEPLOY_TO" ]]; then
+    "$NEONSIGNAL_SPHINX_CLEAN_SCRIPT" --venv --remove-from="$DEPLOY_TO"
+  else
+    "$NEONSIGNAL_SPHINX_CLEAN_SCRIPT" --venv
+  fi
   echo ""
 elif [[ "$DO_CLEAN" == true ]]; then
   print_step "Cleaning build artifacts"
-  "$NEONSIGNAL_SPHINX_CLEAN_SCRIPT"
+  if [[ -n "$DEPLOY_TO" ]]; then
+    "$NEONSIGNAL_SPHINX_CLEAN_SCRIPT" --remove-from="$DEPLOY_TO"
+  else
+    "$NEONSIGNAL_SPHINX_CLEAN_SCRIPT"
+  fi
   echo ""
 fi
 
@@ -86,15 +110,26 @@ fi
 
 # Step 4: Build
 print_step "Building and deploying"
-"$NEONSIGNAL_SPHINX_BUILD_SCRIPT"
+if [[ -n "$DEPLOY_TO" ]]; then
+  "$NEONSIGNAL_SPHINX_BUILD_SCRIPT" --deploy-to="$DEPLOY_TO"
+else
+  "$NEONSIGNAL_SPHINX_BUILD_SCRIPT"
+fi
 echo ""
 
 END_TIME=$(date +%s)
 ELAPSED=$((END_TIME - START_TIME))
 
+PUBLIC_DIR="$NEONSIGNAL_SPHINX_PUBLIC_DIR"
+PUBLIC_ENTRY="$NEONSIGNAL_SPHINX_PUBLIC_ENTRY"
+if [[ -n "$DEPLOY_TO" ]]; then
+  PUBLIC_DIR="$DEPLOY_TO"
+  PUBLIC_ENTRY="$(dirname "$PUBLIC_DIR")/neonsignal-book.html"
+fi
+
 print_header "Pipeline Complete"
 print_success "Total time: ${ELAPSED}s"
 print_substep "Book source: ${NEONSIGNAL_SPHINX_BOOK_DIR}"
 print_substep "Build output: ${NEONSIGNAL_SPHINX_BUILD_DIR}"
-print_substep "Public site: ${NEONSIGNAL_SPHINX_PUBLIC_DIR}"
-print_substep "Entry page: ${NEONSIGNAL_SPHINX_PUBLIC_ENTRY}"
+print_substep "Public site: ${PUBLIC_DIR}"
+print_substep "Entry page: ${PUBLIC_ENTRY}"
