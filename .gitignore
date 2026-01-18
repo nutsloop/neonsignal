@@ -15,6 +15,7 @@
 /public/
 /subprojects/.wraplock
 /subprojects/ansi/
+/subprojects/args/
 /subprojects/libmdbx/
 /www/book/.venv/
 /www/book/source/ai-conversations/*
