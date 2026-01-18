@@ -40,7 +40,7 @@ void Http2Listener::start() {
   });
 
   // Setup periodic timeout checking (every 5 seconds)
-  loop_.add_timer(std::chrono::milliseconds(5000), [this]() {
+  timeout_timer_id_ = loop_.add_timer(std::chrono::milliseconds(5000), [this]() {
     auto timed_out = conn_manager_->find_timed_out_connections();
     for (int fd : timed_out) {
       std::cerr << "Connection timeout, closing fd=" << fd << '\n';
