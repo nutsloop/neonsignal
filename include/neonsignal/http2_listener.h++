@@ -175,6 +175,7 @@ private:
   std::atomic<bool> redirect_service_ok_{false};
   int redirect_probe_port_{9090};
   int redirect_timer_id_{-1};
+  int timeout_timer_id_{-1};
   WebAuthnManager auth_;
   std::unique_ptr<ApiHandler> api_handler_;
   VHostResolver vhost_resolver_;

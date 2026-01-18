@@ -78,6 +78,7 @@ srcs = [
   'neonsignal/http2_listener/probe_redirect_service_.c++',
   'neonsignal/http2_listener/register_connection_.c++',
   'neonsignal/http2_listener/setup_listener_.c++',
+  'neonsignal/http2_listener/shutdown_graceful.c++',
   'neonsignal/http2_listener/start.c++',
   'neonsignal/http2_listener/start_redirect_monitor_.c++',
   'neonsignal/http2_listener/stop_redirect_monitor_.c++',
