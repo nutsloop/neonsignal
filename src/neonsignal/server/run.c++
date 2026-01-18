@@ -29,6 +29,12 @@ void Server::run() {
   if (const char *db_path = std::getenv("NEONSIGNAL_DB_PATH")) {
     config_.db_path = db_path;
   }
+  if (const char *www_root = std::getenv("NEONSIGNAL_WWW_ROOT")) {
+    config_.www_root = www_root;
+  }
+  if (const char *certs_root = std::getenv("NEONSIGNAL_CERTS_ROOT")) {
+    config_.certs_root = certs_root;
+  }
   if (const char *host = std::getenv("NEONSIGNAL_HOST")) {
     config_.host = host;
   }
@@ -58,7 +64,7 @@ void Server::run() {
   ThreadPool::ServerHostPort server_host_port = {.host = config_.host, .port = config_.port};
   pool_ = std::make_unique<ThreadPool>(thread_count, server_host_port);
   loop_ = std::make_unique<EventLoop>();
-  router_ = std::make_unique<Router>(config_.public_root);
+  router_ = std::make_unique<Router>(config_.www_root);
   listener_ = std::make_unique<Http2Listener>(*loop_, *pool_, ssl_ctx_.get(), config_, *router_,
                                               served_files_, page_views_, event_clients_);
   listener_->start();

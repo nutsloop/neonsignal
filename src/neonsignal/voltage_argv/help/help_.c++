@@ -61,6 +61,9 @@ std::string help::help_() const {
       "  {} WebAuthn Relying Party ID\n"
       "  {} WebAuthn origin URL\n"
       "  {}        LIBMDBX database file path (default: data/neonsignal.mdb)\n"
+      "  {}       Static files root directory (default: public)\n"
+      "  {}     TLS certificates root directory (default: certs)\n"
+      "  {}   Working directory for resolving paths\n"
       "  {}               Run in systemd mode (bypasses 'spin' requirement)\n\n"
       "{}\n"
       "  {}                  Show this help message\n"
@@ -70,7 +73,8 @@ std::string help::help_() const {
       "  CLI flags are overridden by environment variables when set:\n"
       "    NEONSIGNAL_THREADS, NEONSIGNAL_HOST, NEONSIGNAL_PORT\n"
       "    NEONSIGNAL_WEBAUTHN_DOMAIN, NEONSIGNAL_WEBAUTHN_ORIGIN\n"
-      "    NEONSIGNAL_DB_PATH\n\n"
+      "    NEONSIGNAL_DB_PATH, NEONSIGNAL_WWW_ROOT, NEONSIGNAL_CERTS_ROOT\n"
+      "    NEONSIGNAL_WORKING_DIR\n\n"
       "{}\n"
       "  {} spin --host=0.0.0.0 --port=9443\n"
       "  {} --systemd --threads=3\n"
@@ -81,7 +85,9 @@ std::string help::help_() const {
       ansi("--threads=<n>").bright_green().str(), ansi("--host=<addr>").bright_green().str(),
       ansi("--port=<n>").bright_green().str(), ansi("--webauthn-domain=<id>").bright_green().str(),
       ansi("--webauthn-origin=<url>").bright_green().str(),
-      ansi("--db-path=<path>").bright_green().str(), ansi("--systemd").bright_green().str(),
+      ansi("--db-path=<path>").bright_green().str(), ansi("--www-root=<path>").bright_green().str(),
+      ansi("--certs-root=<path>").bright_green().str(), ansi("--working-dir=<path>").bright_green().str(),
+      ansi("--systemd").bright_green().str(),
       ansi("Help:").stylish().bold().str(), ansi("--help").bright_cyan().str(),
       ansi("--help=<topic>").bright_cyan().str(), ansi("--version, -v").bright_cyan().str(),
       ansi("Environment Variables:").stylish().bold().str(),

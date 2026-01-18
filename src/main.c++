@@ -6,8 +6,12 @@
 
 #include <cstdlib>
 #include <exception>
+#include <filesystem>
+#include <format>
 #include <iostream>
 #include <string>
+
+#include <unistd.h>
 
 namespace {
 
@@ -39,7 +43,38 @@ int main(int argc, char *argv[]) {
       return 0;
     }
 
+    // Change working directory if specified (before resolving other paths)
+    // Env var takes precedence over CLI arg
+    std::string working_dir_path;
+    if (const char *env = std::getenv("NEONSIGNAL_WORKING_DIR"); env != nullptr) {
+      working_dir_path = env;
+    } else if (voltage.working_dir() && !voltage.working_dir()->empty()) {
+      working_dir_path = *voltage.working_dir();
+    }
+
+    if (!working_dir_path.empty()) {
+      std::filesystem::path path(working_dir_path);
+      if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path)) {
+        throw std::runtime_error(
+            std::format("working directory does not exist: '{}'", working_dir_path));
+      }
+      if (access(working_dir_path.c_str(), W_OK) != 0) {
+        throw std::runtime_error(
+            std::format("working directory is not writable: '{}'", working_dir_path));
+      }
+      try {
+        std::filesystem::current_path(working_dir_path);
+      } catch (const std::filesystem::filesystem_error &e) {
+        throw std::runtime_error(
+            std::format("failed to change working directory to '{}': {}",
+                        working_dir_path, e.what()));
+      }
+    }
+
     neonsignal::ServerConfig config;
+
+    // Store resolved working directory in config
+    config.working_dir = std::filesystem::current_path().string();
 
     if (!env_set("NEONSIGNAL_HOST") && voltage.host() && !voltage.host()->empty()) {
       config.host = *voltage.host();
@@ -57,6 +92,12 @@ int main(int argc, char *argv[]) {
     }
     if (!env_set("NEONSIGNAL_DB_PATH") && voltage.db_path() && !voltage.db_path()->empty()) {
       config.db_path = *voltage.db_path();
+    }
+    if (!env_set("NEONSIGNAL_WWW_ROOT") && voltage.www_root() && !voltage.www_root()->empty()) {
+      config.www_root = *voltage.www_root();
+    }
+    if (!env_set("NEONSIGNAL_CERTS_ROOT") && voltage.certs_root() && !voltage.certs_root()->empty()) {
+      config.certs_root = *voltage.certs_root();
     }
 
     if (!env_set("NEONSIGNAL_THREADS") && voltage.threads() && *voltage.threads() > 0) {

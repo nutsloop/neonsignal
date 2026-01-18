@@ -59,7 +59,7 @@ static constexpr version_t REDIRECT_VERSION = parse_version(NEONSIGNAL_REDIRECT_
 
 // Valid flags for neonsignal
 const args_list_t server_args_list{{"threads", "host", "port", "webauthn-domain", "webauthn-origin",
-                                    "db-path", "systemd", "help", "?", "version", "v"}};
+                                    "db-path", "www-root", "certs-root", "working-dir", "systemd", "help", "?", "version", "v"}};
 
 // Valid commands for neonsignal
 const args_list_command_t server_args_list_command{{"spin"}};
@@ -72,7 +72,7 @@ const args_list_t redirect_args_list{{"instances", "port", "target-port", "host"
 const args_list_command_t redirect_args_list_command{{"spin"}};
 
 std::unordered_set<std::string> server_skip_digits() {
-  return {"host", "webauthn-domain", "webauthn-origin", "db-path"};
+  return {"host", "webauthn-domain", "webauthn-origin", "db-path", "www-root", "certs-root", "working-dir"};
 }
 
 std::unordered_set<std::string> redirect_skip_digits() { return {"host", "acme-webroot"}; }
@@ -163,6 +163,15 @@ server_voltage::server_voltage(int argc, char *argv[]) {
   }
   if (args.has("db-path")) {
     db_path_ = args.get_option_string("db-path").db_path();
+  }
+  if (args.has("www-root")) {
+    www_root_ = args.get_option_string("www-root").www_root();
+  }
+  if (args.has("certs-root")) {
+    certs_root_ = args.get_option_string("certs-root").certs_root();
+  }
+  if (args.has("working-dir")) {
+    working_dir_ = args.get_option_string("working-dir").working_dir();
   }
 }
 

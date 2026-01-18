@@ -4,6 +4,7 @@
 
 #include "neonsignal/http2_listener_helpers.h++"
 
+#include <filesystem>
 #include <iostream>
 
 namespace neonsignal {
@@ -11,9 +12,12 @@ namespace neonsignal {
 void Http2Listener::start() {
   setup_listener_();
 
+  // Log working directory
+  std::cerr << "neonsignal->Working directory: " << std::filesystem::current_path().string() << '\n';
+
   // Preload static files into memory cache
-  std::cerr << "Preloading static file cache from " << config_.public_root << "...\n";
-  static_cache_->preload(config_.public_root);
+  std::cerr << "Preloading static file cache from " << config_.www_root << "...\n";
+  static_cache_->preload(config_.www_root);
 
   // Log virtual hosts
   if (vhost_resolver_.enabled()) {

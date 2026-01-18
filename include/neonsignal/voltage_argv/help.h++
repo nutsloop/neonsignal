@@ -24,6 +24,9 @@ private:
     webauthn_domain,
     webauthn_origin,
     db_path,
+    www_root,
+    certs_root,
+    working_dir,
     systemd,
 
     // Redirect options
@@ -72,6 +75,9 @@ private:
   [[nodiscard]] std::string webauthn_domain_() const;
   [[nodiscard]] std::string webauthn_origin_() const;
   [[nodiscard]] std::string db_path_() const;
+  [[nodiscard]] std::string www_root_() const;
+  [[nodiscard]] std::string certs_root_() const;
+  [[nodiscard]] std::string working_dir_() const;
   [[nodiscard]] std::string systemd_() const;
   [[nodiscard]] std::string instances_() const;
   [[nodiscard]] std::string target_port_() const;

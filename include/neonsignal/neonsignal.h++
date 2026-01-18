@@ -19,10 +19,11 @@ struct ServerConfig {
   std::string host = "0.0.0.0";
   std::uint16_t port = 9443;
   std::string certs_root = "certs";
-  std::string public_root = "public";
+  std::string www_root = "public";
   std::string rp_id = "neonsignal.nutsloop.host";
   std::string origin = "https://neonsignal.nutsloop.host";
   std::string db_path = "data/neonsignal.mdb";
+  std::string working_dir;
 };
 
 class Server {

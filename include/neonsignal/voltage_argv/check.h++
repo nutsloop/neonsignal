@@ -21,6 +21,11 @@ public:
   [[nodiscard]] std::string webauthn_domain() const;
   [[nodiscard]] std::string webauthn_origin() const;
   [[nodiscard]] std::string db_path() const;
+  [[nodiscard]] std::string www_root() const;
+  [[nodiscard]] std::string certs_root() const;
+  [[nodiscard]] std::string working_dir() const;
+
+  // shared
   [[nodiscard]] bool systemd() const;
 
   // Redirect options
