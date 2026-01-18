@@ -20,6 +20,12 @@ std::string help::get_help_topic_(Topic_ topic) const {
     return webauthn_origin_();
   case Topic_::db_path:
     return db_path_();
+  case Topic_::www_root:
+    return www_root_();
+  case Topic_::certs_root:
+    return certs_root_();
+  case Topic_::working_dir:
+    return working_dir_();
   case Topic_::systemd:
     return systemd_();
   case Topic_::instances:

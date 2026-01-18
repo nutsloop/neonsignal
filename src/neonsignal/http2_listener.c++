@@ -27,7 +27,7 @@ Http2Listener::Http2Listener(EventLoop& loop, ThreadPool& pool, SSL_CTX* ssl_ctx
       api_handler_(std::make_unique<ApiHandler>(loop_, auth_, router_, *db_,
                                                 served_files_, page_views_, event_clients_,
                                                 redirect_service_ok_)),
-      vhost_resolver_(config_.public_root) {
+      vhost_resolver_(config_.www_root) {
   if (!ssl_ctx_) {
     throw std::runtime_error("Http2Listener requires a valid SSL_CTX");
   }

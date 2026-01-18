@@ -27,6 +27,9 @@ public:
   [[nodiscard]] const std::optional<std::string> &webauthn_domain() const;
   [[nodiscard]] const std::optional<std::string> &webauthn_origin() const;
   [[nodiscard]] const std::optional<std::string> &db_path() const;
+  [[nodiscard]] const std::optional<std::string> &www_root() const;
+  [[nodiscard]] const std::optional<std::string> &certs_root() const;
+  [[nodiscard]] const std::optional<std::string> &working_dir() const;
 
 private:
   static void validate_dash_format_(int argc, char *argv[]);
@@ -42,6 +45,9 @@ private:
   std::optional<std::string> webauthn_domain_;
   std::optional<std::string> webauthn_origin_;
   std::optional<std::string> db_path_;
+  std::optional<std::string> www_root_;
+  std::optional<std::string> certs_root_;
+  std::optional<std::string> working_dir_;
 };
 
 // ───────────────────────────────────────────────────────────────────────────

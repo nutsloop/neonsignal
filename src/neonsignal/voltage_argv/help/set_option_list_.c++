@@ -14,7 +14,10 @@ void help::set_option_list_() {
                          {"port", Topic_::port},
                          {"webauthn-domain", Topic_::webauthn_domain},
                          {"webauthn-origin", Topic_::webauthn_origin},
-                         {"db-path", Topic_::db_path}});
+                         {"db-path", Topic_::db_path},
+                         {"www-root", Topic_::www_root},
+                         {"certs-root", Topic_::certs_root},
+                         {"working-dir", Topic_::working_dir}});
     return;
   }
 
