@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Centralized repository paths.
-NEONSIGNAL_ROOT_DIR="/home/core/code/neonsignal"
+NEONSIGNAL_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 NEONSIGNAL_SCRIPTS_DIR="$NEONSIGNAL_ROOT_DIR/scripts"
 NEONSIGNAL_LOGGING_LIB_SCRIPT="$NEONSIGNAL_SCRIPTS_DIR/lib/logging.sh"
 
