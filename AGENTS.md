@@ -148,19 +148,6 @@ npm run lint                         # Lint TypeScript
 npm run lint-fix                     # Auto-fix lint issues
 ```
 
-### Sphinx Documentation
-```bash
-./scripts/sphinx/setup.sh            # Create/refresh venv + install deps
-./scripts/sphinx/dynamics.sh         # Generate dynamic content
-./scripts/sphinx/build.sh            # Build + deploy docs (requires venv)
-./scripts/sphinx/clean.sh            # Remove build/public
-./scripts/sphinx/clean.sh --venv     # Remove build/public + venv
-./scripts/sphinx/all.sh              # Quick rebuild (setup + dynamics + build)
-./scripts/sphinx/all.sh --clean      # Clean rebuild (clean + setup + dynamics + build)
-./scripts/sphinx/all.sh --fresh      # Full reset (clean --venv + setup + dynamics + build)
-./scripts/sphinx/all.sh --no-dynamics # Rebuild without refreshing dynamic content
-```
-
 ### Release Build
 ```bash
 ./scripts/build/only-build.sh        # Release build (no wipe; builds backend only)
@@ -187,7 +174,6 @@ npm run lint-fix                     # Auto-fix lint issues
 src/neonsignal/          # C++ implementations (event_loop, http2_listener, router, etc.)
 include/neonsignal/      # C++ headers (mirror src/ structure)
 www/                     # Frontend sources
-  ├── book/              # Sphinx documentation source
   ├── neonsignaljsx/     # neonsignal JSX app
   ├── nutsloopjsx/       # nutsloop JSX app
   ├── simonedelpopolo/   # simonedelpopolo site
@@ -202,7 +188,6 @@ systemd/                 # systemd service units
 scripts/                 # Build and deployment scripts
   ├── global_variables.sh    # Centralized paths
   ├── build/                 # Release/deploy scripts
-  ├── sphinx/                # Sphinx pipeline scripts
   ├── vhost/                 # Virtual host helpers
   └── lib/logging.sh         # Shared logging functions
 ```
@@ -212,8 +197,6 @@ scripts/                 # Build and deployment scripts
 **C++ Backend**: `meson compile` → `build/src/neonsignal`
 
 **Frontend**: TSX → Babel transpile → `build/*/` → esbuild bundle → `public/*/app.js`
-
-**Sphinx Docs**: `www/book/source/` → `build/www/book/` → `public/neonsignal.nutsloop.net/book/`
 
 ### Two Executables
 - `neonsignal` - Main HTTP/2 server (port 9443)
@@ -273,3 +256,4 @@ No formal test suite. Manual testing approaches:
 curl -k --http2 https://localhost:9443/      # HTTP/2 check
 h2load -n 1000 -c 10 https://localhost:9443/ # Load testing
 ```
+

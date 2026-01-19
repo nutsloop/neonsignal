@@ -160,14 +160,6 @@ print_step "Setting up symlinks"
 "$SCRIPT_DIR/../vhost/www-domain-symlink.sh" || true
 print_success "Symlinks configured"
 
-# Sphinx documentation
-print_separator
-print_step "Building Sphinx documentation"
-"$NEONSIGNAL_SPHINX_SETUP_SCRIPT" || true
-"$NEONSIGNAL_SPHINX_DYNAMICS_SCRIPT" || true
-"$NEONSIGNAL_SPHINX_BUILD_SCRIPT" || true
-print_success "Documentation built"
-
 # Certificates
 print_separator
 if [[ "$LOCAL_MODE" == "true" ]]; then
