@@ -86,7 +86,7 @@ bool ApiHandler::incoming_data(const std::shared_ptr<Http2Connection> &conn,
     build_response_frames(conn->write_buf, stream_id, 500, "application/json", body_bytes);
     conn->events |= EventMask::Write;
     loop_.update_fd(conn->fd, conn->events);
-    std::cerr << "UPLOAD init failed (open) fd=" << conn->fd << " stream=" << stream_id
+    std::cerr << "✗ UPLOAD init failed (open) fd=" << conn->fd << " stream=" << stream_id
               << " path=" << fullpath << '\n';
     return true; // handled (500)
   }
@@ -99,7 +99,7 @@ bool ApiHandler::incoming_data(const std::shared_ptr<Http2Connection> &conn,
   conn->events |= EventMask::Write;
   loop_.update_fd(conn->fd, conn->events);
   conn->streams[stream_id] = std::move(st);
-  std::cerr << "UPLOAD init fd=" << conn->fd << " stream=" << stream_id << " method=" << method
+  std::cerr << "• UPLOAD init fd=" << conn->fd << " stream=" << stream_id << " method=" << method
             << " path=" << path << " target=" << fullpath << " name=" << safe_name << '\n';
   return true; // handled (stream registered)
 }

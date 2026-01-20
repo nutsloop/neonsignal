@@ -14,7 +14,7 @@ bool InstallCommand::clone_repository_() {
     try {
       std::filesystem::create_directories(www_path);
     } catch (const std::filesystem::filesystem_error &e) {
-      std::cerr << std::format("Error: Failed to create www-root directory '{}': {}\n",
+      std::cerr << std::format("✗ Failed to create www-root directory '{}': {}\n",
                                www_root_, e.what());
       return false;
     }
@@ -32,7 +32,7 @@ bool InstallCommand::clone_repository_() {
 
   // Check if target already exists
   if (std::filesystem::exists(target_path)) {
-    std::cerr << std::format("Error: Target directory already exists: '{}'\n", target_path);
+    std::cerr << std::format("✗ Target directory already exists: '{}'\n", target_path);
     return false;
   }
 

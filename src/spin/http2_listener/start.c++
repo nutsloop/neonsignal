@@ -13,25 +13,25 @@ void Http2Listener::start() {
   setup_listener_();
 
   // Log working directory
-  std::cerr << "neonsignal->Working directory: " << std::filesystem::current_path().string() << '\n';
+  std::cerr << "• neonsignal->Working directory: " << std::filesystem::current_path().string() << '\n';
 
   // Preload static files into memory cache
-  std::cerr << "Preloading static file cache from " << config_.www_root << "...\n";
+  std::cerr << "• Preloading static file cache from " << config_.www_root << "...\n";
   static_cache_->preload(config_.www_root);
 
   // Log virtual hosts
   if (vhost_resolver_.enabled()) {
-    std::cerr << "neonsignal->Virtual hosts discovered:\n";
+    std::cerr << "• neonsignal->Virtual hosts discovered:\n";
     for (const auto& vhost : vhost_resolver_.list_vhosts()) {
-      std::cerr << "  " << vhost << '\n';
+      std::cerr << "↳ " << vhost << '\n';
     }
   } else {
-    std::cerr << "neonsignal->No virtual hosts configured (single-root mode)\n";
+    std::cerr << "• neonsignal->No virtual hosts configured (single-root mode)\n";
   }
 
   loop_.add_fd(listen_fd_, EventMask::Read, [this](std::uint32_t events) {
     if (events & (EventMask::Error | EventMask::HangUp)) {
-      std::cerr << "Listener socket error/hup\n";
+      std::cerr << "▲ Listener socket fault/hup\n";
       return;
     }
     if (events & EventMask::Read) {
@@ -43,7 +43,7 @@ void Http2Listener::start() {
   timeout_timer_id_ = loop_.add_timer(std::chrono::milliseconds(5000), [this]() {
     auto timed_out = conn_manager_->find_timed_out_connections();
     for (int fd : timed_out) {
-      std::cerr << "Connection timeout, closing fd=" << fd << '\n';
+      std::cerr << "▲ Connection timeout, closing fd=" << fd << '\n';
       close_connection_(fd);
     }
   });

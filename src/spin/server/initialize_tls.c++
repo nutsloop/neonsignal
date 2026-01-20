@@ -70,15 +70,15 @@ void Server::initialize_tls() {
   SSL_CTX_set_tlsext_servername_arg(default_ctx, cert_manager_.get());
 
   // Log loaded certificates
-  std::cerr << "neonsignal->TLS certificates loaded:\n";
+  std::cerr << "• neonsignal->TLS certificates loaded:\n";
   for (const auto &cert : cert_manager_->list_certificates()) {
-    std::cerr << "  " << cert << '\n';
+    std::cerr << "↳ " << cert << '\n';
   }
 
   // Warn about expiring certificates
   auto expiring = cert_manager_->expiring_soon(30);
   for (const auto &cert : expiring) {
-    std::cerr << "  WARNING: " << cert << '\n';
+    std::cerr << "▲ expiring soon: " << cert << '\n';
   }
 }
 

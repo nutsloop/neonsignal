@@ -1,4 +1,5 @@
 #include "install/install_command.h++"
+#include "install/systemd_service_installer.h++"
 #include "neonsignal/logging.h++"
 #include "neonsignal/voltage_argv.h++"
 #include "spin/neonsignal.h++"
@@ -36,6 +37,29 @@ bool is_install_command(int argc, char *argv[]) {
 }
 
 int run_install_command(int argc, char *argv[]) {
+  if (argc == 2 && std::string_view(argv[1]) == "install") {
+    using nutsloop::ansi;
+
+    std::cerr << ansi("✗").bright_red().bold().str()
+              << " install requires one of these switch sets:\n";
+    std::cerr << ansi("▸").bright_cyan().str() << " "
+              << ansi(std::format("{} install", argv[0])).bright_yellow().str() << "\n";
+    std::cerr << ansi("↳").bright_cyan().str() << " "
+              << ansi("--systemd-service").bright_green().str() << "\n";
+    std::cerr << ansi("▸").bright_cyan().str() << " "
+              << ansi(std::format("{} install", argv[0])).bright_yellow().str() << "\n";
+    std::cerr << ansi("↳").bright_cyan().str() << " " << ansi("--repo").bright_green().str()
+              << "\n";
+    std::cerr << ansi("↳").bright_cyan().str() << " " << ansi("--www-root").bright_green().str()
+              << "\n";
+    std::cerr << ansi("↳").bright_cyan().str() << " " << ansi("--name").bright_green().str()
+              << "\n";
+    std::cerr << ansi("↳").bright_cyan().str() << " " << ansi("--branch").bright_green().str()
+              << "\n";
+
+    return 1;
+  }
+
   neonsignal::install_voltage voltage(argc, argv);
 
   if (voltage.should_show_help()) {
@@ -49,6 +73,18 @@ int run_install_command(int argc, char *argv[]) {
       std::cout << *voltage.version_text() << '\n';
     }
     return 0;
+  }
+
+  if (voltage.should_install_systemd_service()) {
+#if !defined(__linux__)
+    using nutsloop::ansi;
+
+    std::cerr << ansi("✗").bright_red().bold().str()
+              << " systemd-service is only supported on Linux\n";
+    return 1;
+#endif
+    neonsignal::install::SystemdServiceInstaller installer(voltage.systemd_service());
+    return installer.install();
   }
 
   neonsignal::install::InstallCommand cmd(voltage);
@@ -154,15 +190,15 @@ int main(int argc, char *argv[]) {
     using nutsloop::ansi;
 
     // Styled error message
-    std::cerr << ansi("✗ Fatal Error").bright_red().bold().str() << "\n";
-    std::cerr << "  "
+    std::cerr << ansi("✗").bright_red().bold().str() << " Fatal\n";
+    std::cerr << ansi("↳").bright_red().str() << " "
               << ansi(ex.what()).bright_red().curly_underline().underline_color({255, 165, 0}).str()
               << "\n\n";
 
     // Show help hint
-    std::cerr << ansi("ℹ For usage information, run:").bright_cyan().str() << "\n";
-    std::cerr << "  " << ansi(argv[0]).bright_yellow().str() << " ";
-    std::cerr << ansi("--help").bright_white().str() << "\n";
+    std::cerr << ansi("▸").bright_cyan().str() << " For usage information, run:\n";
+    std::cerr << ansi("↳").bright_yellow().str() << " " << ansi(argv[0]).bright_yellow().str()
+              << " " << ansi("--help").bright_white().str() << "\n";
 
     return 1;
   }

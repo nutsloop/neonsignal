@@ -39,6 +39,7 @@ public:
   [[nodiscard]] std::string repo() const;
   [[nodiscard]] std::string install_name() const;
   [[nodiscard]] std::string branch() const;
+  [[nodiscard]] std::string systemd_service() const;
 
 private:
   args_key_value_t_ value_;

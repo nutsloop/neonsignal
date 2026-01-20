@@ -16,7 +16,7 @@ NeonJSXConfig parse_neonjsx_config(const std::filesystem::path &config_path) {
   std::ifstream file(config_path);
   if (!file.is_open()) {
     if (!domain_name.empty()) {
-      std::cerr << "vhost: " << domain_name << " [neonjsx: disabled]\n";
+      std::cerr << "• vhost: " << domain_name << " [neonjsx: disabled]\n";
     }
     return config;
   }
@@ -42,7 +42,7 @@ NeonJSXConfig parse_neonjsx_config(const std::filesystem::path &config_path) {
 
   if (!domain_name.empty()) {
     std::size_t count = config.routes.size() + config.wildcard_routes.size();
-    std::cerr << "vhost: " << domain_name << " [neonjsx: " << count << " routes]\n";
+    std::cerr << "• vhost: " << domain_name << " [neonjsx: " << count << " routes]\n";
   }
   return config;
 }

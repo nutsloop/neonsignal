@@ -10,7 +10,7 @@ namespace neonsignal::install {
 std::optional<std::string> GitCloner::clone_to(const std::string &target_dir) {
   // Validate URL before cloning
   if (!is_valid_url_()) {
-    std::cerr << std::format("Error: Invalid repository URL: '{}'\n", repo_url_);
+    std::cerr << std::format("✗ Invalid repository URL: '{}'\n", repo_url_);
     return std::nullopt;
   }
 

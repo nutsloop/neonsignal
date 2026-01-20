@@ -279,7 +279,7 @@ bool WebAuthnManager::load_credentials() {
     cred.sign_count = user.sign_count;
     credentials_.push_back(std::move(cred));
   }
-  std::cerr << "webauthn: loaded " << credentials_.size() << " credential(s)\n";
+  std::cerr << "• webauthn: loaded " << credentials_.size() << " credential(s)\n";
   return true;
 }
 

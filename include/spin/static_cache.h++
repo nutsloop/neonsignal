@@ -55,7 +55,7 @@ public:
       }
     }
 
-    std::cerr << std::format("📦 Static cache: {} files loaded, {} bytes\n",
+    std::cerr << std::format("• Static cache: {} files loaded, {} bytes\n",
                              cache_.size(), current_size_bytes_);
   }
 
@@ -136,7 +136,7 @@ private:
       put(cache_key, std::move(content), mime);
 
     } catch (const std::exception& e) {
-      std::cerr << std::format("Failed to load {}: {}\n", file_path.string(), e.what());
+      std::cerr << std::format("✗ Failed to load {}: {}\n", file_path.string(), e.what());
     }
   }
 

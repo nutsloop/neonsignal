@@ -30,7 +30,7 @@ bool GitCloner::execute_git_clone_(const std::string &target_path) {
 
   std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.c_str(), "r"), pclose);
   if (!pipe) {
-    std::cerr << "Error: Failed to execute git clone command\n";
+    std::cerr << "✗ Failed to execute git clone command\n";
     return false;
   }
 
@@ -41,7 +41,7 @@ bool GitCloner::execute_git_clone_(const std::string &target_path) {
 
   int exit_code = pclose(pipe.release());
   if (exit_code != 0) {
-    std::cerr << std::format("Error: git clone failed with exit code {}\n", exit_code);
+    std::cerr << std::format("✗ git clone failed with exit code {}\n", exit_code);
     return false;
   }
 

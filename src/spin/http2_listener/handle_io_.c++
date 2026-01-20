@@ -57,7 +57,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
   }
 
   if (events & (EventMask::Error | EventMask::HangUp)) {
-    std::cerr << "Connection fd=" << conn->fd << " event error/hangup\n";
+    std::cerr << "▲ Connection fd=" << conn->fd << " event fault/hangup\n";
     close_connection_(conn->fd);
     return;
   }
@@ -66,7 +66,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
 
   if (!conn->handshake_complete) {
     if (now > conn->handshake_deadline) {
-      std::cerr << "TLS handshake timeout fd=" << conn->fd << '\n';
+      std::cerr << "▲ TLS handshake timeout fd=" << conn->fd << '\n';
       close_connection_(conn->fd);
       return;
     }
@@ -92,7 +92,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
       } else if (err == SSL_ERROR_WANT_WRITE) {
         conn->events = EventMask::Write;
       } else {
-        std::cerr << "TLS handshake failed fd=" << conn->fd << " err=" << err << '\n';
+        std::cerr << "✗ TLS handshake failed fd=" << conn->fd << " err=" << err << '\n';
         close_connection_(conn->fd);
         return;
       }
@@ -131,14 +131,14 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
         std::string_view got(reinterpret_cast<char *>(conn->read_buf.data()),
                              kClientPreface.size());
         if (got != kClientPreface) {
-          std::cerr << "Invalid HTTP/2 preface on fd=" << conn->fd << '\n';
+          std::cerr << "✗ Invalid HTTP/2 preface on fd=" << conn->fd << '\n';
           close_connection_(conn->fd);
           return;
         }
         conn->preface_ok = true;
         conn->read_buf.erase(conn->read_buf.begin(),
                              conn->read_buf.begin() + kClientPreface.size());
-        std::cerr << "Preface received fd=" << conn->fd << '\n';
+        std::cerr << "• Preface received fd=" << conn->fd << '\n';
       }
     }
 
@@ -167,7 +167,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
           conn->write_buf.insert(conn->write_buf.end(), ack.begin(), ack.end());
           conn->events |= EventMask::Write;
           loop_.update_fd(conn->fd, conn->events);
-          std::cerr << "Client SETTINGS received fd=" << conn->fd << '\n';
+          std::cerr << "• Client SETTINGS received fd=" << conn->fd << '\n';
         }
         continue;
       }
@@ -232,11 +232,11 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
               upload_header_name = it_name->second;
             }
           } else {
-            std::cerr << "Missing or invalid headers, defaulting path=/ fd=" << conn->fd
+            std::cerr << "▲ Missing or invalid headers, defaulting path=/ fd=" << conn->fd
                       << " stream=" << stream_id << '\n';
           }
 
-          std::cerr << "HEADERS on fd=" << conn->fd << " stream=" << stream_id << " path=" << path
+          std::cerr << "• HEADERS on fd=" << conn->fd << " stream=" << stream_id << " path=" << path
                     << " method=" << method << " authority=" << authority << '\n';
 
           conn->last_path = path;
@@ -254,7 +254,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
                   {"set-cookie", "ns_debug=; Path=/; Max-Age=0; Secure; SameSite=Lax"}};
             };
             if (!cookie) {
-              std::cerr << "auth: missing session cookie for path=" << path << '\n';
+              std::cerr << "▲ auth: missing session cookie for path=" << path << '\n';
               std::string body = "{\"error\":\"auth-required\"}";
               std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
               if (api_route != ApiRoute::None) {
@@ -279,7 +279,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
             if (cached) {
               user = cached->user_id;
               valid = true;
-              std::cerr << "auth: session cache HIT user=" << user << " path=" << path << '\n';
+              std::cerr << "• auth: session cache HIT user=" << user << " path=" << path << '\n';
             } else {
               // Cache miss - validate with auth and cache result
               valid = auth_.validate_session(*cookie, user);
@@ -290,13 +290,13 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
                                               .cached_at = now,
                                               .expires_at = now + std::chrono::seconds(60),
                                               .authenticated = true});
-                std::cerr << "auth: session cache MISS, validated user=" << user << " path=" << path
+                std::cerr << "• auth: session cache MISS, validated user=" << user << " path=" << path
                           << '\n';
               }
             }
 
             if (!valid) {
-              std::cerr << "auth: invalid session for path=" << path << " cookie=" << *cookie
+              std::cerr << "▲ auth: invalid session for path=" << path << " cookie=" << *cookie
                         << '\n';
               std::string body = "{\"error\":\"auth-required\"}";
               std::vector<std::uint8_t> body_bytes(body.begin(), body.end());
@@ -489,9 +489,9 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
           conn->events |= EventMask::Write;
           loop_.update_fd(conn->fd, conn->events);
           if (path == routes::pages::kHome || path == routes::pages::kIndex) {
-            std::cerr << "Serving index.html\n";
+            std::cerr << "• Serving index.html\n";
           }
-          std::cerr << "HEADERS on fd=" << conn->fd << " path=" << path << " method=" << method
+          std::cerr << "• HEADERS on fd=" << conn->fd << " path=" << path << " method=" << method
                     << " authority=" << authority << '\n';
         }
         continue;
@@ -525,7 +525,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
             conn->events |= EventMask::Write;
             loop_.update_fd(conn->fd, conn->events);
             st.responded = true;
-            std::cerr << "UPLOAD too large fd=" << conn->fd << " stream=" << stream_id
+            std::cerr << "▲ UPLOAD too large fd=" << conn->fd << " stream=" << stream_id
                       << " size=" << st.received_bytes << '\n';
             continue;
           }
@@ -534,7 +534,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
                           static_cast<std::streamsize>(payload.size()));
             if (!st.file.good()) {
               st.write_failed = true;
-              std::cerr << "UPLOAD write failed fd=" << conn->fd << " stream=" << stream_id << '\n';
+              std::cerr << "✗ UPLOAD write failed fd=" << conn->fd << " stream=" << stream_id << '\n';
             }
           }
         } else {
@@ -596,7 +596,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
               // Debug cookie (non-HttpOnly) to verify browser storage behavior.
               std::string dbg_cookie = "ns_debug=" + auth_res.session_id +
                                        "; Path=/; Max-Age=432000; Secure; SameSite=Lax";
-              std::cerr << "auth: issued session for user=" << auth_res.user
+              std::cerr << "✓ auth: issued session for user=" << auth_res.user
                         << " session=" << auth_res.session_id << '\n';
               build_response_frames_with_headers(
                   conn->write_buf, stream_id, 200, content_type,
@@ -698,14 +698,15 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
           conn->events |= EventMask::Write;
           loop_.update_fd(conn->fd, conn->events);
           st.responded = true;
-          std::cerr << "UPLOAD complete fd=" << conn->fd << " stream=" << stream_id << " bytes="
-                    << (st.is_upload ? st.received_bytes
-                                     : static_cast<std::uint64_t>(st.body.size()))
-                    << " status=" << status;
+          std::string upload_msg = "✓ UPLOAD complete fd=" + std::to_string(conn->fd) +
+                                   " stream=" + std::to_string(stream_id) + " bytes=" +
+                                   std::to_string(st.is_upload ? st.received_bytes
+                                                               : static_cast<std::uint64_t>(st.body.size())) +
+                                   " status=" + std::to_string(status);
           if (!saved_path.empty()) {
-            std::cerr << " path=" << saved_path;
+            upload_msg += " path=" + saved_path;
           }
-          std::cerr << '\n';
+          std::cerr << upload_msg << '\n';
           conn->streams.erase(st_it);
         } else {
           // Advance windows by the amount received.
@@ -773,7 +774,7 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
       if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
         break;
       }
-      std::cerr << "SSL_write error fd=" << conn->fd << " err=" << err << '\n';
+      std::cerr << "✗ SSL_write failed fd=" << conn->fd << " err=" << err << '\n';
       close_connection_(conn->fd);
       return;
     }

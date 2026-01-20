@@ -39,7 +39,7 @@ bool ApiHandler::cpu_stream(const std::shared_ptr<Http2Connection>& conn,
                          data_frame.end());
   conn->events |= EventMask::Write;
   loop_.update_fd(conn->fd, conn->events);
-  std::cerr << "HEADERS on fd=" << conn->fd << " stream=" << stream_id
+  std::cerr << "• HEADERS on fd=" << conn->fd << " stream=" << stream_id
             << " path=" << path << " method=" << method
             << " authority=" << authority << " (cpu sse)\n";
   return true;

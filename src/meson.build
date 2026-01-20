@@ -107,6 +107,7 @@ srcs = [
   'neonsignal/voltage_argv/check/repo.c++',
   'neonsignal/voltage_argv/check/install_name.c++',
   'neonsignal/voltage_argv/check/branch.c++',
+  'neonsignal/voltage_argv/check/systemd_service.c++',
   # help (neonsignal/)
   'neonsignal/voltage_argv/help/help.c++',
   'neonsignal/voltage_argv/help/mode.c++',
@@ -140,6 +141,7 @@ srcs = [
   'neonsignal/voltage_argv/help/repo_.c++',
   'neonsignal/voltage_argv/help/name_.c++',
   'neonsignal/voltage_argv/help/branch_.c++',
+  'neonsignal/voltage_argv/help/systemd_service_.c++',
   'neonsignal/voltage_argv/help/unknown_.c++',
   # server_voltage (neonsignal/)
   'neonsignal/server_voltage/is_systemd.c++',
@@ -161,6 +163,8 @@ srcs = [
   'neonsignal/install_voltage/www_root.c++',
   'neonsignal/install_voltage/name.c++',
   'neonsignal/install_voltage/branch.c++',
+  'neonsignal/install_voltage/should_install_systemd_service.c++',
+  'neonsignal/install_voltage/systemd_service.c++',
   'neonsignal/install_voltage/should_show_help.c++',
   'neonsignal/install_voltage/should_show_version.c++',
   'neonsignal/install_voltage/help_text.c++',
@@ -212,6 +216,17 @@ srcs = [
   'install/git_cloner/extract_repo_name.c++',
   'install/git_cloner/is_valid_url_.c++',
   'install/git_cloner/execute_git_clone_.c++',
+  'install/systemd_service_installer.c++',
+  'install/systemd_service_installer/install.c++',
+  'install/systemd_service_installer/populate_defaults_.c++',
+  'install/systemd_service_installer/parse_kvp_.c++',
+  'install/systemd_service_installer/validate_config_.c++',
+  'install/systemd_service_installer/check_root_privileges_.c++',
+  'install/systemd_service_installer/generate_neonsignal_service_.c++',
+  'install/systemd_service_installer/generate_redirect_service_.c++',
+  'install/systemd_service_installer/write_service_file_.c++',
+  'install/systemd_service_installer/print_defaults_warning_.c++',
+  'install/systemd_service_installer/print_success_message_.c++',
 ]
 
 # Add shared sources (platform utils, socket utils, backend)
@@ -255,6 +270,7 @@ redirect_srcs = [
   'neonsignal/voltage_argv/check/repo.c++',
   'neonsignal/voltage_argv/check/install_name.c++',
   'neonsignal/voltage_argv/check/branch.c++',
+  'neonsignal/voltage_argv/check/systemd_service.c++',
   # help (neonsignal/)
   'neonsignal/voltage_argv/help/help.c++',
   'neonsignal/voltage_argv/help/mode.c++',
@@ -288,6 +304,7 @@ redirect_srcs = [
   'neonsignal/voltage_argv/help/repo_.c++',
   'neonsignal/voltage_argv/help/name_.c++',
   'neonsignal/voltage_argv/help/branch_.c++',
+  'neonsignal/voltage_argv/help/systemd_service_.c++',
   'neonsignal/voltage_argv/help/unknown_.c++',
   # redirect_voltage (neonsignal/)
   'neonsignal/redirect_voltage/is_systemd.c++',

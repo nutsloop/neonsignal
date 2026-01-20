@@ -37,7 +37,7 @@ void Http2Listener::handle_connection_(int client_fd) {
   conn->events = EventMask::Read | EventMask::Write;
   conn->decoder = std::make_unique<HpackDecoder>();
 
-  std::cerr << "Accepted HTTP/2-capable TLS connection fd=" << client_fd
+  std::cerr << "• Accepted HTTP/2-capable TLS connection fd=" << client_fd
             << '\n';
   register_connection_(std::move(conn));
 }

@@ -17,7 +17,7 @@ ThreadPool::ThreadPool(std::size_t thread_count, const ServerHostPort &server_co
     threads_.emplace_back([this, i, server_config] {
       std::string thread_name = std::format("neonsignal->({})", std::to_string(i));
       platform_utils::set_thread_name(thread_name);
-      std::cerr << std::format("@{}:{}", server_config.host, server_config.port) << std::endl;
+      std::cerr << std::format("• @{}:{}", server_config.host, server_config.port) << std::endl;
       worker_();
     });
   }

@@ -23,13 +23,13 @@ void Http2Listener::handle_accept_() {
       if (errno == EINTR) {
         continue;
       }
-      std::cerr << "accept failed: " << strerror(errno) << '\n';
+      std::cerr << "✗ accept failed: " << strerror(errno) << '\n';
       break;
     }
 
     // Check connection limit (DoS protection)
     if (!conn_manager_->can_accept_connection()) {
-      std::cerr << "Connection limit reached, rejecting fd=" << client_fd << '\n';
+      std::cerr << "▲ Connection limit reached, rejecting fd=" << client_fd << '\n';
       close(client_fd);
       continue;
     }

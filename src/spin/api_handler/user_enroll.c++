@@ -188,7 +188,7 @@ ApiHandler::ApiResponse ApiHandler::user_enroll_finish(std::uint64_t user_id,
     return res;
   }
 
-  std::cerr << "[ENROLL] User " << user->email << " enrolled WebAuthn credential\n";
+  std::cerr << "✓ [ENROLL] User " << user->email << " enrolled WebAuthn credential\n";
 
   res.status = 200;
   std::ostringstream out;

@@ -38,6 +38,7 @@ private:
     repo,
     install_name,
     branch,
+    systemd_service,
 
     // Command
     spin,
@@ -91,6 +92,7 @@ private:
   [[nodiscard]] std::string repo_() const;
   [[nodiscard]] std::string install_name_() const;
   [[nodiscard]] std::string branch_() const;
+  [[nodiscard]] std::string systemd_service_() const;
   [[nodiscard]] std::string spin_() const;
   [[nodiscard]] std::string install_() const;
   [[nodiscard]] std::string unknown_() const;

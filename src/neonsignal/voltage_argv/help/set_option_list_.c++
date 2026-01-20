@@ -21,7 +21,8 @@ void help::set_option_list_() {
                          {"working-dir", Topic_::working_dir},
                          {"repo", Topic_::repo},
                          {"name", Topic_::install_name},
-                         {"branch", Topic_::branch}});
+                         {"branch", Topic_::branch},
+                         {"systemd-service", Topic_::systemd_service}});
     return;
   }
 

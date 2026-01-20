@@ -12,6 +12,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_set>
+#include <variant>
 
 namespace neonsignal {
 
@@ -73,8 +74,8 @@ constexpr std::array<std::string_view, 14> server_args_list{
 constexpr std::array<std::string_view, 2> server_args_list_command{{"spin", "install"}};
 
 // Valid flags for install command
-constexpr std::array<std::string_view, 8> install_args_list{
-    {"repo", "www-root", "name", "branch", "help", "?", "version", "v"}};
+constexpr std::array<std::string_view, 9> install_args_list{
+    {"repo", "www-root", "name", "branch", "systemd-service", "help", "?", "version", "v"}};
 
 // Valid flags for neonsignal_redirect
 constexpr std::array<std::string_view, 10> redirect_args_list{
@@ -90,7 +91,9 @@ std::unordered_set<std::string> server_skip_digits() {
 
 std::unordered_set<std::string> redirect_skip_digits() { return {"host", "acme-webroot"}; }
 
-std::unordered_set<std::string> install_skip_digits() { return {"repo", "www-root", "name", "branch"}; }
+std::unordered_set<std::string> install_skip_digits() {
+  return {"repo", "www-root", "name", "branch", "systemd-service"};
+}
 
 [[noreturn]] void throw_invalid(const std::string &message) {
   throw std::invalid_argument(message);
@@ -323,9 +326,27 @@ install_voltage::install_voltage(int argc, char *argv[]) {
   if (args.has("branch")) {
     branch_ = args.get_option_string("branch").branch();
   }
+  if (args.has("systemd-service")) {
+    should_install_systemd_service_ = true;
+    auto it = parsed_args.find("systemd-service");
+    if (it != parsed_args.end()) {
+      if (std::holds_alternative<std::string>(it->second)) {
+        systemd_service_ = std::get<std::string>(it->second);
+      } else {
+        systemd_service_ = "";
+      }
+    } else {
+      systemd_service_ = "";
+    }
+  }
+
+  if (should_install_systemd_service_ &&
+      (repo_ || www_root_ || name_ || branch_)) {
+    throw_invalid("systemd-service and --repo related flags are incompatible");
+  }
 
   // Validate required repo option
-  if (!repo_) {
+  if (!repo_ && !should_install_systemd_service_) {
     throw_invalid("--repo is required for install command");
   }
 }

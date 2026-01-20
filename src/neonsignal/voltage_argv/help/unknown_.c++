@@ -10,8 +10,8 @@ std::string help::unknown_() const {
   using nutsloop::ansi;
 
   return std::format(
-      "{}\n  Topic '{}' not found.\n\n{}\n  {} --help\n", ansi("ERROR").bright_red().bold().str(),
-      ansi(look_up_option_).bright_yellow().str(), ansi("TIP").bright_cyan().bold().str(),
+      "{}\n  Topic '{}' not found.\n\n{}\n  {} --help\n", ansi("✗").bright_red().bold().str(),
+      ansi(look_up_option_).bright_yellow().str(), ansi("▸").bright_cyan().bold().str(),
       ansi("  <binary>").bright_yellow().str());
 }
 

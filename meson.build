@@ -9,6 +9,16 @@ project('neonsignal', 'cpp',
   ]
 )
 
+if host_machine.system() == 'darwin'
+  hardening_mode = (get_option('buildtype') == 'debug' or get_option('buildtype') == 'debugoptimized') ? '_LIBCPP_HARDENING_MODE_DEBUG' : '_LIBCPP_HARDENING_MODE_FAST'
+  add_project_arguments(
+    '-U_LIBCPP_ENABLE_ASSERTIONS',
+    '-U_LIBCPP_HARDENING_MODE',
+    '-D_LIBCPP_HARDENING_MODE=' + hardening_mode,
+    language : 'cpp'
+  )
+endif
+
 # Binary versions
 neonsignal_version = '0.2.0'
 neonsignal_redirect_version = '0.1.0'

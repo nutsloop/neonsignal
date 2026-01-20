@@ -11,19 +11,19 @@ namespace neonsignal::install {
 int InstallCommand::run() {
   // Validate the repository URL
   if (!validate_repo_url_()) {
-    std::cerr << "Error: Invalid repository URL\n";
+    std::cerr << "✗ Invalid repository URL\n";
     return 1;
   }
 
   // Clone the repository
   if (!clone_repository_()) {
-    std::cerr << "Error: Failed to clone repository\n";
+    std::cerr << "✗ Failed to clone repository\n";
     return 1;
   }
 
   // Verify the clone was successful
   if (!verify_clone_()) {
-    std::cerr << "Error: Clone verification failed\n";
+    std::cerr << "✗ Clone verification failed\n";
     return 1;
   }
 

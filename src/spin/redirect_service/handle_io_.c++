@@ -15,14 +15,14 @@ void RedirectService::handle_io_(const int fd, const std::uint32_t events) {
 
   const auto it = connections_.find(fd);
   if (it == connections_.end()) {
-    std::cerr << "redirect: missing connection state fd=" << fd << '\n';
+    std::cerr << "▲ redirect: missing connection state fd=" << fd << '\n';
     return;
   }
   Connection &conn = it->second;
 
   if (events & (EventMask::Error | EventMask::HangUp)) {
     // Peer hung up or errored before we finished; drop the connection.
-    std::cerr << "redirect: epoll err/hup fd=" << fd << '\n';
+    std::cerr << "▲ redirect: epoll err/hup fd=" << fd << '\n';
     close_connection_(fd);
     return;
   }
@@ -34,18 +34,18 @@ void RedirectService::handle_io_(const int fd, const std::uint32_t events) {
       // need the request headers.
 
       if (const ssize_t n = recv(fd, buf, sizeof(buf), 0); n > 0) {
-        std::cerr << "redirect: reading headers fd=" << fd << '\n';
+        std::cerr << "• redirect: reading headers fd=" << fd << '\n';
         conn.buffer.append(buf, static_cast<std::size_t>(n));
 
         if (conn.buffer.size() > 32768) {
           // Malformed or too large for a redirect-only service.
-          std::cerr << "redirect: header buffer too large fd=" << fd << '\n';
+          std::cerr << "▲ redirect: header buffer too large fd=" << fd << '\n';
           break;
         }
       } else if (n == 0) {
         // Client closed.
         if (!conn.buffer.empty()) {
-          std::cerr << "redirect: client closed fd=" << fd << '\n';
+          std::cerr << "• redirect: client closed fd=" << fd << '\n';
         }
         close_connection_(fd);
         return;
@@ -54,7 +54,7 @@ void RedirectService::handle_io_(const int fd, const std::uint32_t events) {
           break;
         }
         // Hard read error.
-        std::cerr << "redirect: recv error fd=" << fd << " errno=" << errno << '\n';
+        std::cerr << "✗ redirect: recv failed fd=" << fd << " errno=" << errno << '\n';
         close_connection_(fd);
         return;
       }
@@ -78,14 +78,14 @@ void RedirectService::handle_io_(const int fd, const std::uint32_t events) {
         break;
       }
       // Fatal write error.
-      std::cerr << "redirect: send error fd=" << fd << " errno=" << errno << '\n';
+      std::cerr << "✗ redirect: send failed fd=" << fd << " errno=" << errno << '\n';
       close_connection_(fd);
       return;
     }
 
     if (conn.write_buffer.empty()) {
       // After flushing the redirect, close to keep things simple.
-      std::cerr << "redirect: response flushed fd=" << fd << ", closing\n";
+      std::cerr << "• redirect: response flushed fd=" << fd << ", closing\n";
       close_connection_(fd);
     }
   }

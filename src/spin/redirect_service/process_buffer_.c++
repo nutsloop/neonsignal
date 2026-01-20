@@ -12,13 +12,13 @@ namespace neonsignal {
 
 void RedirectService::process_buffer_(const int fd, Connection &conn) {
   if (conn.responded) {
-    std::cerr << "redirect: already responded fd=" << fd << '\n';
+    std::cerr << "• redirect: already responded fd=" << fd << '\n';
     // Redirect already queued; avoid double responses.
     return;
   }
 
   if (const auto header_end = conn.buffer.find("\r\n\r\n"); header_end == std::string::npos) {
-    std::cerr << "redirect: waiting for full headers fd=" << fd << '\n';
+    std::cerr << "• redirect: waiting for full headers fd=" << fd << '\n';
     // Wait for complete headers.
     return;
   }
@@ -53,7 +53,7 @@ void RedirectService::process_buffer_(const int fd, Connection &conn) {
         // Normalize odd paths back to root.
         path = "/";
       }
-      std::cerr << "redirect: parsed path fd=" << fd << " path=" << path << " method=" << method
+      std::cerr << "• redirect: parsed path fd=" << fd << " path=" << path << " method=" << method
                 << '\n';
     }
   }
@@ -89,7 +89,7 @@ void RedirectService::process_buffer_(const int fd, Connection &conn) {
           }
           // Use the client-sent host when present.
           host = header_host;
-          std::cerr << "redirect: parsed host fd=" << fd << " host=" << host
+          std::cerr << "• redirect: parsed host fd=" << fd << " host=" << host
                     << " port=" << host_port << '\n';
         }
       }
@@ -102,9 +102,9 @@ void RedirectService::process_buffer_(const int fd, Connection &conn) {
       conn.write_buffer =
           "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n";
       conn.write_ready = true;
-      std::cerr << "redirect: ACME 404 fd=" << fd << " path=" << path << '\n';
+      std::cerr << "▲ redirect: ACME 404 fd=" << fd << " path=" << path << '\n';
     } else {
-      std::cerr << "redirect: ACME served fd=" << fd << " path=" << path << '\n';
+      std::cerr << "✓ redirect: ACME served fd=" << fd << " path=" << path << '\n';
     }
     conn.responded = true;
     loop_.update_fd(fd, EventMask::Write | EventMask::Edge);
@@ -114,7 +114,7 @@ void RedirectService::process_buffer_(const int fd, Connection &conn) {
   conn.responded = true;
   // Queue the redirect and flip to EPOLLOUT to flush.
   send_redirect_(conn, host, path);
-  std::cerr << "redirect: queued 308 fd=" << fd << " host=" << host << " port=" << host_port
+  std::cerr << "• redirect: queued 308 fd=" << fd << " host=" << host << " port=" << host_port
             << " method=" << method << " path=" << path << " client_port=" << client_port << '\n';
   loop_.update_fd(fd, EventMask::Write | EventMask::Edge);
 }

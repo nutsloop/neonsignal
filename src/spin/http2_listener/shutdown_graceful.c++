@@ -21,7 +21,7 @@ void Http2Listener::shutdown_graceful() {
     loop_.remove_fd(listen_fd_);
     close(listen_fd_);
     listen_fd_ = -1;
-    std::cerr << "Listener socket closed, no longer accepting connections\n";
+    std::cerr << "• Listener socket closed, no longer accepting connections\n";
   }
 }
 

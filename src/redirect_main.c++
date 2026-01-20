@@ -113,15 +113,15 @@ int main(int argc, char *argv[]) {
     using nutsloop::ansi;
 
     // Styled error message
-    std::cerr << ansi("✗ Fatal Error").bright_red().bold().str() << "\n";
-    std::cerr << "  "
+    std::cerr << ansi("✗").bright_red().bold().str() << " Fatal\n";
+    std::cerr << ansi("↳").bright_red().str() << " "
               << ansi(ex.what()).bright_red().curly_underline().underline_color({255, 165, 0}).str()
               << "\n\n";
 
     // Show help hint
-    std::cerr << ansi("ℹ For usage information, run:").bright_cyan().str() << "\n";
-    std::cerr << "  " << ansi(argv[0]).bright_yellow().str() << " ";
-    std::cerr << ansi("--help").bright_white().str() << "\n";
+    std::cerr << ansi("▸").bright_cyan().str() << " For usage information, run:\n";
+    std::cerr << ansi("↳").bright_yellow().str() << " " << ansi(argv[0]).bright_yellow().str()
+              << " " << ansi("--help").bright_white().str() << "\n";
 
     // Clean up
     if (voltage_ptr != nullptr) {

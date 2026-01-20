@@ -10,7 +10,7 @@ void RedirectService::start() {
     return;
   }
   setup_listener_();
-  std::cerr << std::format("@{}:{}", redirect_host_, listen_port_) << std::endl;
+  std::cerr << std::format("• @{}:{}", redirect_host_, listen_port_) << std::endl;
   loop_.run();
 }
 

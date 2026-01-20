@@ -127,7 +127,7 @@ ApiHandler::ApiResponse ApiHandler::user_verify_finish(std::span<const std::uint
       return res;
     }
 
-    std::cerr << "[VERIFY] User " << email << " already verified, pre_webauthn session created\n";
+    std::cerr << "• [VERIFY] User " << email << " already verified, pre_webauthn session created\n";
 
     res.status = 200;
     res.set_session_cookie = true;
@@ -213,7 +213,7 @@ ApiHandler::ApiResponse ApiHandler::user_verify_finish(std::span<const std::uint
     return res;
   }
 
-  std::cerr << "[VERIFY] User " << email << " verified, pre_webauthn session created\n";
+  std::cerr << "✓ [VERIFY] User " << email << " verified, pre_webauthn session created\n";
 
   res.status = 200;
   std::ostringstream out;

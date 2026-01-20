@@ -37,11 +37,11 @@ bool CertManager::initialize() {
   default_cert_ = nullptr;
 
   if (!std::filesystem::is_directory(certs_root_)) {
-    std::cerr << "neonsignal->CertManager: certs directory not found: " << certs_root_ << '\n';
+    std::cerr << "✗ neonsignal->CertManager: certs directory not found: " << certs_root_ << '\n';
     return false;
   }
 
-  std::cerr << "neonsignal->CertManager scanning: " << certs_root_ << '\n';
+  std::cerr << "• neonsignal->CertManager scanning: " << certs_root_ << '\n';
 
   for (const auto &entry : std::filesystem::directory_iterator(certs_root_)) {
     if (!entry.is_directory()) {
@@ -55,7 +55,7 @@ bool CertManager::initialize() {
     auto bundle = load_certificate(entry.path(), name);
 
     if (!bundle) {
-      std::cerr << "neonsignal->CertManager: failed to load cert for " << name << '\n';
+      std::cerr << "✗ neonsignal->CertManager: failed to load cert for " << name << '\n';
       continue;
     }
 
@@ -73,13 +73,13 @@ bool CertManager::initialize() {
   }
 
   if (!default_cert_) {
-    std::cerr << "neonsignal->CertManager: WARNING - no _default certificate found\n";
+    std::cerr << "▲ neonsignal->CertManager: no _default certificate found\n";
     // Use first available cert as fallback
     if (!exact_certs_.empty()) {
       for (auto &[name, bundle] : exact_certs_) {
         if (name != "_default") {
           default_cert_ = bundle.get();
-          std::cerr << "neonsignal->CertManager: using " << name << " as fallback default\n";
+          std::cerr << "• neonsignal->CertManager: using " << name << " as fallback default\n";
           break;
         }
       }
@@ -106,8 +106,7 @@ CertManager::load_certificate(const std::filesystem::path &cert_dir, const std::
   }
 
   if (!extract_cert_info(*bundle)) {
-    std::cerr << "neonsignal->CertManager: warning - could not extract cert "
-                 "info for "
+    std::cerr << "▲ neonsignal->CertManager: could not extract cert info for "
               << domain << '\n';
   }
 
@@ -128,14 +127,14 @@ bool CertManager::configure_ssl_ctx(CertificateBundle &bundle) {
 
   // Prefer ECDHE cipher suites
   if (SSL_CTX_set_cipher_list(ctx, "ECDHE:!aNULL") != 1) {
-    std::cerr << "neonsignal->CertManager: failed to configure cipher list for " << bundle.domain
+    std::cerr << "✗ neonsignal->CertManager: failed to configure cipher list for " << bundle.domain
               << '\n';
     return false;
   }
 
   // Load certificate chain
   if (SSL_CTX_use_certificate_chain_file(ctx, bundle.cert_path.c_str()) != 1) {
-    std::cerr << "neonsignal->CertManager: failed to load certificate: " << bundle.cert_path
+    std::cerr << "✗ neonsignal->CertManager: failed to load certificate: " << bundle.cert_path
               << '\n';
     ERR_print_errors_fp(stderr);
     return false;
@@ -143,15 +142,14 @@ bool CertManager::configure_ssl_ctx(CertificateBundle &bundle) {
 
   // Load private key
   if (SSL_CTX_use_PrivateKey_file(ctx, bundle.key_path.c_str(), SSL_FILETYPE_PEM) != 1) {
-    std::cerr << "neonsignal->CertManager: failed to load private key: " << bundle.key_path << '\n';
+    std::cerr << "✗ neonsignal->CertManager: failed to load private key: " << bundle.key_path << '\n';
     ERR_print_errors_fp(stderr);
     return false;
   }
 
   // Verify key matches certificate
   if (SSL_CTX_check_private_key(ctx) != 1) {
-    std::cerr << "neonsignal->CertManager: private key does not match "
-                 "certificate for "
+    std::cerr << "✗ neonsignal->CertManager: private key does not match certificate for "
               << bundle.domain << '\n';
     return false;
   }
@@ -159,7 +157,7 @@ bool CertManager::configure_ssl_ctx(CertificateBundle &bundle) {
   // Configure ALPN for HTTP/2
   SSL_CTX_set_alpn_select_cb(ctx, select_h2_alpn, nullptr);
 
-  std::cerr << "neonsignal->CertManager: loaded certificate for " << bundle.domain << '\n';
+  std::cerr << "✓ neonsignal->CertManager: loaded certificate for " << bundle.domain << '\n';
   return true;
 }
 

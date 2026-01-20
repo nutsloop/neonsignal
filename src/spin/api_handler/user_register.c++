@@ -189,9 +189,9 @@ ApiHandler::ApiResponse ApiHandler::user_register_finish(std::span<const std::ui
   std::string token_b64 = base64url_encode(token);
 
   // Log for admin
-  std::cerr << "\n[VERIFICATION] User: " << email << "\n"
-            << "[VERIFICATION] Token: " << token_b64 << "\n"
-            << "[VERIFICATION] Verify with: curl -X POST -d '{\"token\":\"" << token_b64
+  std::cerr << "\n▸ [VERIFICATION] User: " << email << "\n"
+            << "↳ [VERIFICATION] Token: " << token_b64 << "\n"
+            << "↳ [VERIFICATION] Verify with: curl -X POST -d '{\"token\":\"" << token_b64
             << "\",\"email\":\"" << email << "\"}' https://$HOST/api/auth/user/verify\n\n";
 
   res.status = 200;

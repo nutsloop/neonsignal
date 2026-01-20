@@ -107,17 +107,23 @@ public:
   [[nodiscard]] const std::optional<std::string> &name() const;
   [[nodiscard]] const std::optional<std::string> &branch() const;
 
+  // Systemd service
+  [[nodiscard]] bool should_install_systemd_service() const;
+  [[nodiscard]] const std::optional<std::string> &systemd_service() const;
+
 private:
   static void validate_dash_format_(int argc, char *argv[]);
 
   bool show_help_{false};
   bool show_version_{false};
+  bool should_install_systemd_service_{false};
   std::optional<std::string> help_text_;
   std::optional<std::string> version_text_;
   std::optional<std::string> repo_;
   std::optional<std::string> www_root_;
   std::optional<std::string> name_;
   std::optional<std::string> branch_;
+  std::optional<std::string> systemd_service_;
 };
 
 } // namespace neonsignal

@@ -6,7 +6,7 @@
 namespace neonsignal {
 
 void EventLoop::shutdown_graceful(std::chrono::seconds timeout) {
-  std::cerr << std::format("Graceful shutdown initiated (timeout: {}s)\n",
+  std::cerr << std::format("▸ Graceful shutdown initiated (timeout: {}s)\n",
                            timeout.count());
 
   shutdown_requested_.store(true, std::memory_order_release);
@@ -20,15 +20,15 @@ void EventLoop::shutdown_graceful(std::chrono::seconds timeout) {
     // Process events with 1 second timeout
     backend_->poll(1000);
 
-    std::cerr << std::format("Draining connections... {} remaining\n",
+    std::cerr << std::format("• Draining connections... {} remaining\n",
                              active_fd_count());
   }
 
   if (active_fd_count() > 0) {
-    std::cerr << std::format("Timeout reached, {} connections force-closed\n",
+    std::cerr << std::format("▲ Timeout reached, {} connections force-closed\n",
                              active_fd_count());
   } else {
-    std::cerr << "All connections drained successfully\n";
+    std::cerr << "✓ All connections drained\n";
   }
 
   stop();
