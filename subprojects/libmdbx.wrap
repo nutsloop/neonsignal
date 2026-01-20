@@ -2,10 +2,8 @@
 url = https://github.com/erthink/libmdbx.git
 revision = stable
 depth = 1
+# Use native meson.build from packagefiles to avoid CMake 4.x bug on macOS
+patch_directory = libmdbx
 
 [provide]
 libmdbx = mdbx_dep
-
-[cmake]
-CMAKE_POLICY_DEFAULT_CMP0156 = NEW
-CMAKE_MESSAGE_LOG_LEVEL = WARNING
