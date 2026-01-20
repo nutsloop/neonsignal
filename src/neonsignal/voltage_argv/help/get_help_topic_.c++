@@ -34,8 +34,16 @@ std::string help::get_help_topic_(Topic_ topic) const {
     return target_port_();
   case Topic_::acme_webroot:
     return acme_webroot_();
+  case Topic_::repo:
+    return repo_();
+  case Topic_::install_name:
+    return install_name_();
+  case Topic_::branch:
+    return branch_();
   case Topic_::spin:
     return spin_();
+  case Topic_::install:
+    return install_();
   case Topic_::unknown:
     return unknown_();
   }

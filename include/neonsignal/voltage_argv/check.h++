@@ -35,6 +35,11 @@ public:
   [[nodiscard]] std::string redirect_host() const;
   [[nodiscard]] std::string acme_webroot() const;
 
+  // Install options
+  [[nodiscard]] std::string repo() const;
+  [[nodiscard]] std::string install_name() const;
+  [[nodiscard]] std::string branch() const;
+
 private:
   args_key_value_t_ value_;
 };

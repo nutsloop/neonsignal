@@ -6,7 +6,8 @@ void help::set_option_list_() {
   option_list_ = {{"help", Topic_::help},
                   {"version", Topic_::version},
                   {"systemd", Topic_::systemd},
-                  {"spin", Topic_::spin}};
+                  {"spin", Topic_::spin},
+                  {"install", Topic_::install}};
 
   if (mode() == Mode::server) {
     option_list_.insert({{"threads", Topic_::threads},
@@ -17,7 +18,10 @@ void help::set_option_list_() {
                          {"db-path", Topic_::db_path},
                          {"www-root", Topic_::www_root},
                          {"certs-root", Topic_::certs_root},
-                         {"working-dir", Topic_::working_dir}});
+                         {"working-dir", Topic_::working_dir},
+                         {"repo", Topic_::repo},
+                         {"name", Topic_::install_name},
+                         {"branch", Topic_::branch}});
     return;
   }
 

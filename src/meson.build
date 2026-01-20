@@ -1,16 +1,16 @@
 # Platform-specific event loop backend
 if host_machine.system() == 'darwin'
-  event_loop_backend = 'neonsignal/event_loop/darwin/backend.c++'
+  event_loop_backend = 'spin/event_loop/darwin/backend.c++'
 else
-  event_loop_backend = 'neonsignal/event_loop/linux/backend.c++'
+  event_loop_backend = 'spin/event_loop/linux/backend.c++'
 endif
 
 # Shared sources for event loop and utilities
 shared_srcs = [
   # socket_utils
-  'neonsignal/socket_utils/socket_utils.c++',
+  'spin/socket_utils/socket_utils.c++',
   # platform_utils
-  'neonsignal/platform_utils/platform_utils.c++',
+  'spin/platform_utils/platform_utils.c++',
   # event_loop backend
   event_loop_backend,
 ]
@@ -18,76 +18,76 @@ shared_srcs = [
 # neonsignal binary
 srcs = [
   'main.c++',
-  # api_handler
-  'neonsignal/api_handler.c++',
-  'neonsignal/api_handler/auth_login_finish_headers.c++',
-  'neonsignal/api_handler/auth_login_options.c++',
-  'neonsignal/api_handler/auth_user_check.c++',
-  'neonsignal/api_handler/user_register.c++',
-  'neonsignal/api_handler/user_verify.c++',
-  'neonsignal/api_handler/user_enroll.c++',
-  'neonsignal/api_handler/codex_brief.c++',
-  'neonsignal/api_handler/codex_image.c++',
-  'neonsignal/api_handler/codex_item.c++',
-  'neonsignal/api_handler/codex_list.c++',
-  'neonsignal/api_handler/codex_run_artifacts.c++',
-  'neonsignal/api_handler/codex_run_start.c++',
-  'neonsignal/api_handler/codex_run_status.c++',
-  'neonsignal/api_handler/codex_run_stderr.c++',
-  'neonsignal/api_handler/codex_run_stdout.c++',
-  'neonsignal/api_handler/cpu_stream.c++',
-  'neonsignal/api_handler/events.c++',
-  'neonsignal/api_handler/identify_api_route.c++',
-  'neonsignal/api_handler/incoming_data.c++',
-  'neonsignal/api_handler/memory_stream.c++',
-  'neonsignal/api_handler/redirect_service_stream.c++',
-  'neonsignal/api_handler/stats.c++',
-  # event_loop
-  'neonsignal/event_loop.c++',
-  'neonsignal/event_loop/add_fd.c++',
-  'neonsignal/event_loop/add_signal.c++',
-  'neonsignal/event_loop/add_timer.c++',
-  'neonsignal/event_loop/cancel_timer.c++',
-  'neonsignal/event_loop/remove_fd.c++',
-  'neonsignal/event_loop/run.c++',
-  'neonsignal/event_loop/shutdown_graceful.c++',
-  'neonsignal/event_loop/stop.c++',
-  'neonsignal/event_loop/update_fd.c++',
-  # hpack_decoder
-  'neonsignal/hpack_decoder.c++',
-  'neonsignal/hpack_decoder/decode.c++',
-  # http2_listener
-  'neonsignal/http2_listener.c++',
-  'neonsignal/http2_listener/close_connection_.c++',
-  'neonsignal/http2_listener/handle_accept_.c++',
-  'neonsignal/http2_listener/handle_connection_.c++',
-  'neonsignal/http2_listener/handle_io_.c++',
-  'neonsignal/http2_listener/helper/build_frame.c++',
-  'neonsignal/http2_listener/helper/build_response_frames.c++',
-  'neonsignal/http2_listener/helper/build_server_settings.c++',
-  'neonsignal/http2_listener/helper/build_settings_ack.c++',
-  'neonsignal/http2_listener/helper/build_window_update.c++',
-  'neonsignal/http2_listener/helper/decode_integer.c++',
-  'neonsignal/http2_listener/helper/encode_integer.c++',
-  'neonsignal/http2_listener/helper/encode_literal_header_no_index.c++',
-  'neonsignal/http2_listener/helper/encode_string.c++',
-  'neonsignal/http2_listener/helper/guess_content_type.c++',
-  'neonsignal/http2_listener/helper/load_static.c++',
-  'neonsignal/http2_listener/helper/make_listen_socket.c++',
-  'neonsignal/http2_listener/helper/read_rss_kb.c++',
-  'neonsignal/http2_listener/probe_redirect_service_.c++',
-  'neonsignal/http2_listener/register_connection_.c++',
-  'neonsignal/http2_listener/setup_listener_.c++',
-  'neonsignal/http2_listener/shutdown_graceful.c++',
-  'neonsignal/http2_listener/start.c++',
-  'neonsignal/http2_listener/start_redirect_monitor_.c++',
-  'neonsignal/http2_listener/stop_redirect_monitor_.c++',
-  # logging
+  # api_handler (spin/)
+  'spin/api_handler.c++',
+  'spin/api_handler/auth_login_finish_headers.c++',
+  'spin/api_handler/auth_login_options.c++',
+  'spin/api_handler/auth_user_check.c++',
+  'spin/api_handler/user_register.c++',
+  'spin/api_handler/user_verify.c++',
+  'spin/api_handler/user_enroll.c++',
+  'spin/api_handler/codex_brief.c++',
+  'spin/api_handler/codex_image.c++',
+  'spin/api_handler/codex_item.c++',
+  'spin/api_handler/codex_list.c++',
+  'spin/api_handler/codex_run_artifacts.c++',
+  'spin/api_handler/codex_run_start.c++',
+  'spin/api_handler/codex_run_status.c++',
+  'spin/api_handler/codex_run_stderr.c++',
+  'spin/api_handler/codex_run_stdout.c++',
+  'spin/api_handler/cpu_stream.c++',
+  'spin/api_handler/events.c++',
+  'spin/api_handler/identify_api_route.c++',
+  'spin/api_handler/incoming_data.c++',
+  'spin/api_handler/memory_stream.c++',
+  'spin/api_handler/redirect_service_stream.c++',
+  'spin/api_handler/stats.c++',
+  # event_loop (spin/)
+  'spin/event_loop.c++',
+  'spin/event_loop/add_fd.c++',
+  'spin/event_loop/add_signal.c++',
+  'spin/event_loop/add_timer.c++',
+  'spin/event_loop/cancel_timer.c++',
+  'spin/event_loop/remove_fd.c++',
+  'spin/event_loop/run.c++',
+  'spin/event_loop/shutdown_graceful.c++',
+  'spin/event_loop/stop.c++',
+  'spin/event_loop/update_fd.c++',
+  # hpack_decoder (spin/)
+  'spin/hpack_decoder.c++',
+  'spin/hpack_decoder/decode.c++',
+  # http2_listener (spin/)
+  'spin/http2_listener.c++',
+  'spin/http2_listener/close_connection_.c++',
+  'spin/http2_listener/handle_accept_.c++',
+  'spin/http2_listener/handle_connection_.c++',
+  'spin/http2_listener/handle_io_.c++',
+  'spin/http2_listener/helper/build_frame.c++',
+  'spin/http2_listener/helper/build_response_frames.c++',
+  'spin/http2_listener/helper/build_server_settings.c++',
+  'spin/http2_listener/helper/build_settings_ack.c++',
+  'spin/http2_listener/helper/build_window_update.c++',
+  'spin/http2_listener/helper/decode_integer.c++',
+  'spin/http2_listener/helper/encode_integer.c++',
+  'spin/http2_listener/helper/encode_literal_header_no_index.c++',
+  'spin/http2_listener/helper/encode_string.c++',
+  'spin/http2_listener/helper/guess_content_type.c++',
+  'spin/http2_listener/helper/load_static.c++',
+  'spin/http2_listener/helper/make_listen_socket.c++',
+  'spin/http2_listener/helper/read_rss_kb.c++',
+  'spin/http2_listener/probe_redirect_service_.c++',
+  'spin/http2_listener/register_connection_.c++',
+  'spin/http2_listener/setup_listener_.c++',
+  'spin/http2_listener/shutdown_graceful.c++',
+  'spin/http2_listener/start.c++',
+  'spin/http2_listener/start_redirect_monitor_.c++',
+  'spin/http2_listener/stop_redirect_monitor_.c++',
+  # logging (neonsignal/)
   'neonsignal/logging.c++',
-  # voltage_argv
+  # voltage_argv (neonsignal/)
   'neonsignal/voltage_argv.c++',
   'neonsignal/voltage_argv/validate_dash_format_.c++',
-  # check
+  # check (neonsignal/)
   'neonsignal/voltage_argv/check/check.c++',
   'neonsignal/voltage_argv/check/threads.c++',
   'neonsignal/voltage_argv/check/host.c++',
@@ -104,7 +104,10 @@ srcs = [
   'neonsignal/voltage_argv/check/target_port.c++',
   'neonsignal/voltage_argv/check/redirect_host.c++',
   'neonsignal/voltage_argv/check/acme_webroot.c++',
-  # help
+  'neonsignal/voltage_argv/check/repo.c++',
+  'neonsignal/voltage_argv/check/install_name.c++',
+  'neonsignal/voltage_argv/check/branch.c++',
+  # help (neonsignal/)
   'neonsignal/voltage_argv/help/help.c++',
   'neonsignal/voltage_argv/help/mode.c++',
   'neonsignal/voltage_argv/help/set_mode.c++',
@@ -133,8 +136,12 @@ srcs = [
   'neonsignal/voltage_argv/help/target_port_.c++',
   'neonsignal/voltage_argv/help/acme_webroot_.c++',
   'neonsignal/voltage_argv/help/spin_.c++',
+  'neonsignal/voltage_argv/help/install_.c++',
+  'neonsignal/voltage_argv/help/repo_.c++',
+  'neonsignal/voltage_argv/help/name_.c++',
+  'neonsignal/voltage_argv/help/branch_.c++',
   'neonsignal/voltage_argv/help/unknown_.c++',
-  # server_voltage
+  # server_voltage (neonsignal/)
   'neonsignal/server_voltage/is_systemd.c++',
   'neonsignal/server_voltage/should_show_help.c++',
   'neonsignal/server_voltage/should_show_version.c++',
@@ -149,42 +156,62 @@ srcs = [
   'neonsignal/server_voltage/www_root.c++',
   'neonsignal/server_voltage/certs_root.c++',
   'neonsignal/server_voltage/working_dir.c++',
-  # neonsignal
-  'neonsignal/neonsignal.c++',
-  # router
-  'neonsignal/router.c++',
-  'neonsignal/router/resolve.c++',
-  # server
-  'neonsignal/server/configure_credentials.c++',
-  'neonsignal/server/initialize_tls.c++',
-  'neonsignal/server/run.c++',
-  'neonsignal/server/ssl_context_deleter_operator.c++',
-  'neonsignal/server/stop.c++',
-  # thread pool
-  'neonsignal/thread_pool.c++',
-  'neonsignal/thread_pool/enqueue.c++',
-  'neonsignal/thread_pool/worker_.c++',
-  # vhost
-  'neonsignal/vhost.c++',
-  'neonsignal/vhost/resolve.c++',
-  # cert_manager
-  'neonsignal/cert_manager.c++',
-  'neonsignal/cert_manager/initialize.c++',
-  'neonsignal/cert_manager/get_context.c++',
-  # codex_runner
-  'neonsignal/codex_runner.c++',
-  'neonsignal/codex_runner/build_prompt_.c++',
-  'neonsignal/codex_runner/get_config_.c++',
-  'neonsignal/codex_runner/get_config_bool_.c++',
-  'neonsignal/codex_runner/get_config_u64_.c++',
-  'neonsignal/codex_runner/run_async_.c++',
-  'neonsignal/codex_runner/sanitize_filename_.c++',
-  'neonsignal/codex_runner/start_run.c++',
-  # database
-  'neonsignal/database/database.c++',
-  'neonsignal/database/serialization.c++',
-  # webauthn
-  'neonsignal/webauthn.c++',
+  # install_voltage (neonsignal/)
+  'neonsignal/install_voltage/repo.c++',
+  'neonsignal/install_voltage/www_root.c++',
+  'neonsignal/install_voltage/name.c++',
+  'neonsignal/install_voltage/branch.c++',
+  'neonsignal/install_voltage/should_show_help.c++',
+  'neonsignal/install_voltage/should_show_version.c++',
+  'neonsignal/install_voltage/help_text.c++',
+  'neonsignal/install_voltage/version_text.c++',
+  # neonsignal server (spin/)
+  'spin/neonsignal.c++',
+  # router (spin/)
+  'spin/router.c++',
+  'spin/router/resolve.c++',
+  # server (spin/)
+  'spin/server/configure_credentials.c++',
+  'spin/server/initialize_tls.c++',
+  'spin/server/run.c++',
+  'spin/server/ssl_context_deleter_operator.c++',
+  'spin/server/stop.c++',
+  # thread pool (spin/)
+  'spin/thread_pool.c++',
+  'spin/thread_pool/enqueue.c++',
+  'spin/thread_pool/worker_.c++',
+  # vhost (spin/)
+  'spin/vhost.c++',
+  'spin/vhost/resolve.c++',
+  # cert_manager (spin/)
+  'spin/cert_manager.c++',
+  'spin/cert_manager/initialize.c++',
+  'spin/cert_manager/get_context.c++',
+  # codex_runner (spin/)
+  'spin/codex_runner.c++',
+  'spin/codex_runner/build_prompt_.c++',
+  'spin/codex_runner/get_config_.c++',
+  'spin/codex_runner/get_config_bool_.c++',
+  'spin/codex_runner/get_config_u64_.c++',
+  'spin/codex_runner/run_async_.c++',
+  'spin/codex_runner/sanitize_filename_.c++',
+  'spin/codex_runner/start_run.c++',
+  # database (spin/)
+  'spin/database/database.c++',
+  'spin/database/serialization.c++',
+  # webauthn (spin/)
+  'spin/webauthn.c++',
+  # install command (install/)
+  'install/install_command.c++',
+  'install/install_command/run.c++',
+  'install/install_command/validate_repo_url_.c++',
+  'install/install_command/clone_repository_.c++',
+  'install/install_command/verify_clone_.c++',
+  'install/git_cloner.c++',
+  'install/git_cloner/clone_to.c++',
+  'install/git_cloner/extract_repo_name.c++',
+  'install/git_cloner/is_valid_url_.c++',
+  'install/git_cloner/execute_git_clone_.c++',
 ]
 
 # Add shared sources (platform utils, socket utils, backend)
@@ -192,23 +219,23 @@ srcs += shared_srcs
 
 # redirector binary
 redirect_srcs = [
-  # event_loop
-  'neonsignal/event_loop.c++',
-  'neonsignal/event_loop/add_fd.c++',
-  'neonsignal/event_loop/add_signal.c++',
-  'neonsignal/event_loop/add_timer.c++',
-  'neonsignal/event_loop/cancel_timer.c++',
-  'neonsignal/event_loop/remove_fd.c++',
-  'neonsignal/event_loop/run.c++',
-  'neonsignal/event_loop/shutdown_graceful.c++',
-  'neonsignal/event_loop/stop.c++',
-  'neonsignal/event_loop/update_fd.c++',
-  # logging
+  # event_loop (spin/)
+  'spin/event_loop.c++',
+  'spin/event_loop/add_fd.c++',
+  'spin/event_loop/add_signal.c++',
+  'spin/event_loop/add_timer.c++',
+  'spin/event_loop/cancel_timer.c++',
+  'spin/event_loop/remove_fd.c++',
+  'spin/event_loop/run.c++',
+  'spin/event_loop/shutdown_graceful.c++',
+  'spin/event_loop/stop.c++',
+  'spin/event_loop/update_fd.c++',
+  # logging (neonsignal/)
   'neonsignal/logging.c++',
-  # voltage_argv
+  # voltage_argv (neonsignal/)
   'neonsignal/voltage_argv.c++',
   'neonsignal/voltage_argv/validate_dash_format_.c++',
-  # check
+  # check (neonsignal/)
   'neonsignal/voltage_argv/check/check.c++',
   'neonsignal/voltage_argv/check/threads.c++',
   'neonsignal/voltage_argv/check/host.c++',
@@ -225,7 +252,10 @@ redirect_srcs = [
   'neonsignal/voltage_argv/check/target_port.c++',
   'neonsignal/voltage_argv/check/redirect_host.c++',
   'neonsignal/voltage_argv/check/acme_webroot.c++',
-  # help
+  'neonsignal/voltage_argv/check/repo.c++',
+  'neonsignal/voltage_argv/check/install_name.c++',
+  'neonsignal/voltage_argv/check/branch.c++',
+  # help (neonsignal/)
   'neonsignal/voltage_argv/help/help.c++',
   'neonsignal/voltage_argv/help/mode.c++',
   'neonsignal/voltage_argv/help/set_mode.c++',
@@ -254,8 +284,12 @@ redirect_srcs = [
   'neonsignal/voltage_argv/help/target_port_.c++',
   'neonsignal/voltage_argv/help/acme_webroot_.c++',
   'neonsignal/voltage_argv/help/spin_.c++',
+  'neonsignal/voltage_argv/help/install_.c++',
+  'neonsignal/voltage_argv/help/repo_.c++',
+  'neonsignal/voltage_argv/help/name_.c++',
+  'neonsignal/voltage_argv/help/branch_.c++',
   'neonsignal/voltage_argv/help/unknown_.c++',
-  # redirect_voltage
+  # redirect_voltage (neonsignal/)
   'neonsignal/redirect_voltage/is_systemd.c++',
   'neonsignal/redirect_voltage/should_show_help.c++',
   'neonsignal/redirect_voltage/should_show_version.c++',
@@ -266,18 +300,18 @@ redirect_srcs = [
   'neonsignal/redirect_voltage/target_port.c++',
   'neonsignal/redirect_voltage/host.c++',
   'neonsignal/redirect_voltage/acme_webroot.c++',
-  # redirect_service
-  'neonsignal/redirect_service.c++',
-  'neonsignal/redirect_service/close_connection_.c++',
-  'neonsignal/redirect_service/handle_accept_.c++',
-  'neonsignal/redirect_service/handle_io_.c++',
-  'neonsignal/redirect_service/process_buffer_.c++',
-  'neonsignal/redirect_service/register_connection_.c++',
-  'neonsignal/redirect_service/serve_acme_challenge_.c++',
-  'neonsignal/redirect_service/send_redirect_.c++',
-  'neonsignal/redirect_service/setup_listener_.c++',
-  'neonsignal/redirect_service/start.c++',
-  'neonsignal/redirect_service/stop.c++',
+  # redirect_service (spin/)
+  'spin/redirect_service.c++',
+  'spin/redirect_service/close_connection_.c++',
+  'spin/redirect_service/handle_accept_.c++',
+  'spin/redirect_service/handle_io_.c++',
+  'spin/redirect_service/process_buffer_.c++',
+  'spin/redirect_service/register_connection_.c++',
+  'spin/redirect_service/serve_acme_challenge_.c++',
+  'spin/redirect_service/send_redirect_.c++',
+  'spin/redirect_service/setup_listener_.c++',
+  'spin/redirect_service/start.c++',
+  'spin/redirect_service/stop.c++',
   'redirect_main.c++',
 ]
 

@@ -4,6 +4,8 @@
 
 #include <args.h++>
 
+#include <algorithm>
+#include <array>
 #include <cctype>
 #include <format>
 #include <stdexcept>
@@ -18,6 +20,11 @@ using namespace nutsloop::args;
 namespace {
 
 using Sequencer = sequencer<voltage_argv::check, voltage_argv::help>;
+
+template <std::size_t N>
+bool contains_arg(const std::array<std::string_view, N> &list, std::string_view value) {
+  return std::find(list.begin(), list.end(), value) != list.end();
+}
 
 // Parse version string "X.Y.Z" into version_t array {X, Y, Z}
 constexpr version_t parse_version(std::string_view version_str) {
@@ -58,24 +65,32 @@ static constexpr version_t SERVER_VERSION = parse_version(NEONSIGNAL_VERSION);
 static constexpr version_t REDIRECT_VERSION = parse_version(NEONSIGNAL_REDIRECT_VERSION);
 
 // Valid flags for neonsignal
-const args_list_t server_args_list{{"threads", "host", "port", "webauthn-domain", "webauthn-origin",
-                                    "db-path", "www-root", "certs-root", "working-dir", "systemd", "help", "?", "version", "v"}};
+constexpr std::array<std::string_view, 14> server_args_list{
+    {"threads", "host", "port", "webauthn-domain", "webauthn-origin", "db-path", "www-root",
+     "certs-root", "working-dir", "systemd", "help", "?", "version", "v"}};
 
 // Valid commands for neonsignal
-const args_list_command_t server_args_list_command{{"spin"}};
+constexpr std::array<std::string_view, 2> server_args_list_command{{"spin", "install"}};
+
+// Valid flags for install command
+constexpr std::array<std::string_view, 8> install_args_list{
+    {"repo", "www-root", "name", "branch", "help", "?", "version", "v"}};
 
 // Valid flags for neonsignal_redirect
-const args_list_t redirect_args_list{{"instances", "port", "target-port", "host", "acme-webroot",
-                                      "systemd", "help", "?", "version", "v"}};
+constexpr std::array<std::string_view, 10> redirect_args_list{
+    {"instances", "port", "target-port", "host", "acme-webroot", "systemd", "help", "?", "version",
+     "v"}};
 
 // Valid commands for neonsignal_redirect
-const args_list_command_t redirect_args_list_command{{"spin"}};
+constexpr std::array<std::string_view, 1> redirect_args_list_command{{"spin"}};
 
 std::unordered_set<std::string> server_skip_digits() {
   return {"host", "webauthn-domain", "webauthn-origin", "db-path", "www-root", "certs-root", "working-dir"};
 }
 
 std::unordered_set<std::string> redirect_skip_digits() { return {"host", "acme-webroot"}; }
+
+std::unordered_set<std::string> install_skip_digits() { return {"repo", "www-root", "name", "branch"}; }
 
 [[noreturn]] void throw_invalid(const std::string &message) {
   throw std::invalid_argument(message);
@@ -98,15 +113,14 @@ server_voltage::server_voltage(int argc, char *argv[]) {
   // Validate flags against allowed list
   const auto parsed_args = args.get_args();
   for (const auto &[key, value] : parsed_args) {
-    if (server_args_list.find(key) == server_args_list.end()) {
+    if (!contains_arg(server_args_list, key)) {
       throw_invalid(std::format("unknown flag: --{}", key));
     }
   }
 
   // Validate command against allowed list
   const auto command = args.get_command();
-  if (!command.empty() &&
-      server_args_list_command.find(command) == server_args_list_command.end()) {
+  if (!command.empty() && !contains_arg(server_args_list_command, command)) {
     throw_invalid(std::format("unknown command: '{}'", command));
   }
 
@@ -190,15 +204,14 @@ redirect_voltage::redirect_voltage(int argc, char *argv[]) {
   // Validate flags against allowed list
   const auto parsed_args = args.get_args();
   for (const auto &[key, value] : parsed_args) {
-    if (redirect_args_list.find(key) == redirect_args_list.end()) {
+    if (!contains_arg(redirect_args_list, key)) {
       throw_invalid(std::format("unknown flag: --{}", key));
     }
   }
 
   // Validate command against allowed list
   const auto command = args.get_command();
-  if (!command.empty() &&
-      redirect_args_list_command.find(command) == redirect_args_list_command.end()) {
+  if (!command.empty() && !contains_arg(redirect_args_list_command, command)) {
     throw_invalid(std::format("unknown command: '{}'", command));
   }
 
@@ -250,6 +263,70 @@ redirect_voltage::redirect_voltage(int argc, char *argv[]) {
   }
   if (args.has("acme-webroot")) {
     acme_webroot_ = args.get_option_string("acme-webroot").acme_webroot();
+  }
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// INSTALL_VOLTAGE Implementation
+// ───────────────────────────────────────────────────────────────────────────
+
+install_voltage::install_voltage(int argc, char *argv[]) {
+
+  voltage_argv::help::set_server_mode();
+  validate_dash_format_(argc, argv);
+
+  skip_digit_check_t skip{install_skip_digits()};
+  Sequencer args(argc, argv, skip, SERVER_VERSION);
+
+  // Validate flags against allowed list
+  const auto parsed_args = args.get_args();
+  for (const auto &[key, value] : parsed_args) {
+    if (!contains_arg(install_args_list, key)) {
+      throw_invalid(std::format("unknown flag: --{}", key));
+    }
+  }
+
+  // Validate command is 'install'
+  const auto command = args.get_command();
+  if (command != "install") {
+    throw_invalid("install_voltage requires 'install' command");
+  }
+
+  // Handle help
+  if (args.has("help") || args.has("?")) {
+    show_help_ = true;
+    auto topic =
+        args.get_arg<std::string>("help").value_or(args.get_arg<std::string>("?").value_or("install"));
+    auto helper = args.get_help(topic);
+    help_text_ = helper.to_string();
+    return;
+  }
+
+  // Handle version
+  if (args.has("version") || args.has("v")) {
+    show_version_ = true;
+    auto helper = args.get_help("version");
+    version_text_ = helper.to_string();
+    return;
+  }
+
+  // Parse options
+  if (args.has("repo")) {
+    repo_ = args.get_option_string("repo").repo();
+  }
+  if (args.has("www-root")) {
+    www_root_ = args.get_option_string("www-root").www_root();
+  }
+  if (args.has("name")) {
+    name_ = args.get_option_string("name").install_name();
+  }
+  if (args.has("branch")) {
+    branch_ = args.get_option_string("branch").branch();
+  }
+
+  // Validate required repo option
+  if (!repo_) {
+    throw_invalid("--repo is required for install command");
   }
 }
 

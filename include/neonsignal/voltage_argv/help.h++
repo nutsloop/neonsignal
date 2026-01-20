@@ -34,8 +34,14 @@ private:
     target_port,
     acme_webroot,
 
+    // Install options
+    repo,
+    install_name,
+    branch,
+
     // Command
     spin,
+    install,
 
     // Unknown
     unknown
@@ -82,7 +88,11 @@ private:
   [[nodiscard]] std::string instances_() const;
   [[nodiscard]] std::string target_port_() const;
   [[nodiscard]] std::string acme_webroot_() const;
+  [[nodiscard]] std::string repo_() const;
+  [[nodiscard]] std::string install_name_() const;
+  [[nodiscard]] std::string branch_() const;
   [[nodiscard]] std::string spin_() const;
+  [[nodiscard]] std::string install_() const;
   [[nodiscard]] std::string unknown_() const;
 };
 

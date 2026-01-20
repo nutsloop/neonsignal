@@ -1,6 +1,7 @@
+#include "install/install_command.h++"
 #include "neonsignal/logging.h++"
-#include "neonsignal/neonsignal.h++"
 #include "neonsignal/voltage_argv.h++"
+#include "spin/neonsignal.h++"
 
 #include <ansi.h++>
 
@@ -10,6 +11,7 @@
 #include <format>
 #include <iostream>
 #include <string>
+#include <string_view>
 
 #include <unistd.h>
 
@@ -19,97 +21,135 @@ bool env_set(const char *name) { return std::getenv(name) != nullptr; }
 
 bool port_in_range(unsigned long long value) { return value > 0 && value <= 65535; }
 
+// Check if the first non-flag argument is "install"
+bool is_install_command(int argc, char *argv[]) {
+  for (int i = 1; i < argc; ++i) {
+    std::string_view arg = argv[i];
+    // Skip flags (arguments starting with -)
+    if (arg.starts_with("-")) {
+      continue;
+    }
+    // First non-flag argument is the command
+    return arg == "install";
+  }
+  return false;
+}
+
+int run_install_command(int argc, char *argv[]) {
+  neonsignal::install_voltage voltage(argc, argv);
+
+  if (voltage.should_show_help()) {
+    if (voltage.help_text()) {
+      std::cout << *voltage.help_text() << '\n';
+    }
+    return 0;
+  }
+  if (voltage.should_show_version()) {
+    if (voltage.version_text()) {
+      std::cout << *voltage.version_text() << '\n';
+    }
+    return 0;
+  }
+
+  neonsignal::install::InstallCommand cmd(voltage);
+  return cmd.run();
+}
+
+int run_spin_command(int argc, char *argv[]) {
+  neonsignal::server_voltage voltage(argc, argv);
+
+  if (voltage.should_show_help()) {
+    if (voltage.help_text()) {
+      std::cout << *voltage.help_text() << '\n';
+    }
+    return 0;
+  }
+  if (voltage.should_show_version()) {
+    if (voltage.version_text()) {
+      std::cout << *voltage.version_text() << '\n';
+    }
+    return 0;
+  }
+
+  // Change working directory if specified (before resolving other paths)
+  // Env var takes precedence over CLI arg
+  std::string working_dir_path;
+  if (const char *env = std::getenv("NEONSIGNAL_WORKING_DIR"); env != nullptr) {
+    working_dir_path = env;
+  } else if (voltage.working_dir() && !voltage.working_dir()->empty()) {
+    working_dir_path = *voltage.working_dir();
+  }
+
+  if (!working_dir_path.empty()) {
+    std::filesystem::path path(working_dir_path);
+    if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path)) {
+      throw std::runtime_error(
+          std::format("working directory does not exist: '{}'", working_dir_path));
+    }
+    if (access(working_dir_path.c_str(), W_OK) != 0) {
+      throw std::runtime_error(
+          std::format("working directory is not writable: '{}'", working_dir_path));
+    }
+    try {
+      std::filesystem::current_path(working_dir_path);
+    } catch (const std::filesystem::filesystem_error &e) {
+      throw std::runtime_error(std::format("failed to change working directory to '{}': {}",
+                                           working_dir_path, e.what()));
+    }
+  }
+
+  neonsignal::ServerConfig config;
+
+  // Store resolved working directory in config
+  config.working_dir = std::filesystem::current_path().string();
+
+  if (!env_set("NEONSIGNAL_HOST") && voltage.host() && !voltage.host()->empty()) {
+    config.host = *voltage.host();
+  }
+  if (!env_set("NEONSIGNAL_PORT") && voltage.port() && port_in_range(*voltage.port())) {
+    config.port = static_cast<std::uint16_t>(*voltage.port());
+  }
+  if (!env_set("NEONSIGNAL_WEBAUTHN_DOMAIN") && voltage.webauthn_domain() &&
+      !voltage.webauthn_domain()->empty()) {
+    config.rp_id = *voltage.webauthn_domain();
+  }
+  if (!env_set("NEONSIGNAL_WEBAUTHN_ORIGIN") && voltage.webauthn_origin() &&
+      !voltage.webauthn_origin()->empty()) {
+    config.origin = *voltage.webauthn_origin();
+  }
+  if (!env_set("NEONSIGNAL_DB_PATH") && voltage.db_path() && !voltage.db_path()->empty()) {
+    config.db_path = *voltage.db_path();
+  }
+  if (!env_set("NEONSIGNAL_WWW_ROOT") && voltage.www_root() && !voltage.www_root()->empty()) {
+    config.www_root = *voltage.www_root();
+  }
+  if (!env_set("NEONSIGNAL_CERTS_ROOT") && voltage.certs_root() && !voltage.certs_root()->empty()) {
+    config.certs_root = *voltage.certs_root();
+  }
+
+  if (!env_set("NEONSIGNAL_THREADS") && voltage.threads() && *voltage.threads() > 0) {
+    const auto threads_value = std::to_string(*voltage.threads());
+    setenv("NEONSIGNAL_THREADS", threads_value.c_str(), 1);
+  }
+
+  neonsignal::install_thread_logging_prefix();
+  neonsignal::Server server(config);
+  server.run();
+
+  return 0;
+}
+
 } // namespace
 
 int main(int argc, char *argv[]) {
-  neonsignal::server_voltage *voltage_ptr = nullptr;
-
   try {
-    voltage_ptr = new neonsignal::server_voltage(argc, argv);
-    const neonsignal::server_voltage &voltage = *voltage_ptr;
-
-    if (voltage.should_show_help()) {
-      if (voltage.help_text()) {
-        std::cout << *voltage.help_text() << '\n';
-      }
-      delete voltage_ptr;
-      return 0;
-    }
-    if (voltage.should_show_version()) {
-      if (voltage.version_text()) {
-        std::cout << *voltage.version_text() << '\n';
-      }
-      delete voltage_ptr;
-      return 0;
+    // Check if this is an install command
+    if (is_install_command(argc, argv)) {
+      return run_install_command(argc, argv);
     }
 
-    // Change working directory if specified (before resolving other paths)
-    // Env var takes precedence over CLI arg
-    std::string working_dir_path;
-    if (const char *env = std::getenv("NEONSIGNAL_WORKING_DIR"); env != nullptr) {
-      working_dir_path = env;
-    } else if (voltage.working_dir() && !voltage.working_dir()->empty()) {
-      working_dir_path = *voltage.working_dir();
-    }
-
-    if (!working_dir_path.empty()) {
-      std::filesystem::path path(working_dir_path);
-      if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path)) {
-        throw std::runtime_error(
-            std::format("working directory does not exist: '{}'", working_dir_path));
-      }
-      if (access(working_dir_path.c_str(), W_OK) != 0) {
-        throw std::runtime_error(
-            std::format("working directory is not writable: '{}'", working_dir_path));
-      }
-      try {
-        std::filesystem::current_path(working_dir_path);
-      } catch (const std::filesystem::filesystem_error &e) {
-        throw std::runtime_error(
-            std::format("failed to change working directory to '{}': {}",
-                        working_dir_path, e.what()));
-      }
-    }
-
-    neonsignal::ServerConfig config;
-
-    // Store resolved working directory in config
-    config.working_dir = std::filesystem::current_path().string();
-
-    if (!env_set("NEONSIGNAL_HOST") && voltage.host() && !voltage.host()->empty()) {
-      config.host = *voltage.host();
-    }
-    if (!env_set("NEONSIGNAL_PORT") && voltage.port() && port_in_range(*voltage.port())) {
-      config.port = static_cast<std::uint16_t>(*voltage.port());
-    }
-    if (!env_set("NEONSIGNAL_WEBAUTHN_DOMAIN") && voltage.webauthn_domain() &&
-        !voltage.webauthn_domain()->empty()) {
-      config.rp_id = *voltage.webauthn_domain();
-    }
-    if (!env_set("NEONSIGNAL_WEBAUTHN_ORIGIN") && voltage.webauthn_origin() &&
-        !voltage.webauthn_origin()->empty()) {
-      config.origin = *voltage.webauthn_origin();
-    }
-    if (!env_set("NEONSIGNAL_DB_PATH") && voltage.db_path() && !voltage.db_path()->empty()) {
-      config.db_path = *voltage.db_path();
-    }
-    if (!env_set("NEONSIGNAL_WWW_ROOT") && voltage.www_root() && !voltage.www_root()->empty()) {
-      config.www_root = *voltage.www_root();
-    }
-    if (!env_set("NEONSIGNAL_CERTS_ROOT") && voltage.certs_root() && !voltage.certs_root()->empty()) {
-      config.certs_root = *voltage.certs_root();
-    }
-
-    if (!env_set("NEONSIGNAL_THREADS") && voltage.threads() && *voltage.threads() > 0) {
-      const auto threads_value = std::to_string(*voltage.threads());
-      setenv("NEONSIGNAL_THREADS", threads_value.c_str(), 1);
-    }
-
-    delete voltage_ptr;
-
-    neonsignal::install_thread_logging_prefix();
-    neonsignal::Server server(config);
-    server.run();
+    // Default to spin command
+    return run_spin_command(argc, argv);
   } catch (const std::exception &ex) {
     using nutsloop::ansi;
 
@@ -124,13 +164,6 @@ int main(int argc, char *argv[]) {
     std::cerr << "  " << ansi(argv[0]).bright_yellow().str() << " ";
     std::cerr << ansi("--help").bright_white().str() << "\n";
 
-    // Clean up
-    if (voltage_ptr != nullptr) {
-      delete voltage_ptr;
-    }
-
     return 1;
   }
-
-  return 0;
 }

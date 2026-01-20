@@ -87,4 +87,37 @@ private:
   std::optional<std::string> acme_webroot_;
 };
 
+// ───────────────────────────────────────────────────────────────────────────
+// INSTALL_VOLTAGE - Repository Installation Command Configuration
+// ───────────────────────────────────────────────────────────────────────────
+
+class install_voltage {
+public:
+  explicit install_voltage(int argc, char *argv[]);
+
+  // Query methods
+  [[nodiscard]] bool should_show_help() const;
+  [[nodiscard]] bool should_show_version() const;
+  [[nodiscard]] const std::optional<std::string> &help_text() const;
+  [[nodiscard]] const std::optional<std::string> &version_text() const;
+
+  // Configuration accessors
+  [[nodiscard]] const std::optional<std::string> &repo() const;
+  [[nodiscard]] const std::optional<std::string> &www_root() const;
+  [[nodiscard]] const std::optional<std::string> &name() const;
+  [[nodiscard]] const std::optional<std::string> &branch() const;
+
+private:
+  static void validate_dash_format_(int argc, char *argv[]);
+
+  bool show_help_{false};
+  bool show_version_{false};
+  std::optional<std::string> help_text_;
+  std::optional<std::string> version_text_;
+  std::optional<std::string> repo_;
+  std::optional<std::string> www_root_;
+  std::optional<std::string> name_;
+  std::optional<std::string> branch_;
+};
+
 } // namespace neonsignal

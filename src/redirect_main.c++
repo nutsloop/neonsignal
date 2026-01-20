@@ -1,6 +1,6 @@
 #include "neonsignal/logging.h++"
-#include "neonsignal/platform_utils.h++"
-#include "neonsignal/redirect_service.h++"
+#include "spin/platform_utils.h++"
+#include "spin/redirect_service.h++"
 #include "neonsignal/voltage_argv.h++"
 
 #include <ansi.h++>
