@@ -15,7 +15,9 @@ std::string help::systemd_service_() const {
       "{}\n"
       "  Install systemd service files for neonsignal and neonsignal_redirect.\n"
       "  Requires root privileges. Can be used alone (defaults) or with key:value pairs.\n\n"
-      "  ▲ Linux only; on other platforms the command exits with an error.\n\n"
+      "  ▲ Linux only when installing to /etc/systemd/system.\n"
+      "  Use --only-save to write service files to a directory instead of /etc/systemd/system.\n"
+      "  ▲ --only-save works on non-Linux platforms.\n\n"
       "{}\n"
       "  For neonsignal.service:\n"
       "    {}              User to run as (default: current user)\n"
@@ -34,6 +36,7 @@ std::string help::systemd_service_() const {
       "    {}     Listen host (default: same as host)\n"
       "    {} Path to binary (default: /usr/local/bin/neonsignal_redirect)\n\n"
       "{}\n"
+      "  {}\n"
       "  {}\n"
       "  {}\n"
       "  {}\n",
@@ -58,7 +61,8 @@ std::string help::systemd_service_() const {
       ansi("EXAMPLES").stylish().bold().str(),
       ansi("<binary> install --systemd-service").bright_yellow().str(),
       ansi("<binary> install --systemd-service='user:core|group:core'").bright_yellow().str(),
-      ansi("<binary> install --systemd-service='user:www|threads:4|port:443'").bright_yellow().str());
+      ansi("<binary> install --systemd-service='user:www|threads:4|port:443'").bright_yellow().str(),
+      ansi("<binary> install --systemd-service --only-save=./systemd").bright_yellow().str());
 }
 
 } // namespace neonsignal::voltage_argv

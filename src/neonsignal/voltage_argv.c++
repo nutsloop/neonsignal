@@ -74,8 +74,9 @@ constexpr std::array<std::string_view, 14> server_args_list{
 constexpr std::array<std::string_view, 2> server_args_list_command{{"spin", "install"}};
 
 // Valid flags for install command
-constexpr std::array<std::string_view, 9> install_args_list{
-    {"repo", "www-root", "name", "branch", "systemd-service", "help", "?", "version", "v"}};
+constexpr std::array<std::string_view, 10> install_args_list{
+    {"repo", "www-root", "name", "branch", "systemd-service", "only-save", "help", "?", "version",
+     "v"}};
 
 // Valid flags for neonsignal_redirect
 constexpr std::array<std::string_view, 10> redirect_args_list{
@@ -92,7 +93,7 @@ std::unordered_set<std::string> server_skip_digits() {
 std::unordered_set<std::string> redirect_skip_digits() { return {"host", "acme-webroot"}; }
 
 std::unordered_set<std::string> install_skip_digits() {
-  return {"repo", "www-root", "name", "branch", "systemd-service"};
+  return {"repo", "www-root", "name", "branch", "systemd-service", "only-save"};
 }
 
 [[noreturn]] void throw_invalid(const std::string &message) {
@@ -326,6 +327,21 @@ install_voltage::install_voltage(int argc, char *argv[]) {
   if (args.has("branch")) {
     branch_ = args.get_option_string("branch").branch();
   }
+  if (args.has("only-save")) {
+    auto it = parsed_args.find("only-save");
+    if (it != parsed_args.end()) {
+      if (std::holds_alternative<std::string>(it->second)) {
+        only_save_path_ = std::get<std::string>(it->second);
+        if (only_save_path_->empty()) {
+          only_save_path_ = ".";
+        }
+      } else {
+        only_save_path_ = ".";
+      }
+    } else {
+      only_save_path_ = ".";
+    }
+  }
   if (args.has("systemd-service")) {
     should_install_systemd_service_ = true;
     auto it = parsed_args.find("systemd-service");
@@ -338,6 +354,10 @@ install_voltage::install_voltage(int argc, char *argv[]) {
     } else {
       systemd_service_ = "";
     }
+  }
+
+  if (only_save_path_ && !should_install_systemd_service_) {
+    throw_invalid("--only-save requires --systemd-service");
   }
 
   if (should_install_systemd_service_ &&

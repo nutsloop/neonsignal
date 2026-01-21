@@ -27,13 +27,15 @@ struct SystemdServiceConfig {
 
 class SystemdServiceInstaller {
 public:
-  explicit SystemdServiceInstaller(const std::optional<std::string> &kvp_string);
+  SystemdServiceInstaller(const std::optional<std::string> &kvp_string,
+                          const std::optional<std::string> &only_save_path);
 
   [[nodiscard]] int install();
 
 private:
   SystemdServiceConfig config_;
   bool using_defaults_{true};
+  std::optional<std::string> only_save_path_;
 
   void populate_defaults_();
   [[nodiscard]] bool parse_kvp_(const std::string &kvp_string);

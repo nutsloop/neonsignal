@@ -108,6 +108,7 @@ srcs = [
   'neonsignal/voltage_argv/check/install_name.c++',
   'neonsignal/voltage_argv/check/branch.c++',
   'neonsignal/voltage_argv/check/systemd_service.c++',
+  'neonsignal/voltage_argv/check/only_save_path.c++',
   # help (neonsignal/)
   'neonsignal/voltage_argv/help/help.c++',
   'neonsignal/voltage_argv/help/mode.c++',
@@ -142,6 +143,7 @@ srcs = [
   'neonsignal/voltage_argv/help/name_.c++',
   'neonsignal/voltage_argv/help/branch_.c++',
   'neonsignal/voltage_argv/help/systemd_service_.c++',
+  'neonsignal/voltage_argv/help/only_save_.c++',
   'neonsignal/voltage_argv/help/unknown_.c++',
   # server_voltage (neonsignal/)
   'neonsignal/server_voltage/is_systemd.c++',
@@ -165,6 +167,7 @@ srcs = [
   'neonsignal/install_voltage/branch.c++',
   'neonsignal/install_voltage/should_install_systemd_service.c++',
   'neonsignal/install_voltage/systemd_service.c++',
+  'neonsignal/install_voltage/only_save_path.c++',
   'neonsignal/install_voltage/should_show_help.c++',
   'neonsignal/install_voltage/should_show_version.c++',
   'neonsignal/install_voltage/help_text.c++',
@@ -305,6 +308,7 @@ redirect_srcs = [
   'neonsignal/voltage_argv/help/name_.c++',
   'neonsignal/voltage_argv/help/branch_.c++',
   'neonsignal/voltage_argv/help/systemd_service_.c++',
+  'neonsignal/voltage_argv/help/only_save_.c++',
   'neonsignal/voltage_argv/help/unknown_.c++',
   # redirect_voltage (neonsignal/)
   'neonsignal/redirect_voltage/is_systemd.c++',

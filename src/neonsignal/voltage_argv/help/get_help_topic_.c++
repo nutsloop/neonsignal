@@ -42,6 +42,8 @@ std::string help::get_help_topic_(Topic_ topic) const {
     return branch_();
   case Topic_::systemd_service:
     return systemd_service_();
+  case Topic_::only_save:
+    return only_save_();
   case Topic_::spin:
     return spin_();
   case Topic_::install:

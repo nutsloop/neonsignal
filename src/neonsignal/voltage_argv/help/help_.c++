@@ -71,8 +71,9 @@ std::string help::help_() const {
       "  {}     Target directory for clone (default: ./public)\n"
       "  {}          Custom directory name for the clone\n"
       "  {}        Specific branch to clone\n"
-      "  {}   Install systemd service files (defaults when omitted; Linux only)\n"
-      "  ▲ --systemd-service exits with an error on non-Linux platforms\n\n"
+      "  {}   Install systemd service files (defaults when omitted; Linux only when installing)\n"
+      "  {}   Save service files to a directory (default: current directory; requires --systemd-service)\n"
+      "  ▲ Use --only-save to generate service files on non-Linux platforms\n\n"
       "{}\n"
       "  {}\n"
       "    {}\n"
@@ -110,9 +111,11 @@ std::string help::help_() const {
       ansi("--repo=<url>").bright_green().str(), ansi("--www-root=<path>").bright_green().str(),
       ansi("--name=<name>").bright_green().str(), ansi("--branch=<branch>").bright_green().str(),
       ansi("--systemd-service[=kvp]").bright_green().str(),
+      ansi("--only-save[=<path>]").bright_green().str(),
       ansi("Install Switch Sets:").stylish().bold().str(),
       ansi("  <binary> install").bright_yellow().str(),
       ansi("--systemd-service").bright_green().str(),
+      ansi("--only-save[=<path>]").bright_green().str(),
       ansi("  <binary> install").bright_yellow().str(),
       ansi("--repo").bright_green().str(), ansi("--www-root").bright_green().str(),
       ansi("--name").bright_green().str(), ansi("--branch").bright_green().str(),

@@ -2,6 +2,7 @@
 
 #include <ansi.h++>
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 
@@ -11,13 +12,17 @@ int SystemdServiceInstaller::install() {
   using nutsloop::ansi;
 
 #if !defined(__linux__)
-  std::cerr << ansi("✗").bright_red().bold().str()
-            << " systemd-service is only supported on Linux\n";
-  return 1;
+  if (!only_save_path_) {
+    std::cerr << ansi("✗").bright_red().bold().str()
+              << " systemd-service installs are only supported on Linux\n";
+    std::cerr << ansi("▸").bright_cyan().str()
+              << " use --only-save to generate service files on this platform\n";
+    return 1;
+  }
 #endif
 
-  // 1. Check root privileges
-  if (!check_root_privileges_()) {
+  // 1. Check root privileges (only required when installing to system paths)
+  if (!only_save_path_ && !check_root_privileges_()) {
     std::cerr << ansi("✗").bright_red().bold().str()
               << " must run as root to install systemd services\n";
     std::cerr << ansi("▸").bright_cyan().str()
@@ -39,11 +44,16 @@ int SystemdServiceInstaller::install() {
   std::string neonsignal_service = generate_neonsignal_service_();
   std::string redirect_service = generate_redirect_service_();
 
-  // 5. Write to /etc/systemd/system/
-  if (!write_service_file_("/etc/systemd/system/neonsignal.service", neonsignal_service)) {
+  // 5. Write service files
+  const std::filesystem::path output_dir =
+      only_save_path_ ? std::filesystem::path(*only_save_path_) : "/etc/systemd/system";
+  const std::filesystem::path neonsignal_path = output_dir / "neonsignal.service";
+  const std::filesystem::path redirect_path = output_dir / "neonsignal_redirect.service";
+
+  if (!write_service_file_(neonsignal_path.string(), neonsignal_service)) {
     return 1;
   }
-  if (!write_service_file_("/etc/systemd/system/neonsignal_redirect.service", redirect_service)) {
+  if (!write_service_file_(redirect_path.string(), redirect_service)) {
     return 1;
   }
 

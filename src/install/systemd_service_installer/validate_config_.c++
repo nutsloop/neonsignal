@@ -2,6 +2,7 @@
 
 #include <ansi.h++>
 
+#include <arpa/inet.h>
 #include <filesystem>
 #include <iostream>
 
@@ -34,6 +35,41 @@ bool SystemdServiceInstaller::validate_config_() const {
     std::cerr << ansi("✗").bright_red().bold().str()
               << " neonsignal_redirect executable not found: "
               << ansi(config_.redirect_exec_path).bright_red().curly_underline().str() << "\n";
+    return false;
+  }
+
+  if (only_save_path_) {
+    const std::filesystem::path output_dir(*only_save_path_);
+    if (std::filesystem::exists(output_dir) && !std::filesystem::is_directory(output_dir)) {
+      std::cerr << ansi("✗").bright_red().bold().str()
+                << " only-save path is not a directory: "
+                << ansi(output_dir.string()).bright_red().curly_underline().str() << "\n";
+      return false;
+    }
+  }
+
+  // Host validation
+  if (config_.host.empty()) {
+    std::cerr << ansi("✗").bright_red().bold().str() << " host cannot be empty\n";
+    return false;
+  }
+
+  in_addr_t addr{};
+  if (inet_pton(AF_INET, config_.host.c_str(), &addr) <= 0) {
+    std::cerr << ansi("✗").bright_red().bold().str() << " invalid host IPv4 address: "
+              << ansi(config_.host).bright_red().curly_underline().str() << "\n";
+    return false;
+  }
+
+  if (config_.redirect_host.empty()) {
+    std::cerr << ansi("✗").bright_red().bold().str() << " redirect-host cannot be empty\n";
+    return false;
+  }
+
+  if (inet_pton(AF_INET, config_.redirect_host.c_str(), &addr) <= 0) {
+    std::cerr << ansi("✗").bright_red().bold().str()
+              << " invalid redirect-host IPv4 address: "
+              << ansi(config_.redirect_host).bright_red().curly_underline().str() << "\n";
     return false;
   }
 

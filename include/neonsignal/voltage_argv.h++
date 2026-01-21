@@ -106,6 +106,7 @@ public:
   [[nodiscard]] const std::optional<std::string> &www_root() const;
   [[nodiscard]] const std::optional<std::string> &name() const;
   [[nodiscard]] const std::optional<std::string> &branch() const;
+  [[nodiscard]] const std::optional<std::string> &only_save_path() const;
 
   // Systemd service
   [[nodiscard]] bool should_install_systemd_service() const;
@@ -123,6 +124,7 @@ private:
   std::optional<std::string> www_root_;
   std::optional<std::string> name_;
   std::optional<std::string> branch_;
+  std::optional<std::string> only_save_path_;
   std::optional<std::string> systemd_service_;
 };
 

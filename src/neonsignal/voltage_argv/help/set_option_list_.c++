@@ -22,7 +22,8 @@ void help::set_option_list_() {
                          {"repo", Topic_::repo},
                          {"name", Topic_::install_name},
                          {"branch", Topic_::branch},
-                         {"systemd-service", Topic_::systemd_service}});
+                         {"systemd-service", Topic_::systemd_service},
+                         {"only-save", Topic_::only_save}});
     return;
   }
 

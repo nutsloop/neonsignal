@@ -40,6 +40,7 @@ public:
   [[nodiscard]] std::string install_name() const;
   [[nodiscard]] std::string branch() const;
   [[nodiscard]] std::string systemd_service() const;
+  [[nodiscard]] std::string only_save_path() const;
 
 private:
   args_key_value_t_ value_;

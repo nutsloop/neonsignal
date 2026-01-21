@@ -39,6 +39,7 @@ private:
     install_name,
     branch,
     systemd_service,
+    only_save,
 
     // Command
     spin,
@@ -93,6 +94,7 @@ private:
   [[nodiscard]] std::string install_name_() const;
   [[nodiscard]] std::string branch_() const;
   [[nodiscard]] std::string systemd_service_() const;
+  [[nodiscard]] std::string only_save_() const;
   [[nodiscard]] std::string spin_() const;
   [[nodiscard]] std::string install_() const;
   [[nodiscard]] std::string unknown_() const;
