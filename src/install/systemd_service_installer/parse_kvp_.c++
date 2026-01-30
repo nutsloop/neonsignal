@@ -12,6 +12,16 @@ namespace neonsignal::install {
 
 namespace {
 
+std::string trim_copy(std::string_view value) {
+  while (!value.empty() && std::isspace(static_cast<unsigned char>(value.front()))) {
+    value.remove_prefix(1);
+  }
+  while (!value.empty() && std::isspace(static_cast<unsigned char>(value.back()))) {
+    value.remove_suffix(1);
+  }
+  return std::string(value);
+}
+
 bool parse_bool(std::string_view value, std::string_view label) {
   while (!value.empty() && std::isspace(static_cast<unsigned char>(value.front()))) {
     value.remove_prefix(1);
@@ -59,8 +69,8 @@ bool SystemdServiceInstaller::parse_kvp_(const std::string &kvp_string) {
       return false;
     }
 
-    std::string key(pair.substr(0, colon_pos));
-    std::string value(pair.substr(colon_pos + 1));
+    std::string key = trim_copy(pair.substr(0, colon_pos));
+    std::string value = trim_copy(pair.substr(colon_pos + 1));
 
     if (key.empty()) {
       std::cerr << ansi("✗").bright_red().bold().str() << " empty key in pair: "
