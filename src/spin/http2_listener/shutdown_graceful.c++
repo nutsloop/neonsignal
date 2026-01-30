@@ -15,6 +15,10 @@ void Http2Listener::shutdown_graceful() {
     loop_.cancel_timer(timeout_timer_id_);
     timeout_timer_id_ = -1;
   }
+  if (mail_cookie_timer_id_ != -1) {
+    loop_.cancel_timer(mail_cookie_timer_id_);
+    mail_cookie_timer_id_ = -1;
+  }
 
   // Stop accepting new connections
   if (listen_fd_ != -1) {

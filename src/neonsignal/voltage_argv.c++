@@ -66,9 +66,12 @@ static constexpr version_t SERVER_VERSION = parse_version(NEONSIGNAL_VERSION);
 static constexpr version_t REDIRECT_VERSION = parse_version(NEONSIGNAL_REDIRECT_VERSION);
 
 // Valid flags for neonsignal
-constexpr std::array<std::string_view, 14> server_args_list{
+constexpr std::array<std::string_view, 24> server_args_list{
     {"threads", "host", "port", "webauthn-domain", "webauthn-origin", "db-path", "www-root",
-     "certs-root", "working-dir", "systemd", "help", "?", "version", "v"}};
+     "certs-root", "working-dir",
+     "mail-enabled", "mail-domains", "mail-cookie-name", "mail-cookie-ttl", "mail-url-hits",
+     "mail-from", "mail-to-extra", "mail-command", "mail-allowed-ip", "mail-save-db",
+     "systemd", "help", "?", "version", "v"}};
 
 // Valid commands for neonsignal
 constexpr std::array<std::string_view, 2> server_args_list_command{{"spin", "install"}};
@@ -87,7 +90,9 @@ constexpr std::array<std::string_view, 10> redirect_args_list{
 constexpr std::array<std::string_view, 1> redirect_args_list_command{{"spin"}};
 
 std::unordered_set<std::string> server_skip_digits() {
-  return {"host", "webauthn-domain", "webauthn-origin", "db-path", "www-root", "certs-root", "working-dir"};
+  return {"host", "webauthn-domain", "webauthn-origin", "db-path", "www-root", "certs-root",
+          "working-dir", "mail-enabled", "mail-domains", "mail-cookie-name", "mail-url-hits",
+          "mail-from", "mail-to-extra", "mail-command", "mail-allowed-ip", "mail-save-db"};
 }
 
 std::unordered_set<std::string> redirect_skip_digits() { return {"host", "acme-webroot"}; }
@@ -190,6 +195,36 @@ server_voltage::server_voltage(int argc, char *argv[]) {
   }
   if (args.has("working-dir")) {
     working_dir_ = args.get_option_string("working-dir").working_dir();
+  }
+  if (args.has("mail-enabled")) {
+    mail_enabled_ = args.get_option_string("mail-enabled").mail_enabled();
+  }
+  if (args.has("mail-domains")) {
+    mail_domains_ = args.get_option_string("mail-domains").mail_domains();
+  }
+  if (args.has("mail-cookie-name")) {
+    mail_cookie_name_ = args.get_option_string("mail-cookie-name").mail_cookie_name();
+  }
+  if (args.has("mail-cookie-ttl")) {
+    mail_cookie_ttl_ = args.get_option_uint("mail-cookie-ttl").mail_cookie_ttl();
+  }
+  if (args.has("mail-url-hits")) {
+    mail_url_hits_ = args.get_option_string("mail-url-hits").mail_url_hits();
+  }
+  if (args.has("mail-from")) {
+    mail_from_ = args.get_option_string("mail-from").mail_from();
+  }
+  if (args.has("mail-to-extra")) {
+    mail_to_extra_ = args.get_option_string("mail-to-extra").mail_to_extra();
+  }
+  if (args.has("mail-command")) {
+    mail_command_ = args.get_option_string("mail-command").mail_command();
+  }
+  if (args.has("mail-allowed-ip")) {
+    mail_allowed_ip_ = args.get_option_string("mail-allowed-ip").mail_allowed_ip();
+  }
+  if (args.has("mail-save-db")) {
+    mail_save_db_ = args.get_option_string("mail-save-db").mail_save_db();
   }
 }
 

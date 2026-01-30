@@ -22,6 +22,7 @@ enum class ApiRoute {
   CodexRunStderr,
   CodexRunArtifacts,
   IncomingData,
+  Mail,
   Stats,
   Events,
   Cpu,

@@ -53,6 +53,9 @@ ApiRoute identify_api_route(std::string_view path) {
   if (clean == routes::api::kCodexRunArtifacts) {
     return ApiRoute::CodexRunArtifacts;
   }
+  if (clean == routes::api::kMail) {
+    return ApiRoute::Mail;
+  }
   if (clean == routes::api::kIncomingData) {
     return ApiRoute::IncomingData;
   }

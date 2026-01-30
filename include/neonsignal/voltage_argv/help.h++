@@ -27,6 +27,16 @@ private:
     www_root,
     certs_root,
     working_dir,
+    mail_enabled,
+    mail_domains,
+    mail_cookie_name,
+    mail_cookie_ttl,
+    mail_url_hits,
+    mail_from,
+    mail_to_extra,
+    mail_command,
+    mail_allowed_ip,
+    mail_save_db,
     systemd,
 
     // Redirect options
@@ -86,6 +96,16 @@ private:
   [[nodiscard]] std::string www_root_() const;
   [[nodiscard]] std::string certs_root_() const;
   [[nodiscard]] std::string working_dir_() const;
+  [[nodiscard]] std::string mail_enabled_() const;
+  [[nodiscard]] std::string mail_domains_() const;
+  [[nodiscard]] std::string mail_cookie_name_() const;
+  [[nodiscard]] std::string mail_cookie_ttl_() const;
+  [[nodiscard]] std::string mail_url_hits_() const;
+  [[nodiscard]] std::string mail_from_() const;
+  [[nodiscard]] std::string mail_to_extra_() const;
+  [[nodiscard]] std::string mail_command_() const;
+  [[nodiscard]] std::string mail_allowed_ip_() const;
+  [[nodiscard]] std::string mail_save_db_() const;
   [[nodiscard]] std::string systemd_() const;
   [[nodiscard]] std::string instances_() const;
   [[nodiscard]] std::string target_port_() const;

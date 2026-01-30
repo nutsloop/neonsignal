@@ -34,6 +34,7 @@ constexpr std::string_view kCodexRunStatus = "/api/codex/run/status";
 constexpr std::string_view kCodexRunStdout = "/api/codex/run/stdout";
 constexpr std::string_view kCodexRunStderr = "/api/codex/run/stderr";
 constexpr std::string_view kCodexRunArtifacts = "/api/codex/run/artifacts";
+constexpr std::string_view kMail = "/api/mail";
 constexpr std::string_view kIncomingData = "/api/incoming_data";
 constexpr std::string_view kStats = "/api/stats";
 constexpr std::string_view kEvents = "/api/events";

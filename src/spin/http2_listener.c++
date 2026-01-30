@@ -3,6 +3,8 @@
 #include "spin/api_handler.h++"
 #include "spin/event_loop.h++"
 #include "spin/http2_listener_helpers.h++"
+#include "spin/mail_cookie_store.h++"
+#include "spin/mail_service.h++"
 
 #include <csignal>
 #include <stdexcept>
@@ -23,10 +25,14 @@ Http2Listener::Http2Listener(EventLoop& loop, ThreadPool& pool, SSL_CTX* ssl_ctx
       session_cache_(std::make_unique<SessionCache>()),
       sse_broadcaster_(std::make_unique<SSEBroadcaster>()),
       db_(std::make_unique<Database>(config_.db_path)),
+      mail_service_(std::make_unique<MailService>(*db_, config_.mail)),
+      mail_cookie_store_(std::make_unique<MailCookieStore>(config_.mail)),
       auth_(config_.rp_id, config_.origin, *db_),
       api_handler_(std::make_unique<ApiHandler>(loop_, auth_, router_, *db_,
                                                 served_files_, page_views_, event_clients_,
-                                                redirect_service_ok_)),
+                                                redirect_service_ok_,
+                                                *mail_service_, *mail_cookie_store_,
+                                                config_.mail)),
       vhost_resolver_(config_.www_root) {
   if (!ssl_ctx_) {
     throw std::runtime_error("Http2Listener requires a valid SSL_CTX");

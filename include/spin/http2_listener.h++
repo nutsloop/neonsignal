@@ -85,6 +85,7 @@ struct Http2Connection {
     bool is_user_register{false};
     bool is_user_verify{false};
     bool is_user_enroll{false};
+    bool is_mail_send{false};
     std::uint64_t session_user_id{0};
     std::vector<std::uint8_t> body;
     std::string file_rel_path;
@@ -96,6 +97,8 @@ struct Http2Connection {
     bool write_failed{false};
     std::string content_type;
     bool is_codex{false};
+    std::string mail_cookie_code;
+    std::string client_ip;
   };
   std::unordered_map<std::uint32_t, StreamState> streams;
 };
@@ -114,6 +117,8 @@ namespace neonsignal {
 class EventLoop;
 class ThreadPool;
 class ApiHandler;
+class MailService;
+class MailCookieStore;
 
 struct SSEResetPolicy {
   enum class Mode { OnlyTime, OnlyCount, Both };
@@ -171,11 +176,14 @@ private:
   std::unique_ptr<SessionCache> session_cache_;
   std::unique_ptr<SSEBroadcaster> sse_broadcaster_;
   std::unique_ptr<Database> db_;
+  std::unique_ptr<MailService> mail_service_;
+  std::unique_ptr<MailCookieStore> mail_cookie_store_;
 
   std::atomic<bool> redirect_service_ok_{false};
   int redirect_probe_port_{9090};
   int redirect_timer_id_{-1};
   int timeout_timer_id_{-1};
+  int mail_cookie_timer_id_{-1};
   WebAuthnManager auth_;
   std::unique_ptr<ApiHandler> api_handler_;
   VHostResolver vhost_resolver_;

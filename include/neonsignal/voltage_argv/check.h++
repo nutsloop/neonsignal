@@ -24,6 +24,16 @@ public:
   [[nodiscard]] std::string www_root() const;
   [[nodiscard]] std::string certs_root() const;
   [[nodiscard]] std::string working_dir() const;
+  [[nodiscard]] bool mail_enabled() const;
+  [[nodiscard]] std::string mail_domains() const;
+  [[nodiscard]] std::string mail_cookie_name() const;
+  [[nodiscard]] unsigned long long mail_cookie_ttl() const;
+  [[nodiscard]] std::string mail_url_hits() const;
+  [[nodiscard]] std::string mail_from() const;
+  [[nodiscard]] std::string mail_to_extra() const;
+  [[nodiscard]] std::string mail_command() const;
+  [[nodiscard]] std::string mail_allowed_ip() const;
+  [[nodiscard]] bool mail_save_db() const;
 
   // shared
   [[nodiscard]] bool systemd() const;

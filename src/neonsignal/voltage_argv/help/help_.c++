@@ -67,6 +67,17 @@ std::string help::help_() const {
       "  {}   Working directory for resolving paths\n"
       "  {}               Run in systemd mode (bypasses 'spin' requirement)\n\n"
       "{}\n"
+      "  {}        Enable or disable mail API (default: false)\n"
+      "  {}       Allowed mail domains (comma-separated)\n"
+      "  {}   Mail cookie name\n"
+      "  {}   Mail cookie TTL in seconds\n"
+      "  {}     URL paths that set the mail cookie\n"
+      "  {}          From addresses (comma-separated)\n"
+      "  {}      Extra recipients (comma-separated)\n"
+      "  {}        Mail command to execute\n"
+      "  {}     Allowed IP address (optional)\n"
+      "  {}        Save mail submissions to DB\n\n"
+      "{}\n"
       "  {}         Git repository URL (required unless --systemd-service is used)\n"
       "  {}     Target directory for clone (default: ./public)\n"
       "  {}          Custom directory name for the clone\n"
@@ -91,7 +102,11 @@ std::string help::help_() const {
       "    NEONSIGNAL_THREADS, NEONSIGNAL_HOST, NEONSIGNAL_PORT\n"
       "    NEONSIGNAL_WEBAUTHN_DOMAIN, NEONSIGNAL_WEBAUTHN_ORIGIN\n"
       "    NEONSIGNAL_DB_PATH, NEONSIGNAL_WWW_ROOT, NEONSIGNAL_CERTS_ROOT\n"
-      "    NEONSIGNAL_WORKING_DIR\n\n"
+      "    NEONSIGNAL_WORKING_DIR\n"
+      "    NEONSIGNAL_MAIL_ENABLED, NEONSIGNAL_MAIL_DOMAINS, NEONSIGNAL_MAIL_COOKIE_NAME\n"
+      "    NEONSIGNAL_MAIL_COOKIE_TTL, NEONSIGNAL_MAIL_URL_HITS, NEONSIGNAL_MAIL_FROM\n"
+      "    NEONSIGNAL_MAIL_TO_EXTRA, NEONSIGNAL_MAIL_COMMAND, NEONSIGNAL_MAIL_ALLOWED_IP\n"
+      "    NEONSIGNAL_MAIL_SAVE_DB\n\n"
       "{}\n"
       "  {} spin --host=0.0.0.0 --port=9443\n"
       "  {} install --repo=https://github.com/user/repo.git\n"
@@ -107,6 +122,17 @@ std::string help::help_() const {
       ansi("--db-path=<path>").bright_green().str(), ansi("--www-root=<path>").bright_green().str(),
       ansi("--certs-root=<path>").bright_green().str(), ansi("--working-dir=<path>").bright_green().str(),
       ansi("--systemd").bright_green().str(),
+      ansi("Mail Options:").stylish().bold().str(),
+      ansi("--mail-enabled=<bool>").bright_green().str(),
+      ansi("--mail-domains=<list>").bright_green().str(),
+      ansi("--mail-cookie-name=<name>").bright_green().str(),
+      ansi("--mail-cookie-ttl=<seconds>").bright_green().str(),
+      ansi("--mail-url-hits=<list>").bright_green().str(),
+      ansi("--mail-from=<list>").bright_green().str(),
+      ansi("--mail-to-extra=<list>").bright_green().str(),
+      ansi("--mail-command=<cmd>").bright_green().str(),
+      ansi("--mail-allowed-ip=<ip>").bright_green().str(),
+      ansi("--mail-save-db=<bool>").bright_green().str(),
       ansi("Install Options:").stylish().bold().str(),
       ansi("--repo=<url>").bright_green().str(), ansi("--www-root=<path>").bright_green().str(),
       ansi("--name=<name>").bright_green().str(), ansi("--branch=<branch>").bright_green().str(),

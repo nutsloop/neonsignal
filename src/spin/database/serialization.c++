@@ -361,4 +361,41 @@ std::optional<CodexRun> codex_run_from_json(std::string_view json) {
   return run;
 }
 
+std::string mail_submission_to_json(const MailSubmission& submission) {
+  std::ostringstream out;
+  out << "{";
+  out << "\"n\":" << submission.n << ",";
+  out << "\"id\":\"" << json_escape(submission.id) << "\",";
+  out << "\"ip\":\"" << json_escape(submission.ip) << "\",";
+  out << "\"date\":" << static_cast<std::uint64_t>(submission.date) << ",";
+  out << "\"form\":\"" << json_escape(submission.form) << "\",";
+  out << "\"from\":\"" << json_escape(submission.from) << "\",";
+  out << "\"to\":\"" << json_escape(submission.to) << "\",";
+  out << "\"subject\":\"" << json_escape(submission.subject) << "\",";
+  out << "\"body\":\"" << json_escape(submission.body) << "\",";
+  out << "\"status\":\"" << json_escape(submission.status) << "\"";
+  out << "}";
+  return out.str();
+}
+
+std::optional<MailSubmission> mail_submission_from_json(std::string_view json) {
+  MailSubmission submission;
+  auto n = extract_json_u64(json, "n");
+  auto date = extract_json_u64(json, "date");
+  submission.id = extract_json_string(json, "id");
+  submission.ip = extract_json_string(json, "ip");
+  submission.form = extract_json_string(json, "form");
+  submission.from = extract_json_string(json, "from");
+  submission.to = extract_json_string(json, "to");
+  submission.subject = extract_json_string(json, "subject");
+  submission.body = extract_json_string(json, "body");
+  submission.status = extract_json_string(json, "status");
+  if (!n || submission.id.empty()) {
+    return std::nullopt;
+  }
+  submission.n = *n;
+  submission.date = date ? static_cast<std::time_t>(*date) : 0;
+  return submission;
+}
+
 } // namespace neonsignal::db

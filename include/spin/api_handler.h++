@@ -1,8 +1,11 @@
 #pragma once
 
 #include "spin/http2_listener.h++"
-#include "spin/database.h++"
 #include "spin/codex_runner.h++"
+#include "spin/database.h++"
+#include "spin/mail_config.h++"
+#include "spin/mail_cookie_store.h++"
+#include "spin/mail_service.h++"
 
 #include <atomic>
 #include <memory>
@@ -27,7 +30,10 @@ public:
              std::atomic<std::uint64_t>& served_files,
              std::atomic<std::uint64_t>& page_views,
              std::atomic<std::uint64_t>& event_clients,
-             std::atomic<bool>& redirect_ok);
+             std::atomic<bool>& redirect_ok,
+             MailService& mail_service,
+             MailCookieStore& mail_cookie_store,
+             const MailConfig& mail_config);
 
   bool auth_login_options(const std::shared_ptr<Http2Connection>& conn,
                                  std::uint32_t stream_id);
@@ -85,6 +91,15 @@ public:
                             std::uint32_t stream_id, const std::string& method,
                             const std::string& upload_header_name,
                             const std::string& path);
+  bool mail_send_headers(const std::shared_ptr<Http2Connection>& conn,
+                         std::uint32_t stream_id,
+                         const std::unordered_map<std::string, std::string>& headers,
+                         const std::string& path,
+                         const std::string& method,
+                         const std::string& authority);
+  ApiResponse mail_send_finish(const std::string& client_ip,
+                               std::span<const std::uint8_t> payload,
+                               const std::string& cookie_code);
   bool stats(const std::shared_ptr<Http2Connection>& conn,
                     std::uint32_t stream_id, const std::string& path,
                     const std::string& method, const std::string& authority);
@@ -115,6 +130,9 @@ private:
   std::atomic<std::uint64_t>& event_clients_;
   std::atomic<bool>& redirect_service_ok_;
   CodexRunner codex_runner_;
+  MailService& mail_service_;
+  MailCookieStore& mail_cookie_store_;
+  const MailConfig& mail_config_;
 };
 
 } // namespace neonsignal

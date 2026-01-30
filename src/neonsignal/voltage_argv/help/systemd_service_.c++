@@ -29,6 +29,16 @@ std::string help::systemd_service_() const {
       "    {}    WebAuthn RP ID domain (optional)\n"
       "    {}    WebAuthn origin URL (optional)\n"
       "    {}         Path to neonsignal binary (default: /usr/local/bin/neonsignal)\n\n"
+      "    {}        Enable mail API (required if any mail keys are set)\n"
+      "    {}       Mail allowed domains (comma-separated)\n"
+      "    {}   Mail cookie name\n"
+      "    {}   Mail cookie TTL in seconds\n"
+      "    {}     Mail cookie URL hits\n"
+      "    {}          Mail from addresses\n"
+      "    {}      Mail extra recipients\n"
+      "    {}        Mail command\n"
+      "    {}     Mail allowed IP\n"
+      "    {}        Mail save DB\n\n"
       "  For neonsignal_redirect.service:\n"
       "    {} Number of redirect workers (default: 3)\n"
       "    {}     Listen port (default: 9090)\n"
@@ -53,6 +63,16 @@ std::string help::systemd_service_() const {
       ansi("webauthn-domain").bright_cyan().str(),
       ansi("webauthn-origin").bright_cyan().str(),
       ansi("exec-path").bright_cyan().str(),
+      ansi("mail-enabled").bright_cyan().str(),
+      ansi("mail-domains").bright_cyan().str(),
+      ansi("mail-cookie-name").bright_cyan().str(),
+      ansi("mail-cookie-ttl").bright_cyan().str(),
+      ansi("mail-url-hits").bright_cyan().str(),
+      ansi("mail-from").bright_cyan().str(),
+      ansi("mail-to-extra").bright_cyan().str(),
+      ansi("mail-command").bright_cyan().str(),
+      ansi("mail-allowed-ip").bright_cyan().str(),
+      ansi("mail-save-db").bright_cyan().str(),
       ansi("redirect-instances").bright_cyan().str(),
       ansi("redirect-port").bright_cyan().str(),
       ansi("redirect-target-port").bright_cyan().str(),
@@ -62,6 +82,7 @@ std::string help::systemd_service_() const {
       ansi("<binary> install --systemd-service").bright_yellow().str(),
       ansi("<binary> install --systemd-service='user:core|group:core'").bright_yellow().str(),
       ansi("<binary> install --systemd-service='user:www|threads:4|port:443'").bright_yellow().str(),
+      ansi("<binary> install --systemd-service='mail-enabled:true|mail-domains:example.com|mail-from:noreply@example.com'").bright_yellow().str(),
       ansi("<binary> install --systemd-service --only-save=./systemd").bright_yellow().str());
 }
 

@@ -3,6 +3,7 @@
 #include "spin/event_mask.h++"
 
 #include "spin/http2_listener_helpers.h++"
+#include "spin/mail_cookie_store.h++"
 
 #include <filesystem>
 #include <iostream>
@@ -29,6 +30,40 @@ void Http2Listener::start() {
     std::cerr << "• neonsignal->No virtual hosts configured (single-root mode)\n";
   }
 
+  std::cerr << "• mail: /api/mail " << (config_.mail.enabled ? "enabled" : "disabled");
+  if (config_.mail.enabled) {
+    std::cerr << " domains=";
+    if (config_.mail.allowed_domains.empty()) {
+      std::cerr << "none";
+    } else {
+      for (std::size_t i = 0; i < config_.mail.allowed_domains.size(); ++i) {
+        if (i > 0) {
+          std::cerr << ",";
+        }
+        std::cerr << config_.mail.allowed_domains[i];
+      }
+    }
+    std::cerr << " cmd=" << config_.mail.mail_command
+              << " cookie=" << config_.mail.cookie_name
+              << " ttl=" << config_.mail.cookie_lifespan.count() << "s"
+              << " url_hits=";
+    if (config_.mail.url_hits.empty()) {
+      std::cerr << "none";
+    } else {
+      for (std::size_t i = 0; i < config_.mail.url_hits.size(); ++i) {
+        if (i > 0) {
+          std::cerr << ",";
+        }
+        std::cerr << config_.mail.url_hits[i];
+      }
+    }
+    if (!config_.mail.allowed_ip_address.empty()) {
+      std::cerr << " allow_ip=" << config_.mail.allowed_ip_address;
+    }
+    std::cerr << " save_db=" << (config_.mail.save_to_database ? "true" : "false");
+  }
+  std::cerr << '\n';
+
   loop_.add_fd(listen_fd_, EventMask::Read, [this](std::uint32_t events) {
     if (events & (EventMask::Error | EventMask::HangUp)) {
       std::cerr << "▲ Listener socket fault/hup\n";
@@ -45,6 +80,12 @@ void Http2Listener::start() {
     for (int fd : timed_out) {
       std::cerr << "▲ Connection timeout, closing fd=" << fd << '\n';
       close_connection_(fd);
+    }
+  });
+
+  mail_cookie_timer_id_ = loop_.add_timer(std::chrono::seconds(60), [this]() {
+    if (mail_cookie_store_) {
+      mail_cookie_store_->cleanup_expired();
     }
   });
 

@@ -5,20 +5,28 @@
 #include "spin/http2_listener_api.h++"
 #include "spin/http2_listener_helpers.h++"
 #include "spin/routes.h++"
+#include "spin/mail_config.h++"
+#include "spin/mail_cookie_store.h++"
 
 #if defined(__GLIBC__)
 #include <malloc.h>
 #endif
 #include <openssl/ssl.h>
 
+#include <algorithm>
+#include <arpa/inet.h>
 #include <atomic>
 #include <chrono>
+#include <cctype>
 #include <cstring>
 #include <ctime>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <optional>
+#include <netinet/in.h>
+#include <sys/socket.h>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -47,6 +55,62 @@ extract_cookie(const std::unordered_map<std::string, std::string> &headers, std:
     end = cookie.size();
   }
   return std::string(cookie.substr(pos, end - pos));
+}
+
+std::string normalize_authority(std::string_view authority) {
+  if (const auto pos = authority.find(':'); pos != std::string_view::npos) {
+    authority = authority.substr(0, pos);
+  }
+  std::string out(authority);
+  std::transform(out.begin(), out.end(), out.begin(),
+                 [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+  return out;
+}
+
+bool is_allowed_mail_domain(std::string_view authority, const MailConfig& config) {
+  if (authority.empty()) {
+    return false;
+  }
+  if (!config.enabled || config.allowed_domains.empty()) {
+    return false;
+  }
+  auto domain = normalize_authority(authority);
+  std::string raw(authority);
+  std::transform(raw.begin(), raw.end(), raw.begin(),
+                 [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+  for (const auto& allowed_value : config.allowed_domains) {
+    std::string allowed = allowed_value;
+    std::transform(allowed.begin(), allowed.end(), allowed.begin(),
+                   [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    if (raw == allowed || domain == allowed) {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::string get_client_ip(int fd) {
+  sockaddr_storage addr{};
+  socklen_t len = sizeof(addr);
+  if (getpeername(fd, reinterpret_cast<sockaddr*>(&addr), &len) != 0) {
+    return {};
+  }
+
+  char buf[INET6_ADDRSTRLEN] = {};
+  if (addr.ss_family == AF_INET) {
+    const auto* in = reinterpret_cast<const sockaddr_in*>(&addr);
+    if (!inet_ntop(AF_INET, &in->sin_addr, buf, sizeof(buf))) {
+      return {};
+    }
+  } else if (addr.ss_family == AF_INET6) {
+    const auto* in6 = reinterpret_cast<const sockaddr_in6*>(&addr);
+    if (!inet_ntop(AF_INET6, &in6->sin6_addr, buf, sizeof(buf))) {
+      return {};
+    }
+  } else {
+    return {};
+  }
+  return std::string(buf);
 }
 
 } // namespace
@@ -369,6 +433,10 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
           case ApiRoute::CodexRunArtifacts:
             handled_api = api_handler_->codex_run_artifacts(conn, stream_id, path);
             break;
+          case ApiRoute::Mail:
+            handled_api = api_handler_->mail_send_headers(conn, stream_id, header_map, path, method,
+                                                          authority);
+            break;
           case ApiRoute::IncomingData:
             handled_api =
                 api_handler_->incoming_data(conn, stream_id, method, upload_header_name, path);
@@ -460,8 +528,51 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
             }
           }
 
+          std::vector<std::pair<std::string, std::string>> extra_headers;
+          if (res.status == 200 && is_html &&
+              is_allowed_mail_domain(authority, config_.mail)) {
+            bool should_set_mail_cookie = false;
+            std::string_view cookie_path(path);
+            if (auto query = cookie_path.find('?'); query != std::string_view::npos) {
+              cookie_path = cookie_path.substr(0, query);
+            }
+            for (const auto& url_hit : config_.mail.url_hits) {
+              std::string_view hit(url_hit);
+              if (!hit.empty() && hit.front() != '/') {
+                std::string with_slash = std::string("/") + std::string(hit);
+                if (cookie_path == with_slash) {
+                  should_set_mail_cookie = true;
+                  break;
+                }
+              }
+              if (cookie_path == hit) {
+                should_set_mail_cookie = true;
+                break;
+              }
+            }
+            if (should_set_mail_cookie && mail_cookie_store_) {
+              auto client_ip = get_client_ip(conn->fd);
+              if (!client_ip.empty()) {
+                auto cookie_code = mail_cookie_store_->generate_and_store(client_ip);
+                if (!cookie_code.empty()) {
+                  std::string cookie_header = std::format(
+                      "{}={}; Path=/; Max-Age={}; Secure; SameSite=Lax",
+                      config_.mail.cookie_name,
+                      cookie_code,
+                      config_.mail.cookie_lifespan.count());
+                  extra_headers.emplace_back("set-cookie", std::move(cookie_header));
+                }
+              }
+            }
+          }
+
           // as you can see anytime the path:/upload goes it returns a 404 cause file is not there
-          build_response_frames(conn->write_buf, stream_id, res.status, res.content_type, res.body);
+          if (extra_headers.empty()) {
+            build_response_frames(conn->write_buf, stream_id, res.status, res.content_type, res.body);
+          } else {
+            build_response_frames_with_headers(conn->write_buf, stream_id, res.status,
+                                               res.content_type, extra_headers, res.body);
+          }
           if (res.status == 200 && is_html) {
             ++page_views_;
           }
@@ -680,6 +791,12 @@ void Http2Listener::handle_io_(const std::shared_ptr<Http2Connection> &conn, std
                   }
                 }
               }
+            } else if (st.is_mail_send) {
+              auto response = api_handler_->mail_send_finish(st.client_ip, st.body,
+                                                            st.mail_cookie_code);
+              status = response.status;
+              content_type = response.content_type;
+              body_bytes = std::move(response.body);
             } else if (st.is_codex) {
               auto ct = st.content_type.empty() ? "application/octet-stream"
                                                 : std::string_view(st.content_type);

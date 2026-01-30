@@ -16,6 +16,16 @@ struct SystemdServiceConfig {
   std::optional<std::string> webauthn_domain;
   std::optional<std::string> webauthn_origin;
   std::string exec_path{"/usr/local/bin/neonsignal"};
+  std::optional<bool> mail_enabled;
+  std::optional<std::string> mail_domains;
+  std::optional<std::string> mail_cookie_name;
+  std::optional<unsigned long long> mail_cookie_ttl;
+  std::optional<std::string> mail_url_hits;
+  std::optional<std::string> mail_from;
+  std::optional<std::string> mail_to_extra;
+  std::optional<std::string> mail_command;
+  std::optional<std::string> mail_allowed_ip;
+  std::optional<bool> mail_save_db;
 
   // neonsignal_redirect.service properties
   unsigned long long redirect_instances{3};

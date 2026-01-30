@@ -1,9 +1,11 @@
 #pragma once
 
+#include "spin/mail_config.h++"
+
+#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <atomic>
 
 #include <openssl/ssl.h>
 
@@ -24,6 +26,7 @@ struct ServerConfig {
   std::string origin = "https://neonsignal.nutsloop.host";
   std::string db_path = "data/neonsignal.mdb";
   std::string working_dir;
+  MailConfig mail;
 };
 
 class Server {

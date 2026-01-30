@@ -26,6 +26,26 @@ std::string help::get_help_topic_(Topic_ topic) const {
     return certs_root_();
   case Topic_::working_dir:
     return working_dir_();
+  case Topic_::mail_enabled:
+    return mail_enabled_();
+  case Topic_::mail_domains:
+    return mail_domains_();
+  case Topic_::mail_cookie_name:
+    return mail_cookie_name_();
+  case Topic_::mail_cookie_ttl:
+    return mail_cookie_ttl_();
+  case Topic_::mail_url_hits:
+    return mail_url_hits_();
+  case Topic_::mail_from:
+    return mail_from_();
+  case Topic_::mail_to_extra:
+    return mail_to_extra_();
+  case Topic_::mail_command:
+    return mail_command_();
+  case Topic_::mail_allowed_ip:
+    return mail_allowed_ip_();
+  case Topic_::mail_save_db:
+    return mail_save_db_();
   case Topic_::systemd:
     return systemd_();
   case Topic_::instances:

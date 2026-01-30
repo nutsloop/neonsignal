@@ -88,6 +88,19 @@ struct CodexRun {
   std::uint64_t artifact_count{};
 };
 
+struct MailSubmission {
+  std::uint64_t n{};
+  std::string id;
+  std::string ip;
+  std::time_t date{};
+  std::string form;
+  std::string from;
+  std::string to;
+  std::string subject;
+  std::string body;
+  std::string status;
+};
+
 class Database {
 public:
   explicit Database(std::string_view path);
@@ -156,6 +169,12 @@ public:
   bool store_codex_run_artifacts(std::string_view run_id, std::string_view artifacts_json);
   std::optional<std::string> fetch_codex_run_artifacts(std::string_view run_id);
 
+  bool create_mail_submission(const MailSubmission& submission);
+  std::optional<MailSubmission> fetch_mail_submission(std::string_view id);
+  std::optional<MailSubmission> fetch_mail_submission_by_n(std::uint64_t n);
+  std::uint64_t get_next_mail_submission_n();
+  bool update_mail_submission_status(std::string_view id, std::string_view status);
+
   std::optional<std::string> get_config(std::string_view key);
   bool set_config(std::string_view key, std::string_view value);
   bool delete_config(std::string_view key);
@@ -180,6 +199,8 @@ private:
   mdbx::map_handle codex_run_stdout_map_;
   mdbx::map_handle codex_run_stderr_map_;
   mdbx::map_handle codex_run_artifacts_map_;
+  mdbx::map_handle mail_submissions_map_;
+  mdbx::map_handle mail_submission_n_map_;
 };
 
 } // namespace neonsignal

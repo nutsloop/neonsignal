@@ -30,6 +30,16 @@ public:
   [[nodiscard]] const std::optional<std::string> &www_root() const;
   [[nodiscard]] const std::optional<std::string> &certs_root() const;
   [[nodiscard]] const std::optional<std::string> &working_dir() const;
+  [[nodiscard]] const std::optional<bool> &mail_enabled() const;
+  [[nodiscard]] const std::optional<std::string> &mail_domains() const;
+  [[nodiscard]] const std::optional<std::string> &mail_cookie_name() const;
+  [[nodiscard]] const std::optional<unsigned long long> &mail_cookie_ttl() const;
+  [[nodiscard]] const std::optional<std::string> &mail_url_hits() const;
+  [[nodiscard]] const std::optional<std::string> &mail_from() const;
+  [[nodiscard]] const std::optional<std::string> &mail_to_extra() const;
+  [[nodiscard]] const std::optional<std::string> &mail_command() const;
+  [[nodiscard]] const std::optional<std::string> &mail_allowed_ip() const;
+  [[nodiscard]] const std::optional<bool> &mail_save_db() const;
 
 private:
   static void validate_dash_format_(int argc, char *argv[]);
@@ -48,6 +58,16 @@ private:
   std::optional<std::string> www_root_;
   std::optional<std::string> certs_root_;
   std::optional<std::string> working_dir_;
+  std::optional<bool> mail_enabled_;
+  std::optional<std::string> mail_domains_;
+  std::optional<std::string> mail_cookie_name_;
+  std::optional<unsigned long long> mail_cookie_ttl_;
+  std::optional<std::string> mail_url_hits_;
+  std::optional<std::string> mail_from_;
+  std::optional<std::string> mail_to_extra_;
+  std::optional<std::string> mail_command_;
+  std::optional<std::string> mail_allowed_ip_;
+  std::optional<bool> mail_save_db_;
 };
 
 // ───────────────────────────────────────────────────────────────────────────

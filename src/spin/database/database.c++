@@ -21,6 +21,8 @@ std::string codex_to_json(const CodexRecord& record);
 std::optional<CodexRecord> codex_from_json(std::string_view json);
 std::string codex_run_to_json(const CodexRun& run);
 std::optional<CodexRun> codex_run_from_json(std::string_view json);
+std::string mail_submission_to_json(const MailSubmission& submission);
+std::optional<MailSubmission> mail_submission_from_json(std::string_view json);
 } // namespace db
 
 namespace {
@@ -71,7 +73,7 @@ Database::Database(std::string_view path)
   }
   mdbx::env_managed::create_parameters create_params{};
   mdbx::env::operate_parameters operate_params{};
-  operate_params.max_maps = 16;
+  operate_params.max_maps = 18;
   operate_params.reclaiming.lifo = true;
   operate_params.reclaiming.coalesce = true;
   env_ = mdbx::env_managed(std::string(path), create_params, operate_params);
@@ -94,6 +96,8 @@ void Database::open_maps_() {
   codex_run_stdout_map_ = txn.create_map("codex_run_stdout");
   codex_run_stderr_map_ = txn.create_map("codex_run_stderr");
   codex_run_artifacts_map_ = txn.create_map("codex_run_artifacts");
+  mail_submissions_map_ = txn.create_map("mail_submissions");
+  mail_submission_n_map_ = txn.create_map("mail_submission_n");
   txn.commit();
 }
 
@@ -816,6 +820,84 @@ std::optional<std::string> Database::fetch_codex_run_artifacts(std::string_view 
   }
   auto view = slice_to_view(value);
   return std::string(view.begin(), view.end());
+}
+
+bool Database::create_mail_submission(const MailSubmission& submission) {
+  auto txn = env_.start_write();
+  auto json = db::mail_submission_to_json(submission);
+  txn.put(mail_submissions_map_, mdbx::slice(submission.id.data(), submission.id.size()),
+          mdbx::slice(json), mdbx::put_mode::insert_unique);
+  auto n_key = std::to_string(submission.n);
+  txn.put(mail_submission_n_map_, mdbx::slice(n_key.data(), n_key.size()),
+          mdbx::slice(submission.id.data(), submission.id.size()), mdbx::put_mode::insert_unique);
+  txn.commit();
+  return true;
+}
+
+std::optional<MailSubmission> Database::fetch_mail_submission(std::string_view id) {
+  auto txn = env_.start_read();
+  auto value = txn.get(mail_submissions_map_, mdbx::slice(id.data(), id.size()),
+                       mdbx::slice::invalid());
+  if (!value.is_valid()) {
+    return std::nullopt;
+  }
+  auto record = db::mail_submission_from_json(slice_to_view(value));
+  if (!record) {
+    return std::nullopt;
+  }
+  return record;
+}
+
+std::optional<MailSubmission> Database::fetch_mail_submission_by_n(std::uint64_t n) {
+  auto txn = env_.start_read();
+  auto n_key = std::to_string(n);
+  auto id_slice = txn.get(mail_submission_n_map_, mdbx::slice(n_key.data(), n_key.size()),
+                          mdbx::slice::invalid());
+  if (!id_slice.is_valid()) {
+    return std::nullopt;
+  }
+  auto id_view = slice_to_view(id_slice);
+  return fetch_mail_submission(id_view);
+}
+
+std::uint64_t Database::get_next_mail_submission_n() {
+  auto txn = env_.start_write();
+  auto next_val = txn.get(config_map_, mdbx::slice("next_mail_submission_n"),
+                          mdbx::slice::invalid());
+  std::uint64_t next_id = 1;
+  if (next_val.is_valid()) {
+    try {
+      auto next_view = slice_to_view(next_val);
+      std::string next_text(next_view.begin(), next_view.end());
+      next_id = static_cast<std::uint64_t>(std::stoull(next_text));
+    } catch (...) {
+      next_id = 1;
+    }
+  }
+  auto next_str = std::to_string(next_id + 1);
+  txn.put(config_map_, mdbx::slice("next_mail_submission_n"), mdbx::slice(next_str),
+          mdbx::put_mode::upsert);
+  txn.commit();
+  return next_id;
+}
+
+bool Database::update_mail_submission_status(std::string_view id, std::string_view status) {
+  auto txn = env_.start_write();
+  auto value = txn.get(mail_submissions_map_, mdbx::slice(id.data(), id.size()),
+                       mdbx::slice::invalid());
+  if (!value.is_valid()) {
+    return false;
+  }
+  auto record = db::mail_submission_from_json(slice_to_view(value));
+  if (!record) {
+    return false;
+  }
+  record->status = std::string(status);
+  auto json = db::mail_submission_to_json(*record);
+  txn.put(mail_submissions_map_, mdbx::slice(id.data(), id.size()),
+          mdbx::slice(json), mdbx::put_mode::upsert);
+  txn.commit();
+  return true;
 }
 
 std::optional<std::string> Database::get_config(std::string_view key) {
