@@ -22,6 +22,28 @@ std::string trim_copy(std::string_view value) {
   return std::string(value);
 }
 
+std::string normalize_key(std::string_view value) {
+  std::string out;
+  out.reserve(value.size());
+  for (unsigned char c : value) {
+    if (!std::isspace(c)) {
+      out.push_back(static_cast<char>(c));
+    }
+  }
+  return out;
+}
+
+std::string normalize_value(std::string_view value) {
+  std::string out;
+  out.reserve(value.size());
+  for (unsigned char c : value) {
+    if (c != '\n' && c != '\r') {
+      out.push_back(static_cast<char>(c));
+    }
+  }
+  return trim_copy(out);
+}
+
 bool parse_bool(std::string_view value, std::string_view label) {
   while (!value.empty() && std::isspace(static_cast<unsigned char>(value.front()))) {
     value.remove_prefix(1);
@@ -69,8 +91,8 @@ bool SystemdServiceInstaller::parse_kvp_(const std::string &kvp_string) {
       return false;
     }
 
-    std::string key = trim_copy(pair.substr(0, colon_pos));
-    std::string value = trim_copy(pair.substr(colon_pos + 1));
+    std::string key = normalize_key(pair.substr(0, colon_pos));
+    std::string value = normalize_value(pair.substr(colon_pos + 1));
 
     if (key.empty()) {
       std::cerr << ansi("✗").bright_red().bold().str() << " empty key in pair: "
