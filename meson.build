@@ -1,5 +1,5 @@
 project('neonsignal', 'cpp',
-  version : '0.2.0',  # Project version (matches neonsignal binary version)
+  version : '0.4.0',  # Project version (matches neonsignal binary version)
   default_options : [
     'cpp_std=c++23',
     'warning_level=3',
@@ -20,7 +20,7 @@ if host_machine.system() == 'darwin'
 endif
 
 # Binary versions
-neonsignal_version = '0.3.0'
+neonsignal_version = '0.4.0'
 neonsignal_redirect_version = '0.1.0'
 
 neonsignal_inc = include_directories('include')
